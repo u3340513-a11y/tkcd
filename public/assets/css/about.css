@@ -1,0 +1,972 @@
+/* ==========================================================================
+   "Hakkımızda" bölümü paylaşımlı sayfa stilleri.
+   Derneğimiz ve Anlaşmalı Kurumlar sayfalarında yüklenir.
+   Tasarım dili anasayfayla tutarlıdır: aynı token sistemi,
+   aynı degrade ve yumuşak gölge dili kullanılır.
+
+   Bölümler — Derneğimiz (da-):
+     1. Hero             (da-hero)
+     2. Kimliğimiz       (da-kimlik)
+     3. Misyon / Vizyon  (da-mv)
+     4. Temel Amaç       (da-amac)
+     5. Faaliyetler      (da-faaliyet)
+     6. Rakamlar         (da-rakamlar)
+
+   Bölümler — Anlaşmalı Kurumlar (pk-):
+     7. Hero varyantı    (da-hero--uzungol)
+     8. Avantajlar       (pk-avantaj-*)
+     9. Kategoriler      (pk-kategori-*)
+    10. Partner CTA      (pk-cta)
+   ========================================================================== */
+
+/* ============================================================
+   1. HERO
+   Anasayfa hero'suyla aynı bordo→mavi degrade dili;
+   en altta dalga SVG ile sorunsuz geçiş.
+   ============================================================ */
+
+.da-hero {
+  position: relative;
+  padding-block: clamp(4.5rem, 9vw, 7.5rem) clamp(7rem, 13vw, 10rem);
+  color: #fff;
+  overflow: hidden;
+  /*
+   * Üç katman (üstten alta):
+   *   1. Mavi ışık balonları — derinlik ve anasayfa tutarlılığı
+   *   2. Bordo→mavi yarı-saydam marka degradesi — fotoğrafı markaya bağlar
+   *   3. Trabzon (Sümela Manastırı) hero görseli
+   */
+  background-image:
+    radial-gradient(50rem 28rem at 12% -10%, rgba(75, 156, 206, 0.28), transparent 62%),
+    linear-gradient(135deg, rgba(95, 33, 50, 0.86) 0%, rgba(74, 25, 39, 0.72) 48%, rgba(22, 61, 88, 0.82) 100%),
+    url('/assets/img/trabzon-hero.webp');
+  background-size: auto, auto, cover;
+  background-position: center, center, center 35%;
+  background-repeat: no-repeat, no-repeat, no-repeat;
+}
+
+.da-hero__isik {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+}
+
+.da-hero__isik--bordo {
+  width: 28rem;
+  height: 28rem;
+  top: -12rem;
+  left: -10rem;
+  background: rgba(180, 96, 123, 0.22);
+}
+
+.da-hero__isik--mavi {
+  width: 24rem;
+  height: 24rem;
+  right: -8rem;
+  bottom: -6rem;
+  background: rgba(75, 156, 206, 0.24);
+}
+
+.da-hero__ic {
+  position: relative;
+}
+
+/* Kırıntı navigasyonu hero arka planı üzerinde doğru görünmesi için
+   app.css'deki .kirinti renk tanımları zaten beyazdır; ek bir kural gerekmez. */
+
+.da-hero__govde {
+  display: grid;
+  gap: clamp(3rem, 5vw, 4rem);
+  align-items: center;
+  margin-top: var(--bosluk-5);
+}
+
+@media (min-width: 900px) {
+  .da-hero__govde {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  }
+}
+
+.da-hero__rozet {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--bosluk-2);
+  padding: 0.4rem 0.9rem 0.4rem 0.6rem;
+  margin-bottom: var(--bosluk-5);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: var(--yuvarlak-tam);
+  background: rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  font-size: var(--olcek-xs);
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.da-hero__rozet .icon {
+  width: 15px;
+  height: 15px;
+  opacity: 0.85;
+}
+
+.da-hero__baslik {
+  font-size: var(--olcek-5xl);
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+  color: #fff;
+}
+
+/* Gradient span — bordo beyaz zemin üzerinde görünmez;
+   ters modda beyaz→açık-mavi degrade */
+.da-hero__baslik span {
+  background: linear-gradient(110deg, #fff 0%, var(--mavi-200) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.da-hero__ozet {
+  max-width: 56ch;
+  margin-top: var(--bosluk-5);
+  color: rgba(255, 255, 255, 0.82);
+  font-size: var(--olcek-lg);
+}
+
+.da-hero__eylemler {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--bosluk-4);
+  margin-top: var(--bosluk-6);
+}
+
+/* Sağ özet kutusu */
+.da-hero__kart {
+  padding: clamp(1.75rem, 3vw, 2.4rem);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: var(--yuvarlak-xl);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--golge-lg);
+}
+
+.da-hero__ozet-kutu {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(1.25rem, 2.5vw, 1.75rem);
+}
+
+.da-hero__ozet-kutu > div {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bosluk-2);
+}
+
+.da-hero__ozet-kutu dt {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.da-hero__ozet-kutu dt .icon {
+  width: 18px;
+  height: 18px;
+}
+
+.da-hero__ozet-kutu dd {
+  font-size: var(--olcek-sm);
+  font-weight: 650;
+  color: #fff;
+}
+
+/* Dalga geçiş SVG */
+.da-hero__dalga {
+  position: absolute;
+  inset: auto 0 -1px 0;
+  height: 90px;
+  color: var(--renk-zemin);
+  pointer-events: none;
+}
+
+/* ============================================================
+   2. KİMLİĞİMİZ
+   Sol: büyük başlık + prose / Sağ: 2×2 numaralı değer kartları
+   ============================================================ */
+
+.da-kimlik {
+  padding-block: var(--bolum-bosluk);
+}
+
+.da-kimlik__izgara {
+  display: grid;
+  gap: clamp(3rem, 6vw, 5rem);
+  align-items: start;
+}
+
+@media (min-width: 960px) {
+  .da-kimlik__izgara {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  }
+}
+
+.da-kimlik__baslik {
+  font-size: var(--olcek-4xl);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+/* Numaralı değer kartları ızgarası */
+.da-deger-izgara {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(0.875rem, 1.5vw, 1.25rem);
+}
+
+.da-deger-kart {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1.4rem, 2.5vw, 1.9rem);
+  border: 1px solid var(--renk-cizgi);
+  border-radius: var(--yuvarlak-xl);
+  background: var(--renk-yuzey);
+  box-shadow: var(--golge-sm);
+  transition:
+    transform var(--gecis-normal),
+    box-shadow var(--gecis-normal),
+    border-color var(--gecis-normal);
+}
+
+/* Büyük sunum numarası — su basmanlığı etkisi */
+.da-deger-kart::before {
+  content: attr(data-no);
+  position: absolute;
+  top: -1.25rem;
+  right: 0.75rem;
+  font-size: 5.5rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.06em;
+  color: var(--bordo-100);
+  pointer-events: none;
+  user-select: none;
+}
+
+.da-deger-kart:hover {
+  transform: translateY(-6px);
+  border-color: var(--bordo-200);
+  box-shadow: var(--golge-lg);
+}
+
+/* Sol kenar vurgu çizgisi hover'da görünür */
+.da-deger-kart::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  border-radius: var(--yuvarlak-tam) 0 0 var(--yuvarlak-tam);
+  background: var(--degrade-marka);
+  opacity: 0;
+  transition: opacity var(--gecis-normal);
+}
+
+.da-deger-kart:hover::after {
+  opacity: 1;
+}
+
+.da-deger-kart__ikon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: var(--bosluk-4);
+  border-radius: var(--yuvarlak-md);
+  background: linear-gradient(145deg, var(--bordo-50), var(--mavi-50));
+  color: var(--renk-marka);
+  transition: background var(--gecis-normal), color var(--gecis-normal);
+}
+
+.da-deger-kart__ikon .icon {
+  width: 22px;
+  height: 22px;
+}
+
+.da-deger-kart:hover .da-deger-kart__ikon {
+  background: var(--degrade-marka);
+  color: #fff;
+}
+
+.da-deger-kart h3 {
+  font-size: var(--olcek-base);
+  font-weight: 700;
+  color: var(--notr-900);
+}
+
+.da-deger-kart p {
+  margin-top: var(--bosluk-2);
+  font-size: var(--olcek-sm);
+  color: var(--renk-metin-yumusak);
+}
+
+/* ============================================================
+   3. MİSYON / VİZYON
+   Full-bleed markalı bölüm, asimetrik 1.4:1 sütun oranı.
+   Her kartın köşesinde dev sunum numarası.
+   ============================================================ */
+
+.da-mv {
+  position: relative;
+  padding-block: clamp(4.5rem, 8vw, 7rem);
+  overflow: hidden;
+  background:
+    radial-gradient(55rem 30rem at 20% -5%, rgba(75, 156, 206, 0.32), transparent 62%),
+    var(--degrade-marka);
+  color: #fff;
+}
+
+.da-mv__isik {
+  position: absolute;
+  inset: 0 0 auto auto;
+  width: 32rem;
+  height: 32rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  filter: blur(60px);
+  transform: translate(30%, -30%);
+  pointer-events: none;
+}
+
+.da-mv__izgara {
+  display: grid;
+  gap: clamp(1.25rem, 2.5vw, 2rem);
+}
+
+@media (min-width: 860px) {
+  .da-mv__izgara {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.da-mv-kutu {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(2rem, 4vw, 3rem);
+  border-radius: var(--yuvarlak-xl);
+  transition: transform var(--gecis-normal);
+}
+
+.da-mv-kutu:hover {
+  transform: translateY(-4px);
+}
+
+.da-mv-kutu--ana {
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.da-mv-kutu--ikincil {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+/* Sunum numaraları kaldırıldı */
+.da-mv-kutu__no {
+  display: none;
+}
+
+.da-mv-kutu__etiket {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--bosluk-2);
+  margin-bottom: var(--bosluk-4);
+  font-size: var(--olcek-xs);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.da-mv-kutu__etiket .icon {
+  width: 16px;
+  height: 16px;
+}
+
+.da-mv-kutu__baslik {
+  font-size: var(--olcek-2xl);
+  font-weight: 700;
+  line-height: 1.2;
+  color: #fff;
+  margin-bottom: var(--bosluk-4);
+}
+
+.da-mv-kutu p {
+  color: rgba(255, 255, 255, 0.84);
+  font-size: var(--olcek-base);
+  line-height: 1.7;
+}
+
+/* ============================================================
+   4. TEMEL AMAÇ — MANİFESTO
+   Ortalanmış, büyük tipografik alıntı bloğu.
+   ============================================================ */
+
+.da-amac {
+  padding-block: clamp(4.5rem, 8vw, 7rem);
+}
+
+.da-amac__ic {
+  text-align: center;
+}
+
+/* Dev tırnak işareti */
+.da-amac__tirnak {
+  display: block;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(5rem, 12vw, 9rem);
+  line-height: 0.6;
+  font-weight: 900;
+  color: var(--bordo-100);
+  margin-bottom: var(--bosluk-5);
+  user-select: none;
+}
+
+.da-amac .etiket {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--bosluk-6);
+}
+
+.da-amac__ic .etiket::before {
+  display: none;
+}
+
+/* Manifesto metni — büyük, dengeli tipografi */
+.da-amac__metin {
+  font-size: clamp(1.15rem, 2vw, 1.6rem);
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--renk-metin);
+  max-width: 76ch;
+  margin-inline: auto;
+}
+
+.da-amac__metin strong {
+  color: var(--renk-marka);
+  font-weight: 700;
+}
+
+/* ============================================================
+   5. FAALİYETLER + GALERİ
+   Sol: ikon kart listesi / Sağ: mozaik fotoğraf ızgarası
+   ============================================================ */
+
+.da-faaliyet {
+  padding-block: var(--bolum-bosluk);
+}
+
+.da-faaliyet__izgara {
+  display: grid;
+  gap: clamp(3rem, 6vw, 5rem);
+  align-items: start;
+}
+
+@media (min-width: 960px) {
+  .da-faaliyet__izgara {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+  }
+}
+
+/* Faaliyet madde listesi */
+.da-faaliyet-liste {
+  display: grid;
+  gap: var(--bosluk-3);
+  margin-top: var(--bosluk-6);
+}
+
+.da-faaliyet-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--bosluk-4);
+  align-items: start;
+  padding: clamp(1rem, 2vw, 1.35rem);
+  border: 1px solid var(--renk-cizgi);
+  border-radius: var(--yuvarlak-lg);
+  background: var(--renk-yuzey);
+  transition:
+    transform var(--gecis-normal),
+    border-color var(--gecis-normal),
+    box-shadow var(--gecis-normal);
+}
+
+.da-faaliyet-item:hover {
+  transform: translateX(6px);
+  border-color: var(--bordo-200);
+  box-shadow: var(--golge-sm);
+}
+
+.da-faaliyet-item__ikon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+  border-radius: var(--yuvarlak-md);
+  background: var(--degrade-marka);
+  color: #fff;
+  transition: transform var(--gecis-normal);
+}
+
+.da-faaliyet-item__ikon .icon {
+  width: 22px;
+  height: 22px;
+}
+
+.da-faaliyet-item:hover .da-faaliyet-item__ikon {
+  transform: scale(1.1) rotate(-5deg);
+}
+
+.da-faaliyet-item h3 {
+  font-size: var(--olcek-base);
+  font-weight: 700;
+  color: var(--notr-900);
+}
+
+.da-faaliyet-item p {
+  margin-top: 4px;
+  font-size: var(--olcek-sm);
+  color: var(--renk-metin-yumusak);
+}
+
+/* Galeri sütunu */
+.da-galeri__baslik {
+  font-size: var(--olcek-sm);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--renk-metin-silik);
+  margin-bottom: var(--bosluk-4);
+}
+
+/* Mozaik ızgara: 3 sütun; ilk görsel 2 sütun kaplar */
+.da-galeri-mozaik {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: auto;
+  gap: var(--bosluk-3);
+}
+
+.da-galeri-mozaik__oge {
+  position: relative;
+  border-radius: var(--yuvarlak-md);
+  overflow: hidden;
+  background: var(--degrade-marka);
+  transition: transform var(--gecis-normal), box-shadow var(--gecis-normal);
+  aspect-ratio: 1 / 1;
+}
+
+.da-galeri-mozaik__oge--buyuk {
+  grid-column: span 2;
+  aspect-ratio: 16 / 9;
+}
+
+.da-galeri-mozaik__oge:hover {
+  transform: scale(1.03);
+  box-shadow: var(--golge-md);
+}
+
+.da-galeri-mozaik__oge img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.da-galeri-mozaik__oge .gorsel-yedek .icon {
+  width: 28px;
+  height: 28px;
+}
+
+.da-galeri__link {
+  margin-top: var(--bosluk-5);
+  display: inline-flex;
+}
+
+/* ============================================================
+   6. RAKAMLAR
+   Karanlık markalı sayaç şeridi; üç büyük değer.
+   ============================================================ */
+
+.da-rakamlar {
+  position: relative;
+  padding-block: clamp(3.5rem, 7vw, 5.5rem);
+  overflow: hidden;
+  background:
+    radial-gradient(50rem 26rem at 10% 50%, rgba(75, 156, 206, 0.28), transparent 62%),
+    var(--degrade-marka);
+  color: #fff;
+}
+
+.da-rakamlar__isik {
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: 28rem;
+  height: 28rem;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 50%;
+  filter: blur(60px);
+  transform: translate(30%, -20%);
+  pointer-events: none;
+}
+
+.da-rakamlar__izgara {
+  display: grid;
+  gap: clamp(2rem, 4vw, 3rem);
+  justify-items: center;
+  text-align: center;
+}
+
+@media (min-width: 640px) {
+  .da-rakamlar__izgara {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.da-rakamlar__oge {
+  display: grid;
+  justify-items: center;
+  gap: 0;
+}
+
+.da-rakamlar__ikon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: var(--bosluk-4);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #fff;
+}
+
+.da-rakamlar__ikon .icon {
+  width: 26px;
+  height: 26px;
+}
+
+.da-rakamlar__deger {
+  display: block;
+  font-family: var(--yazi-baslik);
+  font-size: clamp(2.6rem, 4.5vw, 4rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+
+.da-rakamlar__etiket {
+  display: block;
+  margin-top: var(--bosluk-2);
+  font-size: var(--olcek-sm);
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.72);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ============================================================
+   7. HERO VARYANTI — Uzungöl
+   Uzungöl görselini arka plana alan .da-hero modifiyeri.
+   ============================================================ */
+
+.da-hero--uzungol {
+  background-image:
+    radial-gradient(50rem 28rem at 88% -10%, rgba(75, 156, 206, 0.3), transparent 62%),
+    linear-gradient(135deg, rgba(22, 61, 88, 0.9) 0%, rgba(38, 80, 112, 0.76) 45%, rgba(95, 33, 50, 0.84) 100%),
+    url('/assets/img/uzungol-hero.webp');
+  background-size: auto, auto, cover;
+  background-position: center, center, center 55%;
+  background-repeat: no-repeat, no-repeat, no-repeat;
+}
+
+/* Hero alt bölüm: tek sütun — metin ortalanmış */
+.pk-hero__govde {
+  display: block;
+  max-width: 72ch;
+}
+
+/* ============================================================
+   8. AVANTAJLAR
+   Üçlü kart ızgarası — beyaz arka plan bölümü.
+   ============================================================ */
+
+.pk-avantaj-izgara {
+  display: grid;
+  gap: clamp(1.25rem, 2.5vw, 2rem);
+  margin-top: clamp(2rem, 4vw, 3rem);
+}
+
+@media (min-width: 640px) {
+  .pk-avantaj-izgara {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.pk-avantaj-kart {
+  position: relative;
+  padding: clamp(1.75rem, 3vw, 2.25rem);
+  border: 1px solid var(--renk-cizgi);
+  border-radius: var(--yuvarlak-xl);
+  background: var(--renk-yuzey);
+  box-shadow: var(--golge-sm);
+  transition:
+    transform var(--gecis-normal),
+    box-shadow var(--gecis-normal),
+    border-color var(--gecis-normal);
+}
+
+.pk-avantaj-kart::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 3px;
+  border-radius: 0 0 var(--yuvarlak-xl) var(--yuvarlak-xl);
+  background: var(--degrade-marka);
+  opacity: 0;
+  transition: opacity var(--gecis-normal);
+}
+
+.pk-avantaj-kart:hover {
+  transform: translateY(-6px);
+  border-color: var(--bordo-200);
+  box-shadow: var(--golge-lg);
+}
+
+.pk-avantaj-kart:hover::after {
+  opacity: 1;
+}
+
+.pk-avantaj-kart__ikon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  margin-bottom: var(--bosluk-5);
+  border-radius: var(--yuvarlak-md);
+  background: linear-gradient(145deg, var(--bordo-50), var(--mavi-50));
+  color: var(--renk-marka);
+  transition: background var(--gecis-normal), color var(--gecis-normal), transform var(--gecis-normal);
+}
+
+.pk-avantaj-kart__ikon .icon {
+  width: 26px;
+  height: 26px;
+}
+
+.pk-avantaj-kart:hover .pk-avantaj-kart__ikon {
+  background: var(--degrade-marka);
+  color: #fff;
+  transform: scale(1.06) rotate(-4deg);
+}
+
+.pk-avantaj-kart h3 {
+  font-size: var(--olcek-xl);
+  font-weight: 700;
+  color: var(--notr-900);
+}
+
+.pk-avantaj-kart p {
+  margin-top: var(--bosluk-3);
+  font-size: var(--olcek-sm);
+  color: var(--renk-metin-yumusak);
+  line-height: 1.65;
+}
+
+/* ============================================================
+   9. KATEGORİLER
+   Altılı kart ızgarası — işaret rengiyle ikili varyant.
+   ============================================================ */
+
+.pk-kategoriler {
+  padding-block: var(--bolum-bosluk);
+}
+
+.pk-kategori-izgara {
+  display: grid;
+  gap: clamp(0.875rem, 1.5vw, 1.25rem);
+  margin-top: clamp(2rem, 4vw, 3rem);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (min-width: 640px) {
+  .pk-kategori-izgara {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 960px) {
+  .pk-kategori-izgara {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+.pk-kategori-kart {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--bosluk-3);
+  padding: clamp(1.5rem, 3vw, 2rem) clamp(1rem, 2vw, 1.5rem);
+  border: 1px solid var(--renk-cizgi);
+  border-radius: var(--yuvarlak-xl);
+  background: var(--renk-yuzey);
+  box-shadow: var(--golge-sm);
+  text-align: center;
+  transition:
+    transform var(--gecis-normal),
+    box-shadow var(--gecis-normal),
+    border-color var(--gecis-normal);
+}
+
+.pk-kategori-kart:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--golge-md);
+}
+
+.pk-kategori-kart--bordo:hover {
+  border-color: var(--bordo-200);
+}
+
+.pk-kategori-kart--mavi:hover {
+  border-color: var(--mavi-200);
+}
+
+.pk-kategori-kart__ikon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: background var(--gecis-normal), color var(--gecis-normal);
+}
+
+.pk-kategori-kart__ikon .icon {
+  width: 24px;
+  height: 24px;
+}
+
+.pk-kategori-kart--bordo .pk-kategori-kart__ikon {
+  background: var(--bordo-50);
+  color: var(--renk-marka);
+}
+
+.pk-kategori-kart--mavi .pk-kategori-kart__ikon {
+  background: var(--mavi-50);
+  color: var(--mavi-600);
+}
+
+.pk-kategori-kart:hover .pk-kategori-kart__ikon {
+  background: var(--degrade-marka);
+  color: #fff;
+}
+
+.pk-kategori-kart h3 {
+  font-size: var(--olcek-sm);
+  font-weight: 700;
+  color: var(--notr-800);
+  line-height: 1.3;
+}
+
+/* "Yakında" rozeti */
+.pk-kategori-kart__rozet {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.22rem 0.7rem;
+  border-radius: var(--yuvarlak-tam);
+  background: var(--notr-100);
+  color: var(--notr-600);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ============================================================
+   10. PARTNER CTA
+   Markalı full-bleed çağrı bölümü.
+   ============================================================ */
+
+.pk-cta {
+  position: relative;
+  padding-block: clamp(4rem, 8vw, 6.5rem);
+  overflow: hidden;
+  background:
+    radial-gradient(55rem 30rem at 85% 50%, rgba(75, 156, 206, 0.28), transparent 62%),
+    var(--degrade-marka);
+  color: #fff;
+}
+
+.pk-cta__isik {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 24rem;
+  height: 24rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  filter: blur(60px);
+  transform: translate(-30%, 10%);
+  pointer-events: none;
+}
+
+.pk-cta__ic {
+  text-align: center;
+  max-width: var(--kapsayici-dar);
+  margin-inline: auto;
+}
+
+.pk-cta__ikon {
+  display: grid;
+  place-items: center;
+  width: 68px;
+  height: 68px;
+  margin-inline: auto;
+  margin-bottom: var(--bosluk-6);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #fff;
+}
+
+.pk-cta__ikon .icon {
+  width: 30px;
+  height: 30px;
+}
+
+.pk-cta__baslik {
+  font-size: var(--olcek-3xl);
+  font-weight: 700;
+  line-height: 1.18;
+  letter-spacing: -0.025em;
+  color: #fff;
+  max-width: 56ch;
+  margin-inline: auto;
+}
+
+.pk-cta__ozet {
+  max-width: 58ch;
+  margin-inline: auto;
+  margin-top: var(--bosluk-5);
+  color: rgba(255, 255, 255, 0.82);
+  font-size: var(--olcek-lg);
+}
+
+.pk-cta__eylemler {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--bosluk-4);
+  margin-top: var(--bosluk-7);
+}

@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /storage/
+Disallow: /app/
+Disallow: /config/
+Disallow: /resources/
+
+Sitemap: https://trabzonlukamucalisanlaridernegi.com/sitemap.xml

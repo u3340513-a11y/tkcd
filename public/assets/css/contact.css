@@ -1,0 +1,359 @@
+/* ==========================================================================
+   İletişim sayfa stilleri  (kt-)
+   Tasarım dili diğer bölüm sayfalarıyla tutarlıdır.
+
+   Bölümler:
+     1. Hero           (kt-hero)
+     2. Harita         (kt-harita)
+     3. İçerik         (kt-icerik / kt-bilgi / kt-form)
+   ========================================================================== */
+
+/* ============================================================
+   1. HERO
+   ============================================================ */
+
+.kt-hero {
+  position: relative;
+  padding-block: clamp(4.5rem, 9vw, 7.5rem) clamp(5.5rem, 10vw, 8rem);
+  color: #fff;
+  overflow: hidden;
+  background-image:
+    radial-gradient(50rem 28rem at 10% -8%, rgba(75, 156, 206, 0.3), transparent 60%),
+    radial-gradient(36rem 22rem at 88% 110%, rgba(180, 96, 123, 0.22), transparent 55%),
+    linear-gradient(140deg, var(--bordo-800) 0%, var(--bordo-700) 45%, var(--mavi-800) 100%);
+}
+
+.kt-hero__ic {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--bosluk-5, 1.25rem);
+}
+
+.kt-hero .da-hero__breadcrumb {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: var(--olcek-sm);
+}
+
+.kt-hero .da-hero__breadcrumb-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--bosluk-2);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  align-items: center;
+}
+
+.kt-hero .da-hero__breadcrumb-list a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.kt-hero .da-hero__breadcrumb-list a:hover {
+  color: #fff;
+}
+
+.kt-hero__baslik {
+  font-size: var(--olcek-4xl);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin: 0;
+  color: #fff;
+}
+
+.kt-hero__alt {
+  font-size: var(--olcek-lg);
+  color: rgba(255, 255, 255, 0.72);
+  max-width: 36rem;
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* ============================================================
+   2. HARİTA
+   ============================================================ */
+
+.kt-harita {
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+  border-bottom: 3px solid var(--bordo-700);
+}
+
+.kt-harita__cerceve {
+  width: 100%;
+  height: clamp(220px, 30vw, 340px);
+  display: block;
+  border: 0;
+  filter: grayscale(15%) contrast(1.05);
+}
+
+/* ============================================================
+   3. İÇERİK
+   ============================================================ */
+
+.kt-icerik {
+  padding-block: clamp(4rem, 8vw, 6.5rem);
+  background: var(--bordo-50, #fbf4f6);
+}
+
+.kt-icerik__izgara {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: clamp(3rem, 6vw, 6rem);
+  align-items: start;
+}
+
+/* ============================================================
+   3a. İLETİŞİM BİLGİLERİ
+   ============================================================ */
+
+.kt-bilgi {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bosluk-5, 1.25rem);
+}
+
+.kt-bilgi__baslik {
+  font-size: var(--olcek-3xl);
+  font-weight: 800;
+  color: var(--bordo-800);
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.kt-bilgi__cizgi {
+  display: block;
+  width: 3.25rem;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--degrade-marka);
+}
+
+.kt-bilgi__aciklama {
+  font-size: var(--olcek-base);
+  color: #556070;
+  line-height: 1.7;
+  margin: 0;
+  max-width: 30rem;
+}
+
+.kt-bilgi__liste {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--bosluk-5, 1.25rem);
+}
+
+.kt-bilgi__satir {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--bosluk-4, 1rem);
+  font-size: var(--olcek-base);
+  color: #445060;
+  line-height: 1.55;
+}
+
+.kt-bilgi__satir a {
+  color: inherit;
+  text-decoration: none;
+  transition: color var(--gecis-hizli, 150ms ease);
+}
+
+.kt-bilgi__satir a:hover {
+  color: var(--bordo-600);
+}
+
+.kt-bilgi__ikon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: var(--yuvarlak-md, 8px);
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(74, 25, 39, 0.1);
+  color: var(--bordo-600);
+  flex-shrink: 0;
+  margin-top: 0.05rem;
+}
+
+.kt-bilgi__ikon svg {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+/* ============================================================
+   3b. FORM KUTUSU
+   ============================================================ */
+
+.kt-form-kutu {
+  background: #fff;
+  border-radius: var(--yuvarlak-xl, 1.25rem);
+  padding: clamp(2rem, 4vw, 3rem);
+  box-shadow:
+    0 1px 3px rgba(74, 25, 39, 0.06),
+    0 8px 32px rgba(74, 25, 39, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.5rem, 3vw, 2rem);
+}
+
+/* Bildirim kutuları */
+.kt-bildiri {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--bosluk-3, 0.75rem);
+  padding: var(--bosluk-4, 1rem) var(--bosluk-5, 1.25rem);
+  border-radius: var(--yuvarlak-lg, 0.75rem);
+  font-size: var(--olcek-sm);
+  line-height: 1.5;
+}
+
+.kt-bildiri svg {
+  width: 1.3rem;
+  height: 1.3rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.kt-bildiri strong {
+  display: block;
+  font-weight: 700;
+  font-size: var(--olcek-base);
+  margin-bottom: 0.15rem;
+}
+
+.kt-bildiri p {
+  margin: 0;
+  opacity: 0.85;
+}
+
+.kt-bildiri--basarili {
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.kt-bildiri--hata {
+  background: #fff1f2;
+  color: var(--bordo-700);
+  border: 1px solid var(--bordo-200);
+}
+
+/* Form elemanları */
+.kt-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bosluk-5, 1.25rem);
+}
+
+.kt-form__alan {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bosluk-2, 0.5rem);
+}
+
+.kt-form__etiket {
+  font-size: var(--olcek-sm);
+  font-weight: 600;
+  color: var(--bordo-800);
+}
+
+.kt-form__zorunlu {
+  color: var(--bordo-500);
+  margin-left: 2px;
+}
+
+.kt-form__girdi {
+  width: 100%;
+  padding: 0.65rem 0.9rem;
+  border: 1.5px solid var(--bordo-200);
+  border-radius: var(--yuvarlak-md, 8px);
+  font-size: var(--olcek-base);
+  color: var(--bordo-800);
+  background: #fff;
+  outline: none;
+  transition:
+    border-color var(--gecis-hizli, 150ms ease),
+    box-shadow var(--gecis-hizli, 150ms ease);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.kt-form__girdi::placeholder {
+  color: #9aabba;
+}
+
+.kt-form__girdi:focus {
+  border-color: var(--mavi-400);
+  box-shadow: 0 0 0 3px rgba(75, 156, 206, 0.18);
+}
+
+.kt-form__girdi:invalid:not(:placeholder-shown) {
+  border-color: var(--bordo-400);
+}
+
+.kt-form__girdi--alan {
+  resize: vertical;
+  min-height: 9rem;
+  font-family: inherit;
+}
+
+.kt-form__gonder {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--bosluk-2, 0.5rem);
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: var(--yuvarlak-md, 8px);
+  font-size: var(--olcek-base);
+  font-weight: 700;
+  color: #fff;
+  background: var(--degrade-marka);
+  cursor: pointer;
+  align-self: flex-start;
+  transition:
+    opacity var(--gecis-hizli, 150ms ease),
+    transform var(--gecis-hizli, 150ms ease),
+    box-shadow var(--gecis-hizli, 150ms ease);
+  box-shadow: 0 2px 12px rgba(95, 33, 50, 0.28);
+}
+
+.kt-form__gonder:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 18px rgba(95, 33, 50, 0.35);
+}
+
+.kt-form__gonder:active {
+  transform: translateY(0);
+}
+
+.kt-form__gonder svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 900px) {
+  .kt-icerik__izgara {
+    grid-template-columns: 1fr;
+    gap: clamp(2.5rem, 5vw, 4rem);
+  }
+}
+
+@media (max-width: 480px) {
+  .kt-form-kutu {
+    padding: 1.5rem;
+  }
+}

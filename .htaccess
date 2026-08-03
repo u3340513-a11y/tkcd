@@ -1,0 +1,32 @@
+# ---------------------------------------------------------------------------
+# Trabzonlu Kamu Çalışanları Derneği - kök dizin yapılandırması
+#
+# cPanel'de bu dizin (public_html) alan adının kök dizinidir. Uygulamanın
+# gerçek giriş noktası /public klasörüdür; app, config, resources ve storage
+# klasörleri tarayıcıdan asla erişilebilir olmamalıdır.
+# ---------------------------------------------------------------------------
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # Uygulama dizinlerine doğrudan HTTP erişimini engelle.
+    RewriteRule ^(app|config|resources|storage|images)(/|$) - [F,L]
+
+    # Nokta ile başlayan gizli dosyalara erişimi engelle (.env, .git vb.).
+    # .well-known dizini AutoSSL sertifika doğrulaması için açık kalmalıdır.
+    RewriteCond %{REQUEST_URI} !^/\.well-known/
+    RewriteRule (^|/)\. - [F,L]
+
+    # Tüm istekleri public/ önyüzüne yönlendir.
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+
+# Dizin listelemesini kapat.
+Options -Indexes
+
+# Hassas dosya uzantılarını kapat.
+<FilesMatch "\.(env|ini|log|sh|sql|md|json|lock|yml|yaml)$">
+    Require all denied
+</FilesMatch>

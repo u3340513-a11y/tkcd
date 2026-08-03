@@ -1,0 +1,345 @@
+/* ==========================================================================
+   Temsilci Ağımız sayfasına özel stiller (tm-).
+   app.css + about.css üzerine yüklenir.
+   ========================================================================== */
+
+/* ============================================================
+   HARİTA BÖLÜMÜ
+   ============================================================ */
+
+.tm-harita-bolum {
+  padding-block: var(--bolum-bosluk);
+  background:
+    radial-gradient(60rem 30rem at 12% -10%, rgba(75, 156, 206, 0.08), transparent 60%),
+    radial-gradient(50rem 26rem at 92% 8%, rgba(95, 33, 50, 0.06), transparent 62%),
+    var(--renk-zemin);
+}
+
+.tm-harita-kapsayici {
+  position: relative;
+  margin-top: clamp(2rem, 4vw, 3.5rem);
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  border: 1px solid var(--renk-cizgi);
+  border-radius: var(--yuvarlak-xl);
+  background: var(--renk-yuzey);
+  box-shadow: var(--golge-md);
+  overflow: hidden;
+}
+
+/* ============================================================
+   SVG HARİTA
+   ============================================================ */
+
+.tm-harita-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+/* Tüm iller — varsayılan görünüm */
+.tm-il {
+  fill: var(--notr-200);
+  stroke: var(--notr-0);
+  stroke-width: 1px;
+  cursor: pointer;
+  transition:
+    fill var(--gecis-hizli),
+    filter var(--gecis-hizli);
+  outline: none;
+}
+
+/* Temsilci atanmış iller — bordo ton */
+.tm-il--atanmis {
+  fill: var(--bordo-200);
+}
+
+/* Hover / focus durumları */
+.tm-il:hover,
+.tm-il:focus-visible {
+  fill: var(--renk-marka) !important;
+  filter: drop-shadow(0 2px 8px rgba(95, 33, 50, 0.45));
+}
+
+/* ============================================================
+   TOOLTIP
+   ============================================================ */
+
+.tm-tooltip {
+  position: absolute;
+  z-index: 50;
+  min-width: 190px;
+  max-width: 260px;
+  padding: 0;
+  border-radius: var(--yuvarlak-md);
+  background: var(--notr-800);
+  box-shadow: var(--golge-lg);
+  pointer-events: none;
+  user-select: none;
+  /* Küçük görünüm animasyonu */
+  opacity: 0;
+  scale: 0.94;
+  transition:
+    opacity var(--gecis-hizli),
+    scale var(--gecis-hizli);
+}
+
+.tm-tooltip[aria-hidden="false"] {
+  opacity: 1;
+  scale: 1;
+}
+
+/* Sol kırmızı kenar şeridi */
+.tm-tooltip::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  border-radius: var(--yuvarlak-md) 0 0 var(--yuvarlak-md);
+  background: var(--renk-marka);
+}
+
+/* hidden attribute'ü ezilmemesi için açık kural */
+.tm-tooltip [hidden] {
+  display: none !important;
+}
+
+.tm-tooltip__baslik {
+  padding: 0.65rem 0.9rem 0.5rem 1.1rem;
+  font-family: var(--yazi-baslik);
+  font-size: var(--olcek-base);
+  font-weight: 700;
+  color: #fff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Her bölüm (İl Başkanı / İlçe Başkanları) */
+.tm-tooltip__bolum {
+  padding: 0.5rem 0.9rem 0.6rem 1.1rem;
+}
+
+.tm-tooltip__bolum + .tm-tooltip__bolum {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.tm-tooltip__alt-baslik {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+  margin-bottom: 0.3rem;
+}
+
+.tm-tooltip__satir {
+  display: flex;
+  align-items: center;
+  gap: var(--bosluk-2);
+  font-size: var(--olcek-sm);
+  color: rgba(255, 255, 255, 0.85);
+  margin-top: 0.2rem;
+}
+
+.tm-tooltip__satir .icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.tm-tooltip__satir--temsilci .icon { color: var(--mavi-300); }
+.tm-tooltip__satir--telefon   .icon { color: var(--bordo-300); }
+
+/* İlçe listesi */
+.tm-tooltip__bolum--ilce ul {
+  display: grid;
+  gap: 0.35rem;
+  margin-top: 0.25rem;
+}
+
+.tm-tooltip__ilce-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: var(--bosluk-2);
+  row-gap: 0;
+  font-size: var(--olcek-xs);
+}
+
+.tm-tooltip__ilce-adi {
+  grid-column: 1;
+  font-weight: 700;
+  color: var(--mavi-200);
+  white-space: nowrap;
+}
+
+.tm-tooltip__ilce-adi::after {
+  content: ":";
+}
+
+.tm-tooltip__ilce-temsilci {
+  grid-column: 2;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.tm-tooltip__ilce-tel {
+  grid-column: 2;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.68rem;
+}
+
+/* Atama Bekleniyor rozeti */
+.tm-tooltip__bos {
+  display: inline-flex;
+  align-items: center;
+  margin: 0.4rem 0.9rem 0.65rem 1.1rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--yuvarlak-tam);
+  background: rgba(255, 255, 255, 0.1);
+  font-size: var(--olcek-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* ============================================================
+   HARİTA RENk AÇIKLAMASI
+   ============================================================ */
+
+.tm-harita-aciklama {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: clamp(1rem, 2.5vw, 2rem);
+  margin-top: var(--bosluk-5);
+  font-size: var(--olcek-sm);
+  color: var(--renk-metin-yumusak);
+}
+
+.tm-harita-aciklama__oge {
+  display: flex;
+  align-items: center;
+  gap: var(--bosluk-2);
+}
+
+.tm-harita-aciklama__renk {
+  display: block;
+  width: 20px;
+  height: 14px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  background: var(--renk-marka);
+}
+
+.tm-harita-aciklama__renk--bos {
+  background: var(--notr-200);
+  border: 1px solid var(--notr-300);
+}
+
+/* ============================================================
+   TEMSİLCİ LİSTESİ
+   ============================================================ */
+
+.tm-liste-bolum {
+  padding-block: var(--bolum-bosluk);
+}
+
+.tm-temsilci-izgara {
+  display: grid;
+  gap: clamp(0.875rem, 1.5vw, 1.25rem);
+  margin-top: clamp(2rem, 4vw, 3rem);
+}
+
+@media (min-width: 480px) {
+  .tm-temsilci-izgara { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (min-width: 800px) {
+  .tm-temsilci-izgara { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+.tm-temsilci-kart {
+  padding: clamp(1.25rem, 2vw, 1.6rem);
+  border: 1px solid var(--renk-cizgi);
+  border-radius: var(--yuvarlak-lg);
+  background: var(--renk-yuzey);
+  box-shadow: var(--golge-sm);
+  transition:
+    transform var(--gecis-normal),
+    box-shadow var(--gecis-normal),
+    border-color var(--gecis-normal);
+}
+
+.tm-temsilci-kart:hover {
+  transform: translateY(-4px);
+  border-color: var(--bordo-200);
+  box-shadow: var(--golge-md);
+}
+
+.tm-temsilci-kart__baslik {
+  display: flex;
+  align-items: center;
+  gap: var(--bosluk-3);
+  margin-bottom: var(--bosluk-4);
+  padding-bottom: var(--bosluk-3);
+  border-bottom: 1px solid var(--renk-cizgi);
+}
+
+/* Plaka rozeti */
+.tm-temsilci-kart__plaka {
+  display: grid;
+  place-items: center;
+  min-width: 38px;
+  height: 38px;
+  padding-inline: 6px;
+  border-radius: var(--yuvarlak-md);
+  background: var(--degrade-marka);
+  color: #fff;
+  font-size: var(--olcek-xs);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+
+.tm-temsilci-kart h3 {
+  font-size: var(--olcek-lg);
+  font-weight: 700;
+  color: var(--notr-900);
+}
+
+.tm-temsilci-kart__icerik {
+  display: grid;
+  gap: var(--bosluk-2);
+}
+
+.tm-temsilci-kart__icerik > p {
+  display: flex;
+  align-items: center;
+  gap: var(--bosluk-2);
+  font-size: var(--olcek-sm);
+  color: var(--renk-metin-yumusak);
+}
+
+.tm-temsilci-kart__icerik .icon {
+  width: 15px;
+  height: 15px;
+  color: var(--renk-marka);
+  flex-shrink: 0;
+}
+
+.tm-temsilci-kart__icerik a {
+  color: var(--renk-metin-yumusak);
+  text-decoration: none;
+}
+
+.tm-temsilci-kart__icerik a:hover {
+  color: var(--renk-marka);
+}
+
+/* ============================================================
+   MOBİL UYUMLULUK
+   ============================================================ */
+
+@media (max-width: 640px) {
+  .tm-harita-kapsayici {
+    padding: var(--bosluk-4);
+  }
+}

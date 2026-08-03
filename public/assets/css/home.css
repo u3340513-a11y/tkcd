@@ -1,0 +1,1075 @@
+/* ==========================================================================
+   Anasayfaya özel bölüm stilleri.
+   Yalnızca anasayfada yüklenir; diğer sayfaların ilk boyama süresi etkilenmez.
+   ========================================================================== */
+
+/* ------------------------------- Kahraman -------------------------------- */
+
+/* Kahraman bölümü ile altındaki "Son Duyurular" şeridini birlikte kapsar;
+   her ekran boyutunda görünür alanın tamamını doldurur. Kahraman içeriği
+   esneyerek şeridi ekranın alt kenarına yaslar; içerik ekrana sığmadığında
+   (örn. küçük cihazlar) alan doğal olarak uzar, taşma yaşanmaz. */
+.kahraman-alani {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - var(--baslik-yukseklik));
+  min-height: calc(100svh - var(--baslik-yukseklik));
+}
+
+.kahraman {
+  position: relative;
+  /* Üst kapsayıcının (.kahraman-alani) tam ekran yüksekliğini dolduracak
+     şekilde esner; duyuru şeridi bu sayede ekranın altında konumlanır. */
+  flex: 1 1 auto;
+  padding-block: clamp(2.75rem, 6vw, 5.5rem) clamp(3rem, 6vw, 5rem);
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  background:
+    radial-gradient(46rem 26rem at 8% 0%, rgba(95, 33, 50, 0.06), transparent 62%),
+    radial-gradient(40rem 24rem at 96% 18%, rgba(75, 156, 206, 0.12), transparent 60%),
+    linear-gradient(180deg, var(--notr-0) 0%, var(--renk-zemin) 100%);
+}
+
+/* Logodaki dalga motifinden esinlenen dekoratif zemin deseni */
+.kahraman__desen {
+  position: absolute;
+  inset: auto 0 -2px 0;
+  height: 180px;
+  color: var(--mavi-200);
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.kahraman__isik {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  pointer-events: none;
+  animation: yuzen 16s ease-in-out infinite;
+}
+
+.kahraman__isik--bordo {
+  width: 22rem;
+  height: 22rem;
+  top: -9rem;
+  left: -9rem;
+  background: rgba(180, 96, 123, 0.16);
+}
+
+.kahraman__isik--mavi {
+  width: 20rem;
+  height: 20rem;
+  right: -7rem;
+  bottom: -5rem;
+  background: rgba(75, 156, 206, 0.18);
+  animation-delay: -6s;
+}
+
+@keyframes yuzen {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(1.5rem, -1.75rem, 0) scale(1.08); }
+}
+
+.kahraman__izgara {
+  position: relative;
+  display: grid;
+  gap: clamp(2.5rem, 5vw, 3.5rem);
+  align-items: center;
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .kahraman__izgara {
+    grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
+  }
+}
+
+.kahraman__rozet {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--bosluk-2);
+  padding: 0.4rem 0.5rem 0.4rem 0.4rem;
+  border: 1px solid var(--renk-cizgi);
+  border-radius: var(--yuvarlak-tam);
+  background: rgba(255, 255, 255, 0.75);
+  box-shadow: var(--golge-xs);
+  font-size: var(--olcek-xs);
+  font-weight: 600;
+  color: var(--renk-metin-yumusak);
+}
+
+.kahraman__rozet strong {
+  padding: 0.2rem 0.65rem;
+  border-radius: var(--yuvarlak-tam);
+  background: var(--degrade-marka);
+  color: #fff;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.kahraman__baslik {
+  margin-top: var(--bosluk-5);
+  font-size: var(--olcek-5xl);
+  letter-spacing: -0.03em;
+}
+
+.kahraman__baslik span {
+  background: var(--degrade-metin);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.kahraman__ozet {
+  max-width: 60ch;
+  margin-top: var(--bosluk-5);
+  color: var(--renk-metin-yumusak);
+  font-size: var(--olcek-lg);
+}
+
+.kahraman__eylemler {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--bosluk-4);
+  margin-top: var(--bosluk-6);
+}
+
+/* Sayaçlar */
+.sayac-izgara {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--bosluk-5);
+  margin-top: clamp(2.25rem, 4vw, 3rem);
+  padding-top: clamp(1.75rem, 3vw, 2.25rem);
+  border-top: 1px solid var(--renk-cizgi);
+}
+
+@media (min-width: 560px) {
+  .sayac-izgara { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+.sayac {
+  display: grid;
+  gap: 2px;
+}
+
+.sayac__ikon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  margin-bottom: var(--bosluk-2);
+  border-radius: var(--yuvarlak-sm);
+  background: var(--bordo-50);
+  color: var(--renk-marka);
+}
+
+.sayac__ikon .icon {
+  width: 20px;
+  height: 20px;
+}
+
+.sayac__deger {
+  font-family: var(--yazi-baslik);
+  font-size: clamp(1.6rem, 2.6vw, 2.2rem);
+  font-weight: 750;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: var(--renk-marka);
+  font-variant-numeric: tabular-nums;
+}
+
+.sayac__etiket {
+  font-size: var(--olcek-sm);
+  color: var(--renk-metin-silik);
+}
+
+/* Kahraman kartı */
+.kahraman__kart {
+  position: relative;
+  padding: var(--bosluk-5);
+  border: 1px solid var(--renk-cizgi);
+  border-radius: var(--yuvarlak-xl);
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: var(--golge-lg);
+}
+
+.kahraman__kart::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--degrade-marka);
+  opacity: 0.35;
+}
+
+.kahraman__gorsel {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  border-radius: var(--yuvarlak-lg);
+  overflow: hidden;
+  background: var(--degrade-marka);
+}
+
+.kahraman__gorsel img {
+  width: 100%;
+  height: 100%;
+  /* "contain" kullanılır: kart görseli marka renklerini taşıyan bir tanıtım
+     infografiği olduğundan "cover" ile kırpılması üstteki logo/bayrak ve
+     alttaki iletişim şeridi gibi önemli bilgilerin kaybolmasına yol açardı. */
+  object-fit: contain;
+}
+
+.kahraman__kart h2 {
+  margin-top: var(--bosluk-5);
+  font-size: var(--olcek-2xl);
+}
+
+.kahraman__kart p {
+  margin-top: var(--bosluk-3);
+  color: var(--renk-metin-yumusak);
+  font-size: var(--olcek-sm);
+}
+
+.kahraman__degerler {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--bosluk-3);
+  margin-top: var(--bosluk-5);
+  padding-top: var(--bosluk-4);
+  border-top: 1px solid var(--renk-cizgi);
+  font-size: var(--olcek-sm);
+  font-weight: 650;
+  color: var(--renk-marka);
+}
+
+.kahraman__degerler .icon {
+  width: 18px;
+  height: 18px;
+  color: var(--mavi-400);
+}
+
+/* --------------------------- Duyuru şeridi ------------------------------- */
+
+.duyuru-serit {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  background: var(--renk-yuzey);
+  border-block: 1px solid var(--renk-cizgi);
+  overflow: hidden;
+}
+
+.duyuru-serit__etiket {
+  display: none;
+  align-items: center;
+  gap: var(--bosluk-2);
+  padding-inline: clamp(1rem, 3vw, 1.75rem);
+  background: var(--degrade-marka);
+  color: #fff;
+  font-size: var(--olcek-xs);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.duyuru-serit__etiket .icon {
+  width: 17px;
+  height: 17px;
+}
+
+@media (min-width: 560px) {
+  .duyuru-serit__etiket { display: flex; }
+}
+
+.duyuru-serit__pencere {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+}
+
+.duyuru-serit__akis {
+  display: flex;
+  width: max-content;
+  padding-block: 0.9rem;
+  animation: kayan-serit 46s linear infinite;
+}
+
+.duyuru-serit:hover .duyuru-serit__akis,
+.duyuru-serit:focus-within .duyuru-serit__akis {
+  animation-play-state: paused;
+}
+
+@keyframes kayan-serit {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+
+.duyuru-serit__grup {
+  display: flex;
+  align-items: center;
+}
+
+.duyuru-serit__oge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--bosluk-3);
+  padding-inline: var(--bosluk-5);
+  font-size: var(--olcek-sm);
+  color: var(--renk-metin-yumusak);
+  white-space: nowrap;
+}
+
+.duyuru-serit__oge strong {
+  color: var(--renk-metin);
+  font-weight: 650;
+}
+
+.duyuru-serit__oge::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--mavi-400);
+}
+
+.duyuru-serit__oge--vurgulu::before {
+  background: var(--bordo-500);
+}
+
+/* ------------------------------- Medya ----------------------------------- */
+
+.medya {
+  position: relative;
+  isolation: isolate;
+  padding-block: clamp(4rem, 9vw, 7.5rem);
+  /* Video yüklenemezse veya JavaScript kapalıysa görünen nihai zemin */
+  background:
+    radial-gradient(50rem 26rem at 20% 0%, rgba(75, 156, 206, 0.32), transparent 62%),
+    var(--degrade-marka);
+  color: #fff;
+  overflow: hidden;
+}
+
+/* Arka planda oynatılan tanıtım videosu (bkz. app.js -> tanitimVideosu) */
+.medya__arkaplan {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background: var(--notr-900);
+}
+
+.medya__arkaplan iframe {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100vw;
+  height: 56.25vw;
+  min-width: 177.78vh;
+  min-height: 100%;
+  border: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+/* Video üzerinde metin okunabilirliği için marka renkli yarı saydam katman */
+.medya__katman {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(50rem 26rem at 20% 0%, rgba(75, 156, 206, 0.35), transparent 62%),
+    linear-gradient(135deg, rgba(95, 33, 50, 0.85) 0%, rgba(74, 25, 39, 0.82) 55%, rgba(36, 102, 145, 0.85) 100%);
+}
+
+.medya__desen {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.16;
+  color: #fff;
+}
+
+.medya__icerik {
+  max-width: 780px;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.medya h2 {
+  color: #fff;
+  font-size: var(--olcek-4xl);
+}
+
+.medya p {
+  margin-top: var(--bosluk-4);
+  color: var(--renk-ters-metin);
+  font-size: var(--olcek-lg);
+}
+
+.medya__oynat {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 84px;
+  height: 84px;
+  margin-bottom: var(--bosluk-5);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  transition: transform var(--gecis-normal), background var(--gecis-normal);
+}
+
+.medya__oynat::after {
+  content: "";
+  position: absolute;
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  animation: nabiz 2.6s ease-out infinite;
+}
+
+.medya__oynat .icon {
+  width: 30px;
+  height: 30px;
+  margin-left: 4px;
+}
+
+.medya__oynat:hover {
+  background: rgba(255, 255, 255, 0.24);
+  transform: scale(1.06);
+}
+
+@keyframes nabiz {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(1.7); opacity: 0; }
+}
+
+.medya__eylem {
+  margin-top: clamp(2rem, 4vw, 2.75rem);
+}
+
+/* ------------------------------ Hakkımızda ------------------------------- */
+
+.hakkinda__izgara {
+  display: grid;
+  gap: clamp(2rem, 4vw, 3rem);
+  align-items: center;
+}
+
+@media (min-width: 900px) {
+  .hakkinda__izgara { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); }
+}
+
+.hakkinda__gorsel {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--yuvarlak-xl);
+  overflow: hidden;
+  box-shadow: var(--golge-lg);
+  background: var(--degrade-marka);
+}
+
+.hakkinda__gorsel img {
+  width: 100%;
+  height: 100%;
+  /* "cover" her iki yüzde de kesilmesine yol açarken "contain" görseli
+     tamamen gösterir; beraberinde verilen object-position değeri, dikey
+     görselin kart içinde yatay ve dikey eksende tam ortalanmasını garanti
+     eder. */
+  object-fit: contain;
+  object-position: center;
+}
+
+.hakkinda__panel {
+  padding: clamp(1.6rem, 3vw, 2.4rem);
+  border: 1px solid var(--renk-cizgi);
+  border-radius: var(--yuvarlak-xl);
+  background: var(--renk-yuzey);
+  box-shadow: var(--golge-md);
+}
+
+.hakkinda__panel > p {
+  color: var(--renk-metin-yumusak);
+}
+
+.hakkinda__baglanti {
+  margin-top: var(--bosluk-5);
+}
+
+.hakkinda__ikili {
+  display: grid;
+  gap: var(--bosluk-4);
+  margin-top: var(--bosluk-5);
+}
+
+@media (min-width: 520px) {
+  .hakkinda__ikili { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.mini-kart {
+  padding: var(--bosluk-4);
+  border: 1px solid var(--renk-cizgi);
+  border-radius: var(--yuvarlak-md);
+  background: var(--degrade-yumusak);
+  transition: border-color var(--gecis-normal), transform var(--gecis-normal);
+}
+
+.mini-kart:hover {
+  transform: translateY(-4px);
+  border-color: var(--bordo-200);
+}
+
+.mini-kart__ikon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  margin-bottom: var(--bosluk-3);
+  border-radius: var(--yuvarlak-sm);
+  background: var(--degrade-marka);
+  color: #fff;
+}
+
+.mini-kart__ikon .icon {
+  width: 21px;
+  height: 21px;
+}
+
+.mini-kart h4 {
+  font-size: var(--olcek-base);
+  font-weight: 700;
+}
+
+.mini-kart p {
+  margin-top: 6px;
+  color: var(--renk-metin-silik);
+  font-size: var(--olcek-sm);
+}
+
+/* ------------------------------ Etkinlikler ------------------------------ */
+
+.etkinlik-kart {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border: 1px solid var(--renk-cizgi);
+  border-radius: var(--yuvarlak-lg);
+  background: var(--renk-yuzey);
+  overflow: hidden;
+  box-shadow: var(--golge-sm);
+  transition: transform var(--gecis-normal), box-shadow var(--gecis-normal), border-color var(--gecis-normal);
+}
+
+.etkinlik-kart:hover {
+  transform: translateY(-6px);
+  border-color: var(--bordo-200);
+  box-shadow: var(--golge-lg);
+}
+
+.etkinlik-kart__medya {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: var(--degrade-marka);
+}
+
+.etkinlik-kart__medya img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--gecis-yumusak);
+}
+
+.etkinlik-kart:hover .etkinlik-kart__medya img {
+  transform: scale(1.06);
+}
+
+.etkinlik-kart__rozet {
+  position: absolute;
+  top: var(--bosluk-3);
+  left: var(--bosluk-3);
+  padding: 0.3rem 0.7rem;
+  border-radius: var(--yuvarlak-tam);
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--renk-marka);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.etkinlik-kart__govde {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: var(--bosluk-3);
+  padding: clamp(1.25rem, 2vw, 1.6rem);
+}
+
+.etkinlik-kart__tarih {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--renk-metin-silik);
+  font-size: var(--olcek-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.etkinlik-kart__tarih .icon {
+  width: 15px;
+  height: 15px;
+}
+
+.etkinlik-kart h3 {
+  font-size: var(--olcek-xl);
+}
+
+.etkinlik-kart p {
+  flex: 1;
+  color: var(--renk-metin-yumusak);
+  font-size: var(--olcek-sm);
+}
+
+.etkinlik-kart__alt {
+  padding-top: var(--bosluk-3);
+  border-top: 1px solid var(--renk-cizgi);
+}
+
+/* ------------------------------- İlçeler --------------------------------- */
+
+.ilce__izgara {
+  display: grid;
+  gap: clamp(2rem, 4vw, 3rem);
+  align-items: start;
+}
+
+@media (min-width: 900px) {
+  .ilce__izgara { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); }
+}
+
+/* Etkileşimli harita */
+.trabzon-harita {
+  position: relative;
+  padding: clamp(1rem, 3vw, 2rem);
+  border: 1px solid var(--renk-cizgi);
+  border-radius: var(--yuvarlak-xl);
+  background:
+    radial-gradient(30rem 18rem at 8% 0%, rgba(75, 156, 206, 0.1), transparent 62%),
+    var(--renk-yuzey);
+  box-shadow: var(--golge-md);
+}
+
+.trabzon-harita__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.trabzon-harita__ilce {
+  fill: var(--notr-300);
+  stroke: var(--renk-yuzey);
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+  cursor: pointer;
+  transition: fill var(--gecis-hizli), filter var(--gecis-hizli);
+}
+
+.trabzon-harita__ilce:hover,
+.trabzon-harita__ilce:focus-visible {
+  fill: var(--mavi-500);
+  filter: drop-shadow(0 6px 10px rgba(36, 102, 145, 0.35));
+  outline: none;
+}
+
+.trabzon-harita__ilce--aktif {
+  fill: var(--bordo-600);
+  filter: drop-shadow(0 6px 12px rgba(74, 25, 39, 0.4));
+}
+
+.trabzon-harita__ilce--merkez {
+  stroke: var(--renk-marka);
+  stroke-width: 2.6;
+}
+
+.trabzon-harita__etiket {
+  position: absolute;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  transform: translate(-50%, -120%);
+  border-radius: var(--yuvarlak-tam);
+  background: var(--degrade-marka);
+  color: #fff;
+  font-size: var(--olcek-xs);
+  font-weight: 700;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: var(--golge-md);
+}
+
+.trabzon-harita__etiket::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border: 5px solid transparent;
+  border-top-color: var(--bordo-500);
+  transform: translateX(-50%);
+}
+
+/* Hızlı seçim listesi */
+.ilce-yardimci {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bosluk-4);
+}
+
+.ilce-yardimci__metin {
+  color: var(--renk-metin-yumusak);
+}
+
+.ilce-liste {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--bosluk-3);
+}
+
+.ilce-dugme {
+  padding: 0.6rem 1.05rem;
+  border: 1px solid var(--renk-cizgi);
+  border-radius: var(--yuvarlak-tam);
+  background: var(--renk-yuzey);
+  color: var(--renk-metin-yumusak);
+  font-size: var(--olcek-sm);
+  font-weight: 600;
+  transition: all var(--gecis-hizli);
+}
+
+.ilce-dugme:hover,
+.ilce-dugme:focus-visible,
+.ilce-dugme--aktif {
+  border-color: transparent;
+  background: var(--degrade-marka);
+  color: #fff;
+  box-shadow: var(--golge-marka);
+  transform: translateY(-2px);
+  outline: none;
+}
+
+.ilce-dugme--merkez::after {
+  content: "Merkez";
+  margin-left: 8px;
+  padding: 0.1rem 0.45rem;
+  border-radius: var(--yuvarlak-tam);
+  background: var(--mavi-50);
+  color: var(--mavi-600);
+  font-size: 0.66rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.ilce-dugme--merkez:hover::after,
+.ilce-dugme--merkez:focus-visible::after,
+.ilce-dugme--merkez.ilce-dugme--aktif::after {
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
+
+/* İlçe bilgi modalı
+   Not: Görsel stil kasıtlı olarak <dialog> öğesinin kendisine değil, içindeki
+   .ilce-modal__panel'e uygulanır. Böylece "event.target === dialog" kontrolü
+   yalnızca gerçek arka plan (backdrop) tıklamalarında true olur; panel
+   içindeki dolgu alanına tıklamak modalı yanlışlıkla kapatmaz. */
+.ilce-modal {
+  /* Genel sıfırlama kuralı (app.css `* { margin: 0 }`) tarayıcının yerleşik
+     dialog ortalama davranışını (margin: auto) geçersiz kıldığı için burada
+     açıkça yeniden tanımlanır. */
+  margin: auto;
+  max-width: none;
+  padding: 0;
+  border: none;
+  background: transparent;
+  overflow: visible;
+}
+
+.ilce-modal::backdrop {
+  background: rgba(38, 45, 61, 0.55);
+  backdrop-filter: blur(2px);
+}
+
+.ilce-modal__panel {
+  position: relative;
+  width: min(420px, calc(100vw - 2.5rem));
+  padding: clamp(1.75rem, 4vw, 2.25rem);
+  border-radius: var(--yuvarlak-xl);
+  background: var(--renk-yuzey);
+  box-shadow: var(--golge-lg);
+  opacity: 0;
+  transform: translateY(10px) scale(0.98);
+  transition: opacity var(--gecis-normal), transform var(--gecis-normal);
+}
+
+.ilce-modal.ilce-modal--gorunur .ilce-modal__panel {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ilce-modal__panel {
+    transition: none;
+  }
+}
+
+.ilce-modal__kapat {
+  position: absolute;
+  top: 1.1rem;
+  right: 1.1rem;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--renk-yuzey-alt);
+  color: var(--renk-metin-yumusak);
+  transition: all var(--gecis-hizli);
+}
+
+.ilce-modal__kapat:hover {
+  background: var(--bordo-50);
+  color: var(--renk-marka);
+}
+
+.ilce-modal__kapat .icon {
+  width: 16px;
+  height: 16px;
+}
+
+.ilce-modal__ikon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  margin-bottom: var(--bosluk-4);
+  border-radius: var(--yuvarlak-md);
+  background: var(--degrade-marka);
+  color: #fff;
+}
+
+.ilce-modal__ikon .icon {
+  width: 26px;
+  height: 26px;
+}
+
+.ilce-modal__etiket {
+  color: var(--renk-vurgu-koyu);
+  font-size: var(--olcek-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ilce-modal h3 {
+  margin-top: 0.35rem;
+  font-size: var(--olcek-2xl);
+}
+
+.ilce-modal__aciklama {
+  margin-top: var(--bosluk-3);
+  color: var(--renk-metin-yumusak);
+}
+
+/* ------------------------------- Tarihçe --------------------------------- */
+
+.zaman-cizelgesi {
+  position: relative;
+  display: grid;
+  gap: clamp(1.5rem, 3vw, 2.25rem);
+  padding-left: 2rem;
+}
+
+.zaman-cizelgesi::before {
+  content: "";
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: 7px;
+  width: 2px;
+  border-radius: var(--yuvarlak-tam);
+  background: linear-gradient(180deg, var(--bordo-300), var(--mavi-300));
+}
+
+.zaman-durak {
+  position: relative;
+}
+
+.zaman-durak::before {
+  content: "";
+  position: absolute;
+  top: 7px;
+  left: -2rem;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 3px solid var(--renk-yuzey);
+  background: var(--degrade-marka);
+  box-shadow: 0 0 0 2px var(--bordo-200);
+}
+
+.zaman-durak__donem {
+  display: inline-block;
+  margin-bottom: 6px;
+  padding: 0.2rem 0.7rem;
+  border-radius: var(--yuvarlak-tam);
+  background: var(--bordo-50);
+  color: var(--renk-marka);
+  font-size: var(--olcek-xs);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.zaman-durak h3 {
+  font-size: var(--olcek-xl);
+}
+
+.zaman-durak p {
+  margin-top: 6px;
+  color: var(--renk-metin-yumusak);
+  font-size: var(--olcek-sm);
+}
+
+/* Masaüstünde duraklar merkez çizginin iki yanında dönüşümlü sıralanır.
+   Tek sütunlu ızgara korunarak her durağın kendi satırında kalması ve
+   sayısı değişse bile düzenin bozulmaması sağlanır. */
+@media (min-width: 860px) {
+  .zaman-cizelgesi {
+    padding-left: 0;
+  }
+
+  .zaman-cizelgesi::before {
+    left: 50%;
+    translate: -50% 0;
+  }
+
+  .zaman-durak {
+    width: calc(50% - 2.5rem);
+    text-align: right;
+  }
+
+  .zaman-durak::before {
+    left: auto;
+    right: calc(-2.5rem - 8px);
+  }
+
+  .zaman-durak:nth-child(even) {
+    margin-left: auto;
+    text-align: left;
+  }
+
+  .zaman-durak:nth-child(even)::before {
+    right: auto;
+    left: calc(-2.5rem - 8px);
+  }
+}
+
+/* ----------------------------- Sosyal çağrı ------------------------------ */
+
+.sosyal-cagri__izgara {
+  display: grid;
+  gap: clamp(2rem, 4vw, 3rem);
+  align-items: center;
+}
+
+@media (min-width: 780px) {
+  .sosyal-cagri__izgara { grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); }
+}
+
+.sosyal-kutu-izgara {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--bosluk-4);
+  max-width: 320px;
+}
+
+.sosyal-kutu-izgara > li {
+  display: flex;
+}
+
+.sosyal-kutu {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--bosluk-3);
+  padding: var(--bosluk-4);
+  border: 1px solid var(--renk-cizgi);
+  border-radius: var(--yuvarlak-md);
+  background: var(--renk-yuzey);
+  color: var(--renk-metin);
+  font-size: var(--olcek-sm);
+  font-weight: 650;
+  box-shadow: var(--golge-sm);
+  transition: transform var(--gecis-normal), box-shadow var(--gecis-normal), color var(--gecis-normal);
+}
+
+.sosyal-kutu .icon {
+  width: 22px;
+  height: 22px;
+  color: var(--renk-marka);
+  transition: color var(--gecis-normal);
+}
+
+.sosyal-kutu:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--golge-md);
+  color: var(--renk-marka);
+}
+
+/* --------------------------- Üyelik çağrı bandı -------------------------- */
+
+.uyelik-bant {
+  position: relative;
+  display: grid;
+  gap: var(--bosluk-5);
+  align-items: center;
+  padding: clamp(2rem, 4vw, 3.25rem);
+  border-radius: var(--yuvarlak-xl);
+  background:
+    radial-gradient(30rem 16rem at 100% 0%, rgba(75, 156, 206, 0.35), transparent 62%),
+    var(--degrade-marka);
+  color: #fff;
+  box-shadow: var(--golge-lg);
+  overflow: hidden;
+}
+
+@media (min-width: 780px) {
+  .uyelik-bant { grid-template-columns: minmax(0, 1fr) auto; }
+}
+
+.uyelik-bant h2 {
+  color: #fff;
+  font-size: var(--olcek-3xl);
+}
+
+.uyelik-bant p {
+  margin-top: var(--bosluk-3);
+  color: var(--renk-ters-metin);
+  max-width: 58ch;
+}
