@@ -16,7 +16,7 @@ return [
         'summary' => 'Birlik ve beraberliğimizi güçlendireceğimiz sıcak bir buluşma.',
         'category' => 'Buluşma',
         'published_at' => '2026-07-20',
-        'image' => '/assets/img/events/hemsehri-bulusmasi.jpg',
+        'image' => '/assets/img/events/sumela.jpg',
         'image_alt' => 'Hemşehri buluşması kahvaltı programında bir araya gelen üyelerimiz',
         'icon' => 'handshake',
         'body' => [
@@ -36,7 +36,7 @@ return [
         'summary' => 'Gelenekten geleceğe uzanan horon kültürünü birlikte öğreniyor ve yaşatıyoruz.',
         'category' => 'Kültür',
         'published_at' => '2026-07-05',
-        'image' => '/assets/img/events/horon.jpg',
+        'image' => '/assets/img/events/sumela.jpg',
         'image_alt' => 'Sahnede horon oynayan Trabzon halk oyunları ekibi',
         'icon' => 'horon',
         'body' => [
@@ -55,7 +55,7 @@ return [
         'summary' => 'Üyelerimizi ve ailelerini bir araya getiren sosyal piknik etkinliğimiz düzenleniyor.',
         'category' => 'Sosyal',
         'published_at' => '2026-06-18',
-        'image' => '/assets/img/events/piknik.jpg',
+        'image' => '/assets/img/events/sumela.jpg',
         'image_alt' => 'Doğada kurulan piknik sofrası ve bir araya gelen aileler',
         'icon' => 'leaf',
         'body' => [
