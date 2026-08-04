@@ -98,6 +98,9 @@ $toplamCount  = 81;
         <div class="tm-harita-kapsayici" role="region" aria-label="Türkiye temsilci ağı haritası">
             <!-- İl tooltip'i — JS ile konumlandırılır -->
             <div class="tm-tooltip" id="tm-tooltip" role="tooltip" aria-hidden="true" hidden>
+                <button type="button" class="tm-tooltip__kapat" id="tm-tooltip-kapat" aria-label="Kapat">
+                    <?= $view->icon('close') ?>
+                </button>
                 <div class="tm-tooltip__baslik" id="tm-tooltip-il"></div>
 
                 <!-- İl Başkanı -->
@@ -113,11 +116,12 @@ $toplamCount  = 81;
                     </p>
                 </div>
 
-                <!-- İlçe Başkanları -->
+                <!-- İlçe Başkanları — GEÇİCİ OLARAK DEVRE DIŞI
                 <div class="tm-tooltip__bolum tm-tooltip__bolum--ilce" id="tm-tt-ilce-bolum" hidden>
                     <p class="tm-tooltip__alt-baslik">İlçe Başkanları</p>
                     <ul id="tm-tt-ilceler"></ul>
                 </div>
+                -->
 
                 <!-- Hiç atama yoksa -->
                 <p class="tm-tooltip__bos" id="tm-tooltip-bos" hidden>Atama Bekleniyor</p>

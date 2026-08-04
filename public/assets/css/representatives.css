@@ -104,6 +104,11 @@
   display: none !important;
 }
 
+/* Mobilde JS ile açılan kapat düğmesi; masaüstünde gizli. */
+.tm-tooltip__kapat {
+  display: none;
+}
+
 .tm-tooltip__baslik {
   padding: 0.65rem 0.9rem 0.5rem 1.1rem;
   font-family: var(--yazi-baslik);
@@ -342,4 +347,52 @@
   .tm-harita-kapsayici {
     padding: var(--bosluk-4);
   }
+
+  /*
+   * Dokunmatik cihazlarda tooltip, harita üzerinde parmağın konumuna göre
+   * absolute konumlandırılınca üst kapsayıcının overflow:hidden'ı yüzünden
+   * kırpılabiliyor (özellikle ilçe başkanları listesi uzun olduğunda) ve
+   * kullanıcı görebilmek için sayfayı zor bir şekilde kaydırmak zorunda
+   * kalıyordu. Mobilde tooltip'i ekrana sabitlenmiş, kendi içinde kaydırılabilir
+   * bir alt panele dönüştürüyoruz; böylece hangi ile dokunulursa dokunulsun
+   * tüm içerik (il ve ilçe başkanları) her zaman tam görünür.
+   */
+  .tm-tooltip {
+    position: fixed;
+    left: var(--bosluk-3);
+    right: var(--bosluk-3);
+    bottom: var(--bosluk-3);
+    top: auto !important;
+    min-width: 0;
+    max-width: none;
+    max-height: min(60vh, 420px);
+    overflow-y: auto;
+    pointer-events: auto;
+    z-index: 200;
+  }
+
+  .tm-tooltip__kapat {
+    display: grid;
+    place-items: center;
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 28px;
+    height: 28px;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.85);
+    cursor: pointer;
+  }
+
+  .tm-tooltip__kapat .icon {
+    width: 14px;
+    height: 14px;
+  }
+
+  .tm-tooltip__baslik {
+    padding-right: 2.5rem;
+  }
 }
+

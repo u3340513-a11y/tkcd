@@ -36,11 +36,20 @@
   const elTemsilci     = document.getElementById('tm-tooltip-temsilci');
   const elTelefon      = document.getElementById('tm-tooltip-telefon');
   const elTelefonSatir = document.getElementById('tm-tt-il-telefon-satir');
-  const elIlceBolum    = document.getElementById('tm-tt-ilce-bolum');
-  const elIlceListe    = document.getElementById('tm-tt-ilceler');
+  // İlçe elementleri GEÇİCİ OLARAK DEVRE DIŞI — HTML yorum satırında
+  const elIlceBolum    = document.getElementById('tm-tt-ilce-bolum');  // null olabilir
+  const elIlceListe    = document.getElementById('tm-tt-ilceler');      // null olabilir
   const elBos          = document.getElementById('tm-tooltip-bos');
+  const elKapat        = document.getElementById('tm-tooltip-kapat');
 
-  if (!elIl || !elIlBolum || !elTemsilci || !elIlceBolum || !elIlceListe || !elBos) return;
+  if (!elIl || !elIlBolum || !elTemsilci || !elBos) return;
+
+  /** Dar ekranlarda tooltip, CSS ile ekrana sabitlenmiş bir alt panele döner;
+   *  bu durumda JS'in fare konumuna göre hesapladığı left/top değerleri
+   *  uygulanmamalı (CSS bottom/left/right geçerli olmalı). */
+  const dar = function () {
+    return window.matchMedia('(max-width: 640px)').matches;
+  };
 
   /**
    * Tooltip içeriğini plateDan gelen veriye göre doldurur.
@@ -72,40 +81,45 @@
       elIlBolum.hidden = true;
     }
 
-    /* İlçe Başkanları bölümü */
-    if (varIlce) {
-      elIlceListe.innerHTML = '';
-      ilceler.forEach(function (ilce) {
-        const li = document.createElement('li');
-        li.className = 'tm-tooltip__ilce-item';
+    /* İlçe Başkanları bölümü — GEÇİCİ OLARAK DEVRE DIŞI
+     * HTML elementi yorum satırında olduğundan render edilmiyor.
+     * Geri almak için representatives.php'deki HTML yorumunu ve
+     * bu bloğu eski haline döndürmek yeterli. */
+    if (elIlceBolum && elIlceListe) {
+      if (varIlce) {
+        elIlceListe.innerHTML = '';
+        ilceler.forEach(function (ilce) {
+          const li = document.createElement('li');
+          li.className = 'tm-tooltip__ilce-item';
 
-        const ilceAdi = document.createElement('span');
-        ilceAdi.className = 'tm-tooltip__ilce-adi';
-        ilceAdi.textContent = ilce.ilce;
+          const ilceAdi = document.createElement('span');
+          ilceAdi.className = 'tm-tooltip__ilce-adi';
+          ilceAdi.textContent = ilce.ilce;
 
-        const temsilciAdi = document.createElement('span');
-        temsilciAdi.className = 'tm-tooltip__ilce-temsilci';
-        temsilciAdi.textContent = ilce.temsilci;
+          const temsilciAdi = document.createElement('span');
+          temsilciAdi.className = 'tm-tooltip__ilce-temsilci';
+          temsilciAdi.textContent = ilce.temsilci;
 
-        li.appendChild(ilceAdi);
-        li.appendChild(temsilciAdi);
+          li.appendChild(ilceAdi);
+          li.appendChild(temsilciAdi);
 
-        if (ilce.telefon) {
-          const tel = document.createElement('span');
-          tel.className = 'tm-tooltip__ilce-tel';
-          tel.textContent = ilce.telefon;
-          li.appendChild(tel);
-        }
+          if (ilce.telefon) {
+            const tel = document.createElement('span');
+            tel.className = 'tm-tooltip__ilce-tel';
+            tel.textContent = ilce.telefon;
+            li.appendChild(tel);
+          }
 
-        elIlceListe.appendChild(li);
-      });
-      elIlceBolum.hidden = false;
-    } else {
-      elIlceBolum.hidden = true;
+          elIlceListe.appendChild(li);
+        });
+        elIlceBolum.hidden = false;
+      } else {
+        elIlceBolum.hidden = true;
+      }
     }
 
-    /* Atama Bekleniyor — yalnızca her ikisi de yoksa */
-    elBos.hidden = varIl || varIlce;
+    /* Atama Bekleniyor — il başkanı da yoksa gösterilir */
+    elBos.hidden = !!varIl;
   }
 
   /**
@@ -119,6 +133,13 @@
   function goster(x, y) {
     tooltip.hidden = false;
     tooltip.setAttribute('aria-hidden', 'false');
+
+    /* Dar ekranda tooltip sabit bir alt paneldir; CSS konumlandırır. */
+    if (dar()) {
+      tooltip.style.left = '';
+      tooltip.style.top  = '';
+      return;
+    }
 
     const container = svg.closest('.tm-harita-kapsayici');
     if (!container) return;
@@ -158,12 +179,48 @@
     goster(e.clientX - rect.left, e.clientY - rect.top);
   });
 
-  svg.addEventListener('mouseleave', gizle);
+  svg.addEventListener('mouseleave', function () {
+    if (!dar()) gizle();
+  });
 
   svg.addEventListener('mouseout', function (e) {
+    if (dar()) return;
     if (!e.relatedTarget || !svg.contains(/** @type {Node} */ (e.relatedTarget))) {
       gizle();
     }
+  });
+
+  /* ---- Dokunma / tıklama (mobil) ----
+   * Dar ekranda tooltip artık sabit bir alt paneldir ve hover ile güvenilir
+   * açılmaz; dokunuşla açılır ve kapat düğmesi veya dışarı dokunuşla
+   * kapanana kadar açık kalır. Böylece ilçe başkanları listesi de her zaman
+   * tam görünür ve kendi içinde kaydırılabilir. */
+  svg.addEventListener('click', function (e) {
+    const path = e.target.closest('.tm-il');
+    if (!path) return;
+    if (!dar()) return;
+
+    const acikMi = !tooltip.hidden;
+    const ayniIl = tooltip.dataset.aktifPlaka === path.dataset.plate;
+    if (acikMi && ayniIl) {
+      gizle();
+      return;
+    }
+
+    tooltip.dataset.aktifPlaka = path.dataset.plate || '';
+    doldur(path.dataset.plate || '', path.dataset.il || '');
+    goster(0, 0);
+  });
+
+  if (elKapat) {
+    elKapat.addEventListener('click', gizle);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (!dar() || tooltip.hidden) return;
+    const target = /** @type {Node} */ (e.target);
+    if (svg.contains(target) || tooltip.contains(target)) return;
+    gizle();
   });
 
   /* ---- Klavye desteği ---- */
@@ -173,6 +230,11 @@
     if (!path) return;
 
     doldur(path.dataset.plate || '', path.dataset.il || '');
+
+    if (dar()) {
+      goster(0, 0);
+      return;
+    }
 
     const container = svg.closest('.tm-harita-kapsayici');
     if (!container) return;
@@ -186,6 +248,7 @@
   });
 
   svg.addEventListener('focusout', function (e) {
+    if (dar()) return;
     if (!svg.contains(/** @type {Node} */ (e.relatedTarget))) {
       gizle();
     }
