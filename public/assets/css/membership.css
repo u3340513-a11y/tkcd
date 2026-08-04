@@ -220,6 +220,29 @@
   cursor: pointer;
 }
 
+/* Input geçerli durumu */
+.ub-form__girdi--gecerli {
+  border-color: #22c55e;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.12);
+}
+
+/* Input hatalı durumu */
+.ub-form__girdi--hatali {
+  border-color: var(--bordo-500) !important;
+  box-shadow: 0 0 0 3px rgba(142, 58, 83, 0.14) !important;
+}
+
+/* Hata mesajı */
+.ub-form__hata {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--bordo-600);
+  margin-top: 0.25rem;
+  line-height: 1.4;
+  min-height: 1rem;
+}
+
 /* Telefon — prefix grubu */
 .ub-form__telefon-grup {
   display: flex;

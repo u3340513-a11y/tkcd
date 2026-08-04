@@ -143,10 +143,17 @@ $calismaSekilleri = ['Tam Zamanlı', 'Yarı Zamanlı', 'Sözleşmeli', 'Emekli K
                         name="ad_soyad"
                         placeholder="Ad Soyad"
                         autocomplete="name"
+                        minlength="3"
                         maxlength="120"
+                        pattern="[A-Za-z\u00c7\u00e7\u011e\u011f\u0130\u0131\u00d6\u00f6\u015e\u015f\u00dc\u00fc\s]+"
                         required
                         aria-required="true"
+                        aria-describedby="ub-ad-soyad-ipucu"
+                        spellcheck="false"
                     >
+                    <span id="ub-ad-soyad-ipucu" class="gorsel-gizli">
+                        Yalnızca harf ve boşluk kullanabilirsiniz; rakam ve özel karakter kabul edilmez.
+                    </span>
                 </div>
 
                 <!-- Telefon Numarası -->
@@ -163,16 +170,19 @@ $calismaSekilleri = ['Tam Zamanlı', 'Yarı Zamanlı', 'Sözleşmeli', 'Emekli K
                             name="telefon"
                             placeholder="XX XXX XX XX"
                             autocomplete="tel-national"
+                            minlength="9"
                             maxlength="9"
                             pattern="[0-9]{9}"
                             inputmode="numeric"
                             required
                             aria-required="true"
                             aria-describedby="ub-telefon-ipucu"
+                            spellcheck="false"
+                            autocorrect="off"
                         >
                     </div>
                     <span id="ub-telefon-ipucu" class="gorsel-gizli">
-                        Başında 05 olmadan 9 haneli numaranızı giriniz.
+                        Başında 05 olmadan 9 rakam giriniz (örn: 532 123 45 67 → 532123456).
                     </span>
                 </div>
 
@@ -186,12 +196,19 @@ $calismaSekilleri = ['Tam Zamanlı', 'Yarı Zamanlı', 'Sözleşmeli', 'Emekli K
                         type="email"
                         id="ub-eposta"
                         name="eposta"
-                        placeholder="E-Posta"
+                        placeholder="ornek@kurum.gov.tr"
                         autocomplete="email"
                         maxlength="254"
                         required
                         aria-required="true"
+                        aria-describedby="ub-eposta-ipucu"
+                        spellcheck="false"
+                        autocorrect="off"
+                        autocapitalize="off"
                     >
+                    <span id="ub-eposta-ipucu" class="gorsel-gizli">
+                        Geçerli bir e-posta adresi giriniz.
+                    </span>
                 </div>
 
                 <!-- Kan Grubu -->

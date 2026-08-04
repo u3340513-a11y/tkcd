@@ -36,9 +36,10 @@ final class MembershipController
         );
 
         return $this->responder->page('pages/membership', $seo, [
-            'durum'           => null,
+            'durum'            => null,
             'recaptchaSiteKey' => $_ENV['RECAPTCHA_SITE_KEY'] ?? '',
-            'styles'          => ['membership.css'],
+            'styles'           => ['membership.css'],
+            'scripts'          => ['membership.js'],
         ]);
     }
 }
