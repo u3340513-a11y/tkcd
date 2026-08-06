@@ -350,14 +350,9 @@ $calismaSekilleri = ['Tam Zamanlı', 'Yarı Zamanlı', 'Sözleşmeli', 'Emekli K
                     </label>
                 </div>
 
-                <!-- reCAPTCHA -->
+                <!-- reCAPTCHA v3 — görünmez; token JS tarafından doldurulur -->
                 <?php if (!empty($recaptchaSiteKey)): ?>
-                <div class="ub-captcha">
-                    <div
-                        class="g-recaptcha"
-                        data-sitekey="<?= $view->e($recaptchaSiteKey) ?>"
-                    ></div>
-                </div>
+                <input type="hidden" name="recaptcha_token" id="recaptcha-token" value="">
                 <?php endif; ?>
 
                 <!-- Gönder -->

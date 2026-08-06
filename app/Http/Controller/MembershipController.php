@@ -52,7 +52,7 @@ final class MembershipController
             'styles'           => ['membership.css'],
             'scripts'          => ['membership.js'],
             'headScripts'      => $siteKey !== ''
-                ? ['https://www.google.com/recaptcha/api.js']
+                ? ['https://www.google.com/recaptcha/api.js?render=' . urlencode($siteKey)]
                 : [],
         ]);
     }
@@ -61,7 +61,7 @@ final class MembershipController
      * Üyelik başvuru formu POST işleyicisi.
      *
      * İşlem sırası:
-     *  1. Google reCAPTCHA v2 token'ı sunucu tarafında doğrula.
+     *  1. Google reCAPTCHA v3 token'ı sunucu tarafında doğrula (skor ≥ 0.5).
      *  2. Form verilerini MembershipService aracılığıyla doğrula ve kaydet.
      *  3. PRG desenine göre yönlendir.
      */
@@ -99,17 +99,18 @@ final class MembershipController
     }
 
     /**
-     * Google reCAPTCHA v2 token'ını siteverify API'si ile doğrular.
+     * Google reCAPTCHA v3 token'ını siteverify API'si ile doğrular.
      *
-     * Neden: İstemci tarafı widget kolayca atlatılabilir; sunucu tarafı
-     * doğrulama olmadan reCAPTCHA güvenlik sağlamaz.
+     * Neden: v3 arka planda çalışır (checkbox yok); 0.0-1.0 arası skor döner.
+     * 0.5 ve üzeri insan kabul edilir. Ağ hatası durumunda isteği geçiriyoruz
+     * (false negative yerine availability tercih edilir).
      *
      * @param string $secretKey  Gizli anahtar (.env: RECAPTCHA_SECRET_KEY)
      * @return bool              true → bot değil, false → reddedilmeli
      */
     private function verifyCaptcha(string $secretKey): bool
     {
-        $token = trim((string) ($this->request->body['g-recaptcha-response'] ?? ''));
+        $token = trim((string) ($this->request->body['recaptcha_token'] ?? ''));
 
         if ($token === '') {
             return false;
@@ -133,14 +134,20 @@ final class MembershipController
         $raw = @file_get_contents(self::RECAPTCHA_VERIFY_URL, false, $context);
 
         if ($raw === false) {
-            // Ağ hatası: güvenli tarafta kal, isteği geç
+            // Ağ hatası: güvenli tarafta kal, isteği geçir
             $this->logger->error('reCAPTCHA API erişim hatası; istek geçiriliyor.');
             return true;
         }
 
-        /** @var array{success: bool}|null $result */
+        /** @var array{success: bool, score: float, action: string}|null $result */
         $result = json_decode($raw, true);
 
-        return isset($result['success']) && $result['success'] === true;
+        if (!isset($result['success']) || $result['success'] !== true) {
+            return false;
+        }
+
+        // v3: skor 0.5 ve üzeri → insan kabul edilir
+        $score = (float) ($result['score'] ?? 0.0);
+        return $score >= 0.5;
     }
 }

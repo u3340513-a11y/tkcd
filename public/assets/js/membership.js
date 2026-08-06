@@ -349,29 +349,52 @@
   // -----------------------------------------------------------------------
 
   form.addEventListener('submit', function (e) {
-    // reCAPTCHA kontrolü: widget mevcut ama doldurulmamışsa engelle
-    const captchaWidget = form.querySelector('.g-recaptcha');
-    if (captchaWidget) {
-      const captchaResponse = (typeof grecaptcha !== 'undefined')
-        ? grecaptcha.getResponse()
-        : '';
-      if (captchaResponse === '') {
+    const tokenInput = document.getElementById('recaptcha-token');
+
+    // reCAPTCHA v3: token yoksa önce al, sonra tekrar gönder
+    if (tokenInput && typeof grecaptcha !== 'undefined') {
+      if (tokenInput.value === '') {
         e.preventDefault();
-        let captchaHata = document.getElementById('captcha-hata');
-        if (!captchaHata) {
-          captchaHata = document.createElement('span');
-          captchaHata.id        = 'captcha-hata';
-          captchaHata.className = 'ub-form__hata';
-          captchaHata.setAttribute('role', 'alert');
-          captchaWidget.closest('.ub-captcha')?.appendChild(captchaHata);
+
+        // Önce form doğrulamasını çalıştır — hata varsa captcha'yı boşa harcama
+        const sonuclarOnce = [
+          dogrulaAdSoyad(),
+          dogrulaTelefon(),
+          dogrulaEposta(),
+          dogrulaDogumTarihi(),
+          dogrulaIkametIl(),
+          dogrulaTrabzonIlce(),
+          dogrulaKvkk(),
+        ];
+        if (sonuclarOnce.some(function (s) { return s === false; })) {
+          const ilkHatali = /** @type {HTMLElement|null} */ (
+            form.querySelector('[aria-invalid="true"]')
+          );
+          if (ilkHatali) {
+            ilkHatali.focus();
+            ilkHatali.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+          return;
         }
-        captchaHata.textContent = 'Lütfen robot olmadığınızı doğrulayın.';
-        captchaWidget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        // Tüm alanlar geçerli — v3 token al ve formu gönder
+        grecaptcha.ready(function () {
+          const siteKey = document.querySelector(
+            'script[src*="recaptcha/api.js"]'
+          )?.src.split('render=')[1] ?? '';
+
+          if (!siteKey) {
+            form.submit();
+            return;
+          }
+
+          grecaptcha.execute(siteKey, { action: 'uye_ol' }).then(function (token) {
+            tokenInput.value = token;
+            form.submit();
+          });
+        });
         return;
       }
-      // Captcha tamamlandı — önceki hata mesajını temizle
-      const captchaHataEl = document.getElementById('captcha-hata');
-      if (captchaHataEl) captchaHataEl.textContent = '';
     }
 
     const sonuclar = [
