@@ -53,6 +53,10 @@
     trabzonIlce: {
       bos: 'Trabzon ilçesini seçiniz.',
     },
+    captcha: {
+      bos:      'Güvenlik sorusunu yanıtlayınız.',
+      gecersiz: 'Yanlış cevap, lütfen tekrar deneyin.',
+    },
     kvkk: {
       onay: 'KVKK metnini okuyup onaylamanız gerekmektedir.',
     },
@@ -64,13 +68,16 @@
   const form        = document.getElementById('uyelik-basvuru-formu');
   if (!form) return;
 
-  const elAdSoyad    = document.getElementById('ub-ad-soyad');
-  const elTelefon    = document.getElementById('ub-telefon');
-  const elEposta     = document.getElementById('ub-eposta');
-  const elDogum      = document.getElementById('ub-dogum-tarihi');
-  const elIl         = document.getElementById('ub-ikamet-il');
+  const elAdSoyad     = document.getElementById('ub-ad-soyad');
+  const elTelefon     = document.getElementById('ub-telefon');
+  const elEposta      = document.getElementById('ub-eposta');
+  const elDogum       = document.getElementById('ub-dogum-tarihi');
+  const elIl          = document.getElementById('ub-ikamet-il');
   const elTrabzonIlce = document.getElementById('ub-trabzon-ilce');
-  const elKvkk       = document.getElementById('ub-kvkk');
+  const elKvkk        = document.getElementById('ub-kvkk');
+  const elCaptcha     = document.getElementById('ub-captcha-answer');
+  const elCaptchaA    = /** @type {HTMLInputElement|null} */ (form.querySelector('[name="captcha_a"]'));
+  const elCaptchaB    = /** @type {HTMLInputElement|null} */ (form.querySelector('[name="captcha_b"]'));
 
   // -----------------------------------------------------------------------
   // Hata göster / temizle
@@ -351,98 +358,47 @@
   }
 
   // -----------------------------------------------------------------------
+  // Matematik doğrulama
+  // -----------------------------------------------------------------------
+
+  function dogrulaCaptcha() {
+    if (!elCaptcha) return true; // Alan yoksa geç
+
+    const deger = elCaptcha.value.trim();
+    const hataEl = document.getElementById('ub-captcha-hata');
+
+    function captchaHata(mesaj) {
+      elCaptcha.setAttribute('aria-invalid', 'true');
+      if (hataEl) hataEl.textContent = mesaj;
+      return false;
+    }
+
+    if (deger === '') {
+      return captchaHata(HATALAR.captcha.bos);
+    }
+
+    const a = parseInt((elCaptchaA && elCaptchaA.value) || '0', 10);
+    const b = parseInt((elCaptchaB && elCaptchaB.value) || '0', 10);
+
+    if (parseInt(deger, 10) !== (a + b)) {
+      return captchaHata(HATALAR.captcha.gecersiz);
+    }
+
+    elCaptcha.removeAttribute('aria-invalid');
+    if (hataEl) hataEl.textContent = '';
+    return true;
+  }
+
+  if (elCaptcha) {
+    elCaptcha.addEventListener('blur', dogrulaCaptcha);
+  }
+
+  // -----------------------------------------------------------------------
   // Form submit — tüm zorunlu alanları doğrula, hata varsa durdur
   // -----------------------------------------------------------------------
 
-  /** reCAPTCHA v3 token'ı alınma zamanı (saniye cinsinden) */
-  var recaptchaTokenTime = 0;
-
-  /**
-   * reCAPTCHA v3 token al ve formu gönder.
-   * Herhangi bir hata veya zaman aşımında captcha'sız gönderir.
-   */
-  function tokenAlVeGonder(tokenInput) {
-    var siteKey = form.getAttribute('data-recaptcha-site-key') || '';
-
-    // Site key yoksa veya grecaptcha yüklenmediyse direkt gönder
-    if (!siteKey || typeof grecaptcha === 'undefined') {
-      form.submit();
-      return;
-    }
-
-    // 5 saniye zaman aşımı: grecaptcha cevap vermezse yine de gönder
-    var gonderildi = false;
-    var zamanlayici = setTimeout(function () {
-      if (!gonderildi) {
-        gonderildi = true;
-        form.submit();
-      }
-    }, 5000);
-
-    grecaptcha.ready(function () {
-      grecaptcha.execute(siteKey, { action: 'uye_ol' })
-        .then(function (token) {
-          if (gonderildi) return;
-          gonderildi = true;
-          clearTimeout(zamanlayici);
-          tokenInput.value = token;
-          recaptchaTokenTime = Math.floor(Date.now() / 1000);
-          form.submit();
-        })
-        .catch(function () {
-          // grecaptcha.execute başarısız oldu — captcha olmadan gönder
-          if (gonderildi) return;
-          gonderildi = true;
-          clearTimeout(zamanlayici);
-          form.submit();
-        });
-    });
-  }
-
   form.addEventListener('submit', function (e) {
-    var tokenInput = document.getElementById('recaptcha-token');
-
-    // reCAPTCHA v3 akışı
-    if (tokenInput) {
-      var simdi = Math.floor(Date.now() / 1000);
-      // Token yoksa veya 110 saniyeden eski ise (süresi dolmuş olabilir) yenile
-      var tokenGecersiz = tokenInput.value === '' ||
-        (recaptchaTokenTime > 0 && (simdi - recaptchaTokenTime) > 110);
-
-      if (tokenGecersiz) {
-        e.preventDefault();
-
-        // Önce form alanlarını doğrula
-        var sonuclarOnce = [
-          dogrulaAdSoyad(),
-          dogrulaTelefon(),
-          dogrulaEposta(),
-          dogrulaDogumTarihi(),
-          dogrulaIkametIl(),
-          dogrulaTrabzonIlce(),
-          dogrulaKvkk(),
-        ];
-
-        if (sonuclarOnce.some(function (s) { return s === false; })) {
-          var ilkHatali = /** @type {HTMLElement|null} */ (
-            form.querySelector('[aria-invalid="true"]')
-          );
-          if (ilkHatali) {
-            ilkHatali.focus();
-            ilkHatali.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }
-          return; // Alan hataları var, token alma
-        }
-
-        // Alanlar geçerli — token al ve gönder
-        tokenInput.value = '';
-        tokenAlVeGonder(tokenInput);
-        return;
-      }
-    }
-
-    // Token zaten mevcut: normal doğrulama akışı
-    var sonuclar = [
+    const sonuclar = [
       dogrulaAdSoyad(),
       dogrulaTelefon(),
       dogrulaEposta(),
@@ -450,14 +406,15 @@
       dogrulaIkametIl(),
       dogrulaTrabzonIlce(),
       dogrulaKvkk(),
+      dogrulaCaptcha(),
     ];
 
-    var basarisiz = sonuclar.some(function (s) { return s === false; });
+    const basarisiz = sonuclar.some(function (s) { return s === false; });
 
     if (basarisiz) {
       e.preventDefault();
 
-      var ilkHatali = /** @type {HTMLElement|null} */ (
+      const ilkHatali = /** @type {HTMLElement|null} */ (
         form.querySelector('[aria-invalid="true"]')
       );
       if (ilkHatali) {
@@ -468,3 +425,4 @@
   });
 
 })();
+

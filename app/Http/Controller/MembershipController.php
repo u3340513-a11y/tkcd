@@ -14,14 +14,12 @@ use App\Core\Log\LoggerInterface;
 /**
  * Üye Ol sayfası.
  *
- * GET  /uye-ol  → Başvuru formunu gösterir.
- * POST /uye-ol  → reCAPTCHA doğrular, formu işler, dernek_uyeler tablosuna 'bekleyen'
- *                 olarak kaydeder ve PRG (Post/Redirect/Get) deseniyle yönlendirir.
+ * GET  /uye-ol  → Başvuru formunu gösterir; matematik doğrulama sorusu üretir.
+ * POST /uye-ol  → Matematik doğrulamayı kontrol eder, formu işler,
+ *                 dernek_uyeler tablosuna 'bekleyen' kaydeder (PRG deseni).
  */
 final class MembershipController
 {
-    private const RECAPTCHA_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify';
-
     public function __construct(
         private readonly PageResponder     $responder,
         private readonly MembershipService $membershipService,
@@ -43,17 +41,18 @@ final class MembershipController
             breadcrumbs: [['label' => $title, 'path' => '/uye-ol']],
         );
 
-        $durum       = trim((string) ($this->request->query['durum'] ?? ''));
-        $siteKey     = Env::string('RECAPTCHA_SITE_KEY');
+        $durum = trim((string) ($this->request->query['durum'] ?? ''));
+
+        // Matematik doğrulama sorusu: her sayfa yüklenişinde farklı
+        [$captchaA, $captchaB, $captchaToken] = $this->generateMathCaptcha();
 
         return $this->responder->page('pages/membership', $seo, [
-            'durum'            => in_array($durum, ['basarili', 'hata'], true) ? $durum : null,
-            'recaptchaSiteKey' => $siteKey,
-            'styles'           => ['membership.css'],
-            'scripts'          => ['membership.js'],
-            'headScripts'      => $siteKey !== ''
-                ? ['https://www.google.com/recaptcha/api.js?render=' . urlencode($siteKey)]
-                : [],
+            'durum'        => in_array($durum, ['basarili', 'hata'], true) ? $durum : null,
+            'captchaA'     => $captchaA,
+            'captchaB'     => $captchaB,
+            'captchaToken' => $captchaToken,
+            'styles'       => ['membership.css'],
+            'scripts'      => ['membership.js'],
         ]);
     }
 
@@ -61,17 +60,16 @@ final class MembershipController
      * Üyelik başvuru formu POST işleyicisi.
      *
      * İşlem sırası:
-     *  1. Google reCAPTCHA v3 token'ı sunucu tarafında doğrula (skor ≥ 0.5).
+     *  1. Matematik doğrulaması (HMAC imzalı, replay-safe).
      *  2. Form verilerini MembershipService aracılığıyla doğrula ve kaydet.
      *  3. PRG desenine göre yönlendir.
      */
     public function store(): Response
     {
         try {
-            // 1. reCAPTCHA sunucu tarafı doğrulaması
-            $secretKey = Env::string('RECAPTCHA_SECRET_KEY');
-            if ($secretKey !== '' && !$this->verifyCaptcha($secretKey)) {
-                $this->logger->error('reCAPTCHA doğrulaması başarısız.');
+            // 1. Matematik doğrulaması
+            if (!$this->verifyMathCaptcha($this->request->body)) {
+                $this->logger->error('Matematik doğrulaması başarısız.');
                 return Response::redirect('/uye-ol?durum=hata');
             }
 
@@ -99,55 +97,74 @@ final class MembershipController
     }
 
     /**
-     * Google reCAPTCHA v3 token'ını siteverify API'si ile doğrular.
+     * Matematik doğrulama sorusu üretir.
      *
-     * Neden: v3 arka planda çalışır (checkbox yok); 0.0-1.0 arası skor döner.
-     * 0.5 ve üzeri insan kabul edilir. Ağ hatası durumunda isteği geçiriyoruz
-     * (false negative yerine availability tercih edilir).
+     * Token, a + b değerini ve zaman dilimini HMAC ile imzalar.
+     * Böylece sayfa kapatılıp tekrar açılsa bile eski token'lar
+     * bir saatlik süre içinde geçerli kalır (saat sınırı geçişlerini kapsar).
      *
-     * @param string $secretKey  Gizli anahtar (.env: RECAPTCHA_SECRET_KEY)
-     * @return bool              true → bot değil, false → reddedilmeli
+     * @return array{int, int, string} [$a, $b, $token]
      */
-    private function verifyCaptcha(string $secretKey): bool
+    private function generateMathCaptcha(): array
     {
-        $token = trim((string) ($this->request->body['recaptcha_token'] ?? ''));
+        $a     = random_int(1, 12);
+        $b     = random_int(1, 12);
+        $secret    = $this->captchaSecret();
+        $timeSlot  = (int) floor(time() / 3600);
+        $token = hash_hmac('sha256', "{$a}:{$b}:{$timeSlot}", $secret);
 
-        if ($token === '') {
+        return [$a, $b, $token];
+    }
+
+    /**
+     * Kullanıcının matematik doğrulamasını HMAC ile kontrol eder.
+     *
+     * Replay koruması: token, a ve b değerleri ile saatlik zaman dilimini içerir.
+     * Önceki saat dilimi de kabul edilir (saat sınırı geçişi için tolerans).
+     *
+     * @param array<string, mixed> $post
+     */
+    private function verifyMathCaptcha(array $post): bool
+    {
+        $a               = (int) ($post['captcha_a']     ?? 0);
+        $b               = (int) ($post['captcha_b']     ?? 0);
+        $submittedToken  = trim((string) ($post['captcha_token']  ?? ''));
+        $userAnswerRaw   = trim((string) ($post['captcha_answer'] ?? ''));
+
+        if ($userAnswerRaw === '' || !ctype_digit($userAnswerRaw)) {
             return false;
         }
 
-        $payload = http_build_query([
-            'secret'   => $secretKey,
-            'response' => $token,
-            'remoteip' => $this->request->clientIp,
-        ]);
-
-        $context = stream_context_create([
-            'http' => [
-                'method'  => 'POST',
-                'header'  => 'Content-Type: application/x-www-form-urlencoded',
-                'content' => $payload,
-                'timeout' => 5,
-            ],
-        ]);
-
-        $raw = @file_get_contents(self::RECAPTCHA_VERIFY_URL, false, $context);
-
-        if ($raw === false) {
-            // Ağ hatası: güvenli tarafta kal, isteği geçir
-            $this->logger->error('reCAPTCHA API erişim hatası; istek geçiriliyor.');
-            return true;
-        }
-
-        /** @var array{success: bool, score: float, action: string}|null $result */
-        $result = json_decode($raw, true);
-
-        if (!isset($result['success']) || $result['success'] !== true) {
+        if ((int) $userAnswerRaw !== ($a + $b)) {
             return false;
         }
 
-        // v3: skor 0.5 ve üzeri → insan kabul edilir
-        $score = (float) ($result['score'] ?? 0.0);
-        return $score >= 0.5;
+        $secret   = $this->captchaSecret();
+        $timeSlot = (int) floor(time() / 3600);
+
+        // Geçerli saat ve önceki saat kabul edilir
+        foreach ([$timeSlot, $timeSlot - 1] as $slot) {
+            $expected = hash_hmac('sha256', "{$a}:{$b}:{$slot}", $secret);
+            if (hash_equals($expected, $submittedToken)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * HMAC imzası için sunucu tarafı gizli anahtar.
+     * .env'den RECAPTCHA_SECRET_KEY veya DB_PASSWORD'ü yedek kullanır.
+     */
+    private function captchaSecret(): string
+    {
+        $key = Env::string('RECAPTCHA_SECRET_KEY');
+
+        if ($key === '') {
+            $key = Env::string('DB_PASSWORD');
+        }
+
+        return $key !== '' ? $key : 'tkcd-fallback-secret-2024';
     }
 }

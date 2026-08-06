@@ -398,3 +398,30 @@
     display: none;
   }
 }
+
+/* ── Matematik Doğrulama ─────────────────────────────── */
+.ub-math-captcha {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.ub-math-captcha__soru {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--bordo-700, #7c1c2e);
+  background: var(--bordo-50, #fdf2f4);
+  border: 2px solid var(--bordo-200, #e8b4bc);
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.ub-math-captcha__girdi {
+  width: 8rem;
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 600;
+}

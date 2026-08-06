@@ -22,7 +22,9 @@ use App\Core\View\SeoMeta;
  * @var SeoMeta              $seo
  * @var array<string, mixed> $site
  * @var string|null          $durum   'basarili' | 'hata' | null
- * @var string               $recaptchaSiteKey
+ * @var string               $captchaA      Matematik sorusu: ilk sayı
+ * @var string               $captchaB      Matematik sorusu: ikinci sayı
+ * @var string               $captchaToken  HMAC imzalı doğrulama token'ı
  */
 
 /** @var list<string> $iller */
@@ -130,7 +132,6 @@ $calismaSekilleri = ['Tam Zamanlı', 'Yarı Zamanlı', 'Sözleşmeli', 'Emekli K
                 action="/uye-ol"
                 novalidate
                 aria-label="Üyelik başvuru formu"
-                data-recaptcha-site-key="<?= $view->e($recaptchaSiteKey) ?>"
             >
                 <!-- Adı Soyadı -->
                 <div class="ub-form__alan">
@@ -351,10 +352,34 @@ $calismaSekilleri = ['Tam Zamanlı', 'Yarı Zamanlı', 'Sözleşmeli', 'Emekli K
                     </label>
                 </div>
 
-                <!-- reCAPTCHA v3 — görünmez; token JS tarafından doldurulur -->
-                <?php if (!empty($recaptchaSiteKey)): ?>
-                <input type="hidden" name="recaptcha_token" id="recaptcha-token" value="">
-                <?php endif; ?>
+                <!-- Matematik Doğrulama -->
+                <div class="ub-form__alan">
+                    <label class="ub-form__etiket" for="ub-captcha-answer">
+                        Güvenlik Sorusu <span class="ub-form__zorunlu" aria-label="zorunlu">*</span>
+                    </label>
+                    <div class="ub-math-captcha">
+                        <span class="ub-math-captcha__soru">
+                            <?= (int)$captchaA ?> + <?= (int)$captchaB ?> = ?
+                        </span>
+                        <input
+                            class="ub-form__girdi ub-math-captcha__girdi"
+                            type="number"
+                            id="ub-captcha-answer"
+                            name="captcha_answer"
+                            inputmode="numeric"
+                            min="2"
+                            max="24"
+                            autocomplete="off"
+                            placeholder="Cevabınız"
+                            aria-required="true"
+                            aria-describedby="ub-captcha-hata"
+                        >
+                    </div>
+                    <span class="ub-form__hata" id="ub-captcha-hata" role="alert"></span>
+                    <input type="hidden" name="captcha_a"     value="<?= (int)$captchaA ?>">
+                    <input type="hidden" name="captcha_b"     value="<?= (int)$captchaB ?>">
+                    <input type="hidden" name="captcha_token" value="<?= $view->e($captchaToken) ?>">
+                </div>
 
                 <!-- Gönder -->
                 <div>
