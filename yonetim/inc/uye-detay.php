@@ -88,7 +88,8 @@ try {
     $notlar_sorgu->execute([$uye_id]);
     $notlar = $notlar_sorgu->fetchAll();
 } catch (\PDOException $e) {
-    die("Veritabanı hatası: " . $e->getMessage());
+    error_log('Yönetim üye detay hatası: ' . $e->getMessage());
+    die('Üye bilgileri yüklenirken bir hata oluştu.');
 }
 
 // --- STATÜ RENK AYARLARI ---

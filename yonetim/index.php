@@ -1,47 +1,150 @@
 <?php
-// Bu dosya yonetim/index.php olarak güncellenecektir.
+
+/**
+ * Yönetim Paneli ana giriş noktası.
+ *
+ * Güvenlik katmanları:
+ *   1. Session güvenliği (baglan.php'de merkezi)
+ *   2. Login sonrası session_regenerate_id() — session fixation koruması
+ *   3. IP bazlı brute-force koruması (5 deneme / 15 dk)
+ *   4. Hata mesajlarında detay sızıntısı engellendi
+ *   5. Oturum zaman aşımı 30 dk (baglan.php'de)
+ */
+
 require_once 'inc/baglan.php';
 
 $hata_mesaji = "";
 
+// ─── ÇIKIŞ İŞLEMİ ──────────────────────────────────────────────────────
 if (isset($_GET['islem']) && $_GET['islem'] === 'cikis') {
-    $_SESSION = array();
+    $_SESSION = [];
     session_destroy();
     header("Location: /yonetim/");
     exit;
 }
 
+// ─── BRUTE-FORCE KORUMASI ───────────────────────────────────────────────
+/**
+ * IP bazlı login deneme sayacı.
+ *
+ * Neden dosya tabanlı: Yönetim paneli Composer/framework kullanmıyor;
+ * DB'de ayrı bir tablo oluşturmak yerine basit bir dosya tabanlı
+ * mekanizma yeterli ve bağımsız çalışır.
+ *
+ * Yapı: storage/security/login_attempts/ altında IP bazlı JSON dosyaları.
+ */
+$guvenlikDizini = dirname(__DIR__, 1) . '/../storage/security/login_attempts';
+if (!is_dir($guvenlikDizini)) {
+    @mkdir($guvenlikDizini, 0755, true);
+}
+
+/**
+ * Belirtilen IP'nin kilitli olup olmadığını kontrol eder.
+ *
+ * @param string $ip        İstemci IP adresi
+ * @param string $dizin     Depolama dizini
+ * @param int    $maxDeneme Maksimum başarısız deneme (varsayılan: 5)
+ * @param int    $kilitSure  Kilit süresi saniye cinsinden (varsayılan: 900 = 15 dk)
+ * @return bool true ise IP kilitli, giriş engellenmeli
+ */
+function login_kilitli_mi(string $ip, string $dizin, int $maxDeneme = 5, int $kilitSure = 900): bool
+{
+    $dosya = $dizin . '/' . md5($ip) . '.json';
+    if (!is_file($dosya)) {
+        return false;
+    }
+    $veri = json_decode((string) file_get_contents($dosya), true);
+    if (!is_array($veri)) {
+        return false;
+    }
+    // Kilit süresi dolmuşsa dosyayı sil
+    if (isset($veri['son_deneme']) && (time() - $veri['son_deneme']) > $kilitSure) {
+        @unlink($dosya);
+        return false;
+    }
+    return ($veri['deneme'] ?? 0) >= $maxDeneme;
+}
+
+/**
+ * Başarısız login denemesini kaydeder.
+ */
+function login_basarisiz_kaydet(string $ip, string $dizin): void
+{
+    $dosya = $dizin . '/' . md5($ip) . '.json';
+    $veri = ['deneme' => 0, 'son_deneme' => time()];
+    if (is_file($dosya)) {
+        $okunan = json_decode((string) file_get_contents($dosya), true);
+        if (is_array($okunan)) {
+            $veri = $okunan;
+        }
+    }
+    $veri['deneme'] = ($veri['deneme'] ?? 0) + 1;
+    $veri['son_deneme'] = time();
+    file_put_contents($dosya, json_encode($veri), LOCK_EX);
+}
+
+/**
+ * Başarılı login sonrası deneme sayacını sıfırlar.
+ */
+function login_basarili_temizle(string $ip, string $dizin): void
+{
+    $dosya = $dizin . '/' . md5($ip) . '.json';
+    if (is_file($dosya)) {
+        @unlink($dosya);
+    }
+}
+
+$istemciIp = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+
+// ─── LOGIN İŞLEMİ ──────────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['kullanici_adi'])) {
-    $kullanici = trim($_POST['kullanici_adi']);
-    $sifre     = trim($_POST['sifre']);
 
-    if (!empty($kullanici) && !empty($sifre)) {
-        $sorgu = $db_baglanti->prepare("SELECT * FROM dernek_yoneticiler WHERE kullanici_adi = ?");
-        $sorgu->execute([$kullanici]);
-        $user = $sorgu->fetch();
+    // Brute-force kontrolü
+    if (login_kilitli_mi($istemciIp, $guvenlikDizini)) {
+        $hata_mesaji = "Çok fazla başarısız giriş denemesi. Lütfen 15 dakika sonra tekrar deneyin.";
+    } else {
+        $kullanici = trim($_POST['kullanici_adi']);
+        $sifre     = trim($_POST['sifre']);
 
-        if ($user && password_verify($sifre, $user['sifre'])) {
-            $_SESSION['oturum'] = true;
-            $_SESSION['id'] = $user['id'];
-            $_SESSION['kullanici_adi'] = $user['kullanici_adi'];
-            $_SESSION['rol'] = isset($user['rol']) ? $user['rol'] : 'admin'; // Rol oturuma yüklendi
-            header("Location: /yonetim/");
-            exit;
-        } else {
-            $hata_mesaji = "Kullanıcı adı veya şifre hatalı!";
+        if (!empty($kullanici) && !empty($sifre)) {
+            $sorgu = $db_baglanti->prepare("SELECT id, kullanici_adi, sifre, rol FROM dernek_yoneticiler WHERE kullanici_adi = ?");
+            $sorgu->execute([$kullanici]);
+            $user = $sorgu->fetch();
+
+            if ($user && password_verify($sifre, $user['sifre'])) {
+                // Session fixation koruması: login sonrası yeni session ID üret
+                session_regenerate_id(true);
+
+                $_SESSION['oturum'] = true;
+                $_SESSION['id'] = $user['id'];
+                $_SESSION['kullanici_adi'] = $user['kullanici_adi'];
+                $_SESSION['rol'] = $user['rol'] ?? 'admin';
+                $_SESSION['son_aktivite'] = time();
+
+                // Başarılı giriş: deneme sayacını temizle
+                login_basarili_temizle($istemciIp, $guvenlikDizini);
+
+                header("Location: /yonetim/");
+                exit;
+            } else {
+                // Başarısız giriş: sayacı artır
+                login_basarisiz_kaydet($istemciIp, $guvenlikDizini);
+                $hata_mesaji = "Kullanıcı adı veya şifre hatalı!";
+            }
         }
     }
 }
 
+// ─── OTURUM KONTROLÜ ────────────────────────────────────────────────────
 if (!isset($_SESSION['oturum']) || $_SESSION['oturum'] !== true) {
     include 'inc/login_form.php';
     exit;
 }
 
-// ROL KONTROLLERİ
-$kullanici_rolu = isset($_SESSION['rol']) ? $_SESSION['rol'] : 'admin';
-$is_denetci = ($kullanici_rolu === 'denetci');
-$is_moderator = ($kullanici_rolu === 'moderator'); // Moderatör Rolü
+// ─── ROL KONTROLLERİ ───────────────────────────────────────────────────
+$kullanici_rolu = $_SESSION['rol'] ?? 'admin';
+$is_denetci   = ($kullanici_rolu === 'denetci');
+$is_moderator = ($kullanici_rolu === 'moderator');
 
 $sayfa = isset($_GET['sayfa']) ? trim($_GET['sayfa']) : 'dashboard';
 
@@ -50,7 +153,6 @@ include 'inc/navbar.php';
 
 switch ($sayfa) {
     case 'uyeler':
-        // Denetçi için izin verilen filtrelerin güvenliği (Moderatör buraya takılmaz, hepsini görür)
         $aktif_filtre = isset($_GET['filtre']) ? trim($_GET['filtre']) : '';
         $izinli_filtreler = ['yonetim_kurulu', 'bolge_koordinatoru', 'il_baskani', 'ilce_baskani', 'kurum_temsilcisi'];
         
@@ -74,7 +176,6 @@ switch ($sayfa) {
         break;
 
     case 'bekleyen-uyeler':
-        // Denetçi giremez ama Moderatör GİREBİLİR
         if ($is_denetci) {
             echo '<div class="container py-5"><div class="alert alert-danger text-center fw-bold"><i class="fa-solid fa-lock me-2"></i>Erişim Engellendi: Bekleyen başvuruları inceleme yetkiniz bulunmamaktadır.</div></div>';
         } else {
@@ -85,18 +186,15 @@ switch ($sayfa) {
     case 'dashboard':
     default:
         try {
-            // Dinamik sayımları çekiyoruz (Ana statü ve ek görev uyumlu)
             $toplam_uye = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli'")->fetchColumn();
             $toplam_il  = $db_baglanti->query("SELECT COUNT(DISTINCT ikamet_ili) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND ikamet_ili IS NOT NULL AND ikamet_ili != ''")->fetchColumn();
             
-            // Yönetim Kurulu (Yönetim Kurulu kelimesi geçen Asıl, Yedek ve Yöneticiler tam sayım)
             $yonetim_kurulu = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu LIKE '%Yönetim Kurulu%' OR temsilci_turu = 'Yönetici' OR ek_gorev LIKE '%Yönetim Kurulu%' OR ek_gorev = 'Yönetici')")->fetchColumn();
             $bolge_koordinatorleri = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Bölge Koordinatörü' OR ek_gorev = 'Bölge Koordinatörü')")->fetchColumn();
             $il_baskanlari = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'İl Başkanı' OR temsilci_turu = 'İl Temsilcisi' OR ek_gorev = 'İl Başkanı' OR ek_gorev = 'İl Temsilcisi')")->fetchColumn();
             $ilce_baskanlari = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'İlçe Başkanı' OR temsilci_turu = 'İlçe Temsilcisi' OR ek_gorev = 'İlçe Başkanı' OR ek_gorev = 'İlçe Temsilcisi')")->fetchColumn();
             $kurum_temsilcileri = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Kurum Temsilcisi' OR ek_gorev = 'Kurum Temsilcisi')")->fetchColumn();
 
-            // Bekleyen Başvuru Sayısı
             $bekleyen_uye_sayisi = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'bekleyen'")->fetchColumn();
 
             $ilce_sorgu = $db_baglanti->query("SELECT trabzon_ilcesi, COUNT(*) as adet 
@@ -113,7 +211,10 @@ switch ($sayfa) {
                 $grafik_sayilari[] = intval($veri['adet']);
             }
         } catch (\PDOException $e) {
-            die("İstatistik hatası: " . $e->getMessage());
+            error_log('Yönetim dashboard hatası: ' . $e->getMessage());
+            echo '<div class="container py-5"><div class="alert alert-danger">İstatistikler yüklenirken bir hata oluştu.</div></div>';
+            include 'inc/footer.php';
+            exit;
         }
         ?>
         <div class="container-fluid py-4 px-md-4">

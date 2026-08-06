@@ -1,0 +1,20 @@
+# ---------------------------------------------------------------------------
+# yonetim/inc/ — Doğrudan HTTP erişim kısıtlaması
+#
+# Neden: uyeler.php, bekleyen-uyeler.php gibi dosyalar index.php tarafından
+# include edilmek üzere tasarlanmıştır. Doğrudan tarayıcıdan çağrıldığında
+# $db_baglanti tanımsız olur ve PHP hata mesajı üzerinden bilgi sızıntısı
+# yaşanır. canli-ara.php, excel-indir.php ve pdf-indir.php ise AJAX/indirme
+# uç noktası oldukları için doğrudan erişime açık kalmalıdır.
+# ---------------------------------------------------------------------------
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # canli-ara, excel-indir, pdf-indir hariç tüm PHP dosyalarını engelle
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteCond %{REQUEST_URI} !canli-ara\.php$ [NC]
+    RewriteCond %{REQUEST_URI} !excel-indir\.php$ [NC]
+    RewriteCond %{REQUEST_URI} !pdf-indir\.php$ [NC]
+    RewriteRule \.php$ - [F,L]
+</IfModule>

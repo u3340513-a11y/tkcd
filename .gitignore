@@ -2,6 +2,8 @@
 .DS_Store
 storage/logs/*.log
 storage/cache/
+storage/security/
+eski-site.php
 vendor/
 node_modules/
 *.zip

@@ -90,7 +90,8 @@ try {
     $sorgu = $db_baglanti->query("SELECT * FROM dernek_uyeler WHERE onay_durumu = 'bekleyen' ORDER BY id DESC");
     $bekleyenler = $sorgu->fetchAll(PDO::FETCH_ASSOC);
 } catch (\PDOException $e) {
-    die("Veritabanı hatası: " . $e->getMessage());
+    error_log('Yönetim bekleyen üyeler hatası: ' . $e->getMessage());
+    die('Bekleyen başvuru verileri yüklenirken bir hata oluştu.');
 }
 ?>
 

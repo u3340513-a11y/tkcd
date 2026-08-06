@@ -46,7 +46,8 @@ try {
     $uyeler = $sorgu->fetchAll(PDO::FETCH_ASSOC);
 
 } catch (\PDOException $e) {
-    die("Veritabanı hatası: " . $e->getMessage());
+    error_log('Yönetim PDF hata: ' . $e->getMessage());
+    die('Veri aktarımı sırasında bir hata oluştu.');
 }
 
 $bugun = date('d.m.Y');

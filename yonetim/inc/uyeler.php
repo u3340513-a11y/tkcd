@@ -131,7 +131,8 @@ try {
     $sorgu->execute();
     $veriler = $sorgu->fetchAll(PDO::FETCH_ASSOC);
 } catch (\PDOException $e) {
-    die("Veri çekme hatası: " . $e->getMessage());
+    error_log('Yönetim üye listeleme hatası: ' . $e->getMessage());
+    die('Üye verileri yüklenirken bir hata oluştu.');
 }
 ?>
 
