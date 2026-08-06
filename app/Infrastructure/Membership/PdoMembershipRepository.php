@@ -74,8 +74,10 @@ final class PdoMembershipRepository implements MembershipRepositoryInterface
      */
     public function existsByTelefon(string $telefon): bool
     {
+        // REPLACE(telefon, ' ', '') ile DB'deki boşluklu eski kayıtları da yakalar
+        // Örn: "0551 605 59 69" == "05516055969" eşleşir
         $stmt = $this->connection()->prepare(
-            'SELECT COUNT(*) FROM dernek_uyeler WHERE telefon = ? LIMIT 1'
+            "SELECT COUNT(*) FROM dernek_uyeler WHERE REPLACE(telefon, ' ', '') = ? LIMIT 1"
         );
         $stmt->execute([$telefon]);
 
