@@ -19,12 +19,13 @@ final class SecurityHeaders
         "form-action 'self'",
         "frame-ancestors 'self'",
         "object-src 'none'",
-        "img-src 'self' data: https:",
+        "img-src 'self' data: https: blob:",
         "font-src 'self' data:",
         "style-src 'self' 'unsafe-inline'",
-        "script-src 'self'",
-        "connect-src 'self'",
-        "frame-src 'self' https://www.google.com https://www.youtube-nocookie.com",
+        "script-src 'self' https://www.google.com https://www.gstatic.com https://www.youtube.com https://www.youtube-nocookie.com",
+        "connect-src 'self' https://www.youtube-nocookie.com https://www.youtube.com",
+        "frame-src 'self' https://www.google.com https://www.youtube.com https://www.youtube-nocookie.com",
+        "media-src 'self' blob: https://www.youtube-nocookie.com https://www.youtube.com https://*.googlevideo.com",
         'upgrade-insecure-requests',
     ];
 
