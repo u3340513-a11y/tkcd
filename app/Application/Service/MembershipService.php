@@ -73,13 +73,17 @@ final class MembershipService
             throw new \InvalidArgumentException('Trabzon ilçesi zorunludur.');
         }
 
-        // Telefonu tam formata çevir: "05" + 9 rakam → "0512345678" gibi
+        // Telefonu tam, boşluksuz forma çevir: "05" + 9 rakam
         $telefonTam = '05' . $telefonSuffix;
 
         // Telefon unique kontrolü: aynı numara zaten kayıtlıysa reddet
+        // (existsByTelefon içinde REPLACE ile boşluklu eski kayıtlar da yakalanır)
         if ($this->repository->existsByTelefon($telefonTam)) {
             throw new \InvalidArgumentException('__TELEFON_KAYITLI__');
         }
+
+        // Görüntülenebilir formata çevir: "0551 605 59 69" (yönetim panelinde okunabilir)
+        $telefonGosterim = $this->formatTelefon($telefonTam);
 
         // Doğum tarihini DATE formatına çevir (HTML date input: YYYY-MM-DD)
         $dogumTarihiDb = '';
@@ -90,7 +94,7 @@ final class MembershipService
 
         $application = new MembershipApplication(
             adiSoyadi:    $adiSoyadi,
-            telefon:      $telefonTam,
+            telefon:      $telefonGosterim,
             eposta:       $eposta,
             kanGrubu:     $kanGrubu,
             dogumTarihi:  $dogumTarihiDb,
@@ -102,5 +106,27 @@ final class MembershipService
         );
 
         return $this->repository->save($application);
+    }
+
+    /**
+     * 11 haneli Türkiye telefon numarasını okunabilir formata çevirir.
+     *
+     * Neden: Yönetim panelinde "0551 605 59 69" formatı daha kolay okunur.
+     * Unique kontrolü REPLACE(telefon, ' ', '') ile yapıldığından format farklılığı sorun yaratmaz.
+     *
+     * @param  string $telefon 11 haneli boşluksuz numara (örn: "05516055969")
+     * @return string          Formatlanmış numara (örn: "0551 605 59 69")
+     */
+    private function formatTelefon(string $telefon): string
+    {
+        // Güvence: önce tüm boşlukları temizle
+        $t = preg_replace('/\s+/', '', $telefon) ?? $telefon;
+
+        if (strlen($t) !== 11) {
+            return $telefon; // Beklenmedik uzunlukta — olduğu gibi bırak
+        }
+
+        // XXXX XXX XX XX
+        return substr($t, 0, 4) . ' ' . substr($t, 4, 3) . ' ' . substr($t, 7, 2) . ' ' . substr($t, 9, 2);
     }
 }
