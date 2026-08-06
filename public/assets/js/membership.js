@@ -354,16 +354,66 @@
   // Form submit — tüm zorunlu alanları doğrula, hata varsa durdur
   // -----------------------------------------------------------------------
 
-  form.addEventListener('submit', function (e) {
-    const tokenInput = document.getElementById('recaptcha-token');
+  /** reCAPTCHA v3 token'ı alınma zamanı (saniye cinsinden) */
+  var recaptchaTokenTime = 0;
 
-    // reCAPTCHA v3: token yoksa önce al, sonra tekrar gönder
-    if (tokenInput && typeof grecaptcha !== 'undefined') {
-      if (tokenInput.value === '') {
+  /**
+   * reCAPTCHA v3 token al ve formu gönder.
+   * Herhangi bir hata veya zaman aşımında captcha'sız gönderir.
+   */
+  function tokenAlVeGonder(tokenInput) {
+    var siteKey = form.getAttribute('data-recaptcha-site-key') || '';
+
+    // Site key yoksa veya grecaptcha yüklenmediyse direkt gönder
+    if (!siteKey || typeof grecaptcha === 'undefined') {
+      form.submit();
+      return;
+    }
+
+    // 5 saniye zaman aşımı: grecaptcha cevap vermezse yine de gönder
+    var gonderildi = false;
+    var zamanlayici = setTimeout(function () {
+      if (!gonderildi) {
+        gonderildi = true;
+        form.submit();
+      }
+    }, 5000);
+
+    grecaptcha.ready(function () {
+      grecaptcha.execute(siteKey, { action: 'uye_ol' })
+        .then(function (token) {
+          if (gonderildi) return;
+          gonderildi = true;
+          clearTimeout(zamanlayici);
+          tokenInput.value = token;
+          recaptchaTokenTime = Math.floor(Date.now() / 1000);
+          form.submit();
+        })
+        .catch(function () {
+          // grecaptcha.execute başarısız oldu — captcha olmadan gönder
+          if (gonderildi) return;
+          gonderildi = true;
+          clearTimeout(zamanlayici);
+          form.submit();
+        });
+    });
+  }
+
+  form.addEventListener('submit', function (e) {
+    var tokenInput = document.getElementById('recaptcha-token');
+
+    // reCAPTCHA v3 akışı
+    if (tokenInput) {
+      var simdi = Math.floor(Date.now() / 1000);
+      // Token yoksa veya 110 saniyeden eski ise (süresi dolmuş olabilir) yenile
+      var tokenGecersiz = tokenInput.value === '' ||
+        (recaptchaTokenTime > 0 && (simdi - recaptchaTokenTime) > 110);
+
+      if (tokenGecersiz) {
         e.preventDefault();
 
-        // Önce form doğrulamasını çalıştır — hata varsa captcha'yı boşa harcama
-        const sonuclarOnce = [
+        // Önce form alanlarını doğrula
+        var sonuclarOnce = [
           dogrulaAdSoyad(),
           dogrulaTelefon(),
           dogrulaEposta(),
@@ -372,38 +422,27 @@
           dogrulaTrabzonIlce(),
           dogrulaKvkk(),
         ];
+
         if (sonuclarOnce.some(function (s) { return s === false; })) {
-          const ilkHatali = /** @type {HTMLElement|null} */ (
+          var ilkHatali = /** @type {HTMLElement|null} */ (
             form.querySelector('[aria-invalid="true"]')
           );
           if (ilkHatali) {
             ilkHatali.focus();
             ilkHatali.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }
-          return;
+          return; // Alan hataları var, token alma
         }
 
-        // Tüm alanlar geçerli — v3 token al ve formu gönder
-        grecaptcha.ready(function () {
-          const siteKey = document.querySelector(
-            'script[src*="recaptcha/api.js"]'
-          )?.src.split('render=')[1] ?? '';
-
-          if (!siteKey) {
-            form.submit();
-            return;
-          }
-
-          grecaptcha.execute(siteKey, { action: 'uye_ol' }).then(function (token) {
-            tokenInput.value = token;
-            form.submit();
-          });
-        });
+        // Alanlar geçerli — token al ve gönder
+        tokenInput.value = '';
+        tokenAlVeGonder(tokenInput);
         return;
       }
     }
 
-    const sonuclar = [
+    // Token zaten mevcut: normal doğrulama akışı
+    var sonuclar = [
       dogrulaAdSoyad(),
       dogrulaTelefon(),
       dogrulaEposta(),
@@ -413,13 +452,12 @@
       dogrulaKvkk(),
     ];
 
-    const basarisiz = sonuclar.some(function (s) { return s === false; });
+    var basarisiz = sonuclar.some(function (s) { return s === false; });
 
     if (basarisiz) {
       e.preventDefault();
 
-      // İlk hatalı alana odaklan
-      const ilkHatali = /** @type {HTMLElement|null} */ (
+      var ilkHatali = /** @type {HTMLElement|null} */ (
         form.querySelector('[aria-invalid="true"]')
       );
       if (ilkHatali) {

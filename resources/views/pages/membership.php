@@ -130,6 +130,7 @@ $calismaSekilleri = ['Tam Zamanlı', 'Yarı Zamanlı', 'Sözleşmeli', 'Emekli K
                 action="/uye-ol"
                 novalidate
                 aria-label="Üyelik başvuru formu"
+                data-recaptcha-site-key="<?= $view->e($recaptchaSiteKey) ?>"
             >
                 <!-- Adı Soyadı -->
                 <div class="ub-form__alan">
