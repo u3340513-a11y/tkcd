@@ -52,15 +52,15 @@ final class PdoMembershipRepository implements MembershipRepositoryInterface
 
         $statement->execute([
             $application->adiSoyadi,
-            $application->telefon    ?: null,
-            $application->eposta     ?: null,
-            $application->kanGrubu   ?: null,
-            $application->dogumTarihi ?: null,
+            $application->telefon,
+            $application->eposta,
+            $application->kanGrubu,
+            $application->dogumTarihi,
             $application->ikametIli,
-            $application->trabzonIlcesi ?: null,
-            $application->kurum         ?: null,
-            $application->gorevUnvan    ?: null,
-            $application->calismaSekli  ?: null,
+            $application->trabzonIlcesi,
+            $application->kurum,
+            $application->gorevUnvan,
+            $application->calismaSekli,
         ]);
 
         return (int) $pdo->lastInsertId();

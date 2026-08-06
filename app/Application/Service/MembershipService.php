@@ -40,13 +40,13 @@ final class MembershipService
         $adiSoyadi = trim((string) ($post['ad_soyad'] ?? ''));
         $telefonSuffix = trim((string) ($post['telefon'] ?? ''));
         $eposta    = trim((string) ($post['eposta'] ?? ''));
-        $kanGrubu  = trim((string) ($post['kan_grubu'] ?? '')) ?: null;
-        $dogumTarihi = trim((string) ($post['dogum_tarihi'] ?? '')) ?: null;
+        $kanGrubu  = trim((string) ($post['kan_grubu'] ?? ''));
+        $dogumTarihi = trim((string) ($post['dogum_tarihi'] ?? ''));
         $ikametIl  = trim((string) ($post['ikamet_il'] ?? ''));
-        $trabzonIlce = trim((string) ($post['trabzon_ilce'] ?? '')) ?: null;
-        $kurum       = trim((string) ($post['kurum'] ?? '')) ?: null;
-        $gorev       = trim((string) ($post['gorev'] ?? '')) ?: null;
-        $calismaSekli = trim((string) ($post['calisma_sekli'] ?? '')) ?: null;
+        $trabzonIlce = trim((string) ($post['trabzon_ilce'] ?? ''));
+        $kurum       = trim((string) ($post['kurum'] ?? ''));
+        $gorev       = trim((string) ($post['gorev'] ?? ''));
+        $calismaSekli = trim((string) ($post['calisma_sekli'] ?? ''));
 
         // Zorunlu alan kontrolleri
         if (mb_strlen($adiSoyadi) < 3 || mb_strlen($adiSoyadi) > 120) {
@@ -77,10 +77,10 @@ final class MembershipService
         $telefonTam = '05' . $telefonSuffix;
 
         // Doğum tarihini DATE formatına çevir (HTML date input: YYYY-MM-DD)
-        $dogumTarihiDb = null;
-        if ($dogumTarihi !== null) {
+        $dogumTarihiDb = '';
+        if ($dogumTarihi !== '') {
             $dt = \DateTimeImmutable::createFromFormat('Y-m-d', $dogumTarihi);
-            $dogumTarihiDb = $dt !== false ? $dt->format('Y-m-d') : null;
+            $dogumTarihiDb = $dt !== false ? $dt->format('Y-m-d') : '';
         }
 
         $application = new MembershipApplication(

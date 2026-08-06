@@ -14,16 +14,16 @@ namespace App\Domain\Membership;
 final readonly class MembershipApplication
 {
     public function __construct(
-        public string  $adiSoyadi,
-        public string  $telefon,
-        public string  $eposta,
-        public ?string $kanGrubu,
-        public ?string $dogumTarihi,
-        public string  $ikametIli,
-        public ?string $trabzonIlcesi,
-        public ?string $kurum,
-        public ?string $gorevUnvan,
-        public ?string $calismaSekli,
+        public string $adiSoyadi,
+        public string $telefon,
+        public string $eposta,
+        public string $kanGrubu,
+        public string $dogumTarihi,
+        public string $ikametIli,
+        public string $trabzonIlcesi,
+        public string $kurum,
+        public string $gorevUnvan,
+        public string $calismaSekli,
     ) {
     }
 }
