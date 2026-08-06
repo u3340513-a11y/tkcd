@@ -32,6 +32,11 @@ Options -Indexes -MultiViews
     Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains" env=HTTPS
     Header always unset X-Powered-By
     Header unset Server
+
+    # cPanel WAF veya sunucu konfigürasyonu tarafından eklenen CSP'yi temizle
+    # ve doğru politikayı PHP yerine Apache üzerinden gönder
+    Header always unset Content-Security-Policy
+    Header always set Content-Security-Policy "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; object-src 'none'; img-src 'self' data: https: blob:; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' https://www.google.com https://www.gstatic.com https://www.youtube.com https://www.youtube-nocookie.com; connect-src 'self' https://www.youtube-nocookie.com https://www.youtube.com; frame-src 'self' https://www.google.com https://www.youtube.com https://www.youtube-nocookie.com; media-src 'self' blob: https://www.youtube-nocookie.com https://www.youtube.com https://*.googlevideo.com; upgrade-insecure-requests"
 </IfModule>
 
 # ------------------------------ Önbellekleme -------------------------------
