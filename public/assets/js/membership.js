@@ -174,17 +174,19 @@
   }
 
   function dogrulaDogumTarihi() {
-    const deger = elDogum.value;
+    const deger = (elDogum.value || '').trim();
 
-    if (!deger) {
+    if (deger === '') {
       hataGoster(elDogum, HATALAR.dogumTarihi.bos);
       return false;
     }
 
-    // Timezone kaymasını önlemek için UTC olarak parse ediyoruz.
-    // new Date('YYYY-MM-DD') UTC gece yarısı olarak yorumlar; yerel saat
-    // farkından kaynaklanan -1 gün hatasını ortadan kaldırır.
     const parcalar = deger.split('-');
+    if (parcalar.length !== 3) {
+      hataGoster(elDogum, HATALAR.dogumTarihi.bos);
+      return false;
+    }
+
     const dogum    = new Date(Date.UTC(
       parseInt(parcalar[0], 10),
       parseInt(parcalar[1], 10) - 1,
@@ -217,8 +219,12 @@
   }
 
   function dogrulaTrabzonIlce() {
-    if (!elTrabzonIlce || !elTrabzonIlce.value || elTrabzonIlce.value === '') {
-      if (elTrabzonIlce) hataGoster(elTrabzonIlce, HATALAR.trabzonIlce.bos);
+    // Element DOM'da yoksa bu alan isteğe bağlıdır — doğrulamayı geç
+    if (!elTrabzonIlce) return true;
+
+    const seciliDeger = (elTrabzonIlce.value || '').trim();
+    if (seciliDeger === '') {
+      hataGoster(elTrabzonIlce, HATALAR.trabzonIlce.bos);
       return false;
     }
     hataSil(elTrabzonIlce);

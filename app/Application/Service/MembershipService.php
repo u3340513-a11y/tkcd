@@ -65,7 +65,13 @@ final class MembershipService
             throw new \InvalidArgumentException('İkamet edilen il zorunludur.');
         }
 
-        // trabzon_ilce isteğe bağlı; boşsa null olarak kaydedilir.
+        if ($dogumTarihi === null || $dogumTarihi === '') {
+            throw new \InvalidArgumentException('Doğum tarihi zorunludur.');
+        }
+
+        if ($trabzonIlce === null || $trabzonIlce === '') {
+            throw new \InvalidArgumentException('Trabzon ilçesi zorunludur.');
+        }
 
         // Telefonu tam formata çevir: "05" + 9 rakam → "0512345678" gibi
         $telefonTam = '05' . $telefonSuffix;
