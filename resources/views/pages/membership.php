@@ -121,6 +121,12 @@ $calismaSekilleri = ['Tam Zamanlı', 'Yarı Zamanlı', 'Sözleşmeli', 'Emekli K
                 <div>
                     <strong>Gönderim Başarısız</strong>
                     <p>Lütfen tüm zorunlu alanları doğru doldurup tekrar deneyin.</p>
+                    <?php
+                    $hataMesaji = trim((string) ($_GET['hata_mesaji'] ?? ''));
+                    if ($hataMesaji !== ''):
+                    ?>
+                    <p style="font-size:0.85rem;color:#666;margin-top:0.5rem">Detay: <?= htmlspecialchars($hataMesaji, ENT_QUOTES, 'UTF-8') ?></p>
+                    <?php endif; ?>
                 </div>
             </div>
             <?php endif; ?>

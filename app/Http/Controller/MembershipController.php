@@ -70,7 +70,7 @@ final class MembershipController
             // 1. Matematik doğrulaması
             if (!$this->verifyMathCaptcha($this->request->body)) {
                 $this->logger->error('Matematik doğrulaması başarısız.');
-                return Response::redirect('/uye-ol?durum=hata');
+                return Response::redirect('/uye-ol?durum=hata&hata_mesaji=' . urlencode('Matematik dogrulamasi basarisiz'));
             }
 
             // 2. Form verisi doğrulama + kayıt
@@ -80,19 +80,11 @@ final class MembershipController
         } catch (\InvalidArgumentException $e) {
             $this->logger->error('Üyelik başvurusu doğrulama hatası: ' . $e->getMessage());
 
-            $debugSuffix = Env::bool('APP_DEBUG')
-                ? '&hata_mesaji=' . urlencode($e->getMessage())
-                : '';
-
-            return Response::redirect('/uye-ol?durum=hata' . $debugSuffix);
+            return Response::redirect('/uye-ol?durum=hata&hata_mesaji=' . urlencode($e->getMessage()));
         } catch (\Throwable $e) {
             $this->logger->exception($e);
 
-            $debugSuffix = Env::bool('APP_DEBUG')
-                ? '&hata_mesaji=' . urlencode($e->getMessage())
-                : '';
-
-            return Response::redirect('/uye-ol?durum=hata' . $debugSuffix);
+            return Response::redirect('/uye-ol?durum=hata&hata_mesaji=' . urlencode($e->getMessage()));
         }
     }
 
