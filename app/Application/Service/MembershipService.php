@@ -76,6 +76,11 @@ final class MembershipService
         // Telefonu tam formata çevir: "05" + 9 rakam → "0512345678" gibi
         $telefonTam = '05' . $telefonSuffix;
 
+        // Telefon unique kontrolü: aynı numara zaten kayıtlıysa reddet
+        if ($this->repository->existsByTelefon($telefonTam)) {
+            throw new \InvalidArgumentException('__TELEFON_KAYITLI__');
+        }
+
         // Doğum tarihini DATE formatına çevir (HTML date input: YYYY-MM-DD)
         $dogumTarihiDb = '';
         if ($dogumTarihi !== '') {

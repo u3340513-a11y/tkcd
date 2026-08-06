@@ -67,6 +67,22 @@ final class PdoMembershipRepository implements MembershipRepositoryInterface
     }
 
     /**
+     * Verilen telefon numarasının veritabanında kayıtlı olup olmadığını kontrol eder.
+     *
+     * Neden: Üyelik formunu kaydetmeden önce telefon tekrarını tespit etmek için
+     * kullanılır. COUNT(*) ile tek sorgu; indeksli sütunda O(log n) performans.
+     */
+    public function existsByTelefon(string $telefon): bool
+    {
+        $stmt = $this->connection()->prepare(
+            'SELECT COUNT(*) FROM dernek_uyeler WHERE telefon = ? LIMIT 1'
+        );
+        $stmt->execute([$telefon]);
+
+        return (int) $stmt->fetchColumn() > 0;
+    }
+
+    /**
      * İlk çağrıda bağlantıyı kurar, sonrasında aynı nesneyi döndürür.
      */
     private function connection(): PDO

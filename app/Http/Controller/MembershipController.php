@@ -47,7 +47,7 @@ final class MembershipController
         [$captchaA, $captchaB, $captchaToken] = $this->generateMathCaptcha();
 
         return $this->responder->page('pages/membership', $seo, [
-            'durum'        => in_array($durum, ['basarili', 'hata'], true) ? $durum : null,
+            'durum'        => in_array($durum, ['basarili', 'hata', 'telefon_kayitli'], true) ? $durum : null,
             'captchaA'     => $captchaA,
             'captchaB'     => $captchaB,
             'captchaToken' => $captchaToken,
@@ -78,6 +78,11 @@ final class MembershipController
 
             return Response::redirect('/uye-ol?durum=basarili');
         } catch (\InvalidArgumentException $e) {
+            // Telefon numarası zaten kayıtlı — özel uyarı sayfası
+            if ($e->getMessage() === '__TELEFON_KAYITLI__') {
+                return Response::redirect('/uye-ol?durum=telefon_kayitli');
+            }
+
             $this->logger->error('Üyelik başvurusu doğrulama hatası: ' . $e->getMessage());
 
             return Response::redirect('/uye-ol?durum=hata&hata_mesaji=' . urlencode($e->getMessage()));

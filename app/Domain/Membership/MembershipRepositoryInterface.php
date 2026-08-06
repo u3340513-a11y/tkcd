@@ -21,4 +21,12 @@ interface MembershipRepositoryInterface
      * @return int Eklenen satırın otomatik artan kimliği
      */
     public function save(MembershipApplication $application): int;
+
+    /**
+     * Verilen telefon numarası veritabanında kayıtlı mı kontrol eder.
+     *
+     * @param string $telefon Tam telefon numarası (örn: "05321234567")
+     * @return bool true → zaten kayıtlı
+     */
+    public function existsByTelefon(string $telefon): bool;
 }

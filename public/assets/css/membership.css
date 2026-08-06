@@ -155,6 +155,12 @@
   border: 1px solid var(--bordo-200);
 }
 
+.ub-bildiri--uyari {
+  background: #fffbeb;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+}
+
 /* Form iskelet */
 .ub-form {
   display: flex;
