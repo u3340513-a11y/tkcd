@@ -49,4 +49,30 @@ return [
             'linkedin'  => '',
         ],
     ],
+    [
+        'slug'      => 'ilyas-demir',
+        'ad'        => 'İlyas Demir',
+        'unvan'     => 'Gençlik Kolları Başkanı',
+        'fotograf'  => 'ilyas-demir.jpeg',
+        'biyografi' => '',
+        'gorevler'  => [],
+        'sosyal' => [
+            'facebook'  => '',
+            'instagram' => '',
+            'linkedin'  => '',
+        ],
+    ],
+    [
+        'slug'      => 'fatma-demir',
+        'ad'        => 'Fatma Demir',
+        'unvan'     => 'Kadın Kolları Başkanı',
+        'fotograf'  => 'fatma-demir.jpeg',
+        'biyografi' => '',
+        'gorevler'  => [],
+        'sosyal' => [
+            'facebook'  => '',
+            'instagram' => '',
+            'linkedin'  => '',
+        ],
+    ],
 ];
