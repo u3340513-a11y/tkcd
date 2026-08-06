@@ -170,6 +170,12 @@
   transition: background var(--gecis-hizli, 150ms ease);
 }
 
+/* display:grid, tarayıcının [hidden] için uyguladığı display:none'ı geçersiz kılar.
+   Bu kural filtre JS'inin hidden attribute'unu doğru çalıştırması için zorunludur. */
+.dy-karti[hidden] {
+  display: none;
+}
+
 .dy-karti:first-child {
   border-top: 1px solid var(--bordo-100);
 }

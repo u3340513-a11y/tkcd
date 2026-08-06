@@ -349,6 +349,31 @@
   // -----------------------------------------------------------------------
 
   form.addEventListener('submit', function (e) {
+    // reCAPTCHA kontrolü: widget mevcut ama doldurulmamışsa engelle
+    const captchaWidget = form.querySelector('.g-recaptcha');
+    if (captchaWidget) {
+      const captchaResponse = (typeof grecaptcha !== 'undefined')
+        ? grecaptcha.getResponse()
+        : '';
+      if (captchaResponse === '') {
+        e.preventDefault();
+        let captchaHata = document.getElementById('captcha-hata');
+        if (!captchaHata) {
+          captchaHata = document.createElement('span');
+          captchaHata.id        = 'captcha-hata';
+          captchaHata.className = 'ub-form__hata';
+          captchaHata.setAttribute('role', 'alert');
+          captchaWidget.closest('.ub-captcha')?.appendChild(captchaHata);
+        }
+        captchaHata.textContent = 'Lütfen robot olmadığınızı doğrulayın.';
+        captchaWidget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+      // Captcha tamamlandı — önceki hata mesajını temizle
+      const captchaHataEl = document.getElementById('captcha-hata');
+      if (captchaHataEl) captchaHataEl.textContent = '';
+    }
+
     const sonuclar = [
       dogrulaAdSoyad(),
       dogrulaTelefon(),

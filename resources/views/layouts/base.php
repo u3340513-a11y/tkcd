@@ -17,13 +17,17 @@ use App\Core\View\SeoMeta;
  * @var list<string> $scripts Sayfaya özel ek JavaScript dosyaları
  */
 
-$styles  = $styles  ?? [];
-$scripts = $scripts ?? [];
+$styles      = $styles      ?? [];
+$scripts     = $scripts     ?? [];
+$headScripts = $headScripts ?? [];
 ?>
 <!DOCTYPE html>
 <html lang="<?= $view->e($language) ?>" prefix="og: https://ogp.me/ns#">
 <head>
 <?= $view->partial('partials/head', ['seo' => $seo, 'styles' => $styles]) ?>
+<?php foreach ($headScripts as $hs): ?>
+    <script src="<?= $view->e($hs) ?>" async defer></script>
+<?php endforeach; ?>
 </head>
 <body>
     <a class="atlama-baglantisi" href="#ana-icerik">İçeriğe geç</a>

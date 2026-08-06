@@ -347,12 +347,6 @@ $calismaSekilleri = ['Tam Zamanlı', 'Yarı Zamanlı', 'Sözleşmeli', 'Emekli K
                     <label class="ub-kvkk__etiket" for="ub-kvkk">
                         <strong>KVKK Onayı</strong> <span style="color:var(--bordo-500)">*</span><br>
                         Kişisel verilerimin işlenmesini kabul ediyorum.
-                        <a
-                            class="ub-kvkk__link"
-                            href="/kvkk-aydinlatma-metni"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >Kvkk Aydınlatma Metni</a>
                     </label>
                 </div>
 
