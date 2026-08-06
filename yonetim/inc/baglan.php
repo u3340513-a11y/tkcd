@@ -76,10 +76,12 @@ function yonetim_env_yukle(string $path): void
         $anahtar = trim(substr($satir, 0, $esitPos));
         $deger   = trim(substr($satir, $esitPos + 1));
 
-        // Çift veya tek tırnak varsa kaldır
+        // Çift veya tek tırnak varsa kaldır (PHP 7.x uyumlu)
+        $ilkKar = $deger[0] ?? '';
+        $sonKar = substr($deger, -1);
         if (
-            (str_starts_with($deger, '"') && str_ends_with($deger, '"'))
-            || (str_starts_with($deger, "'") && str_ends_with($deger, "'"))
+            ($ilkKar === '"' && $sonKar === '"')
+            || ($ilkKar === "'" && $sonKar === "'")
         ) {
             $deger = substr($deger, 1, -1);
         }

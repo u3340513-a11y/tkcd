@@ -33,7 +33,7 @@ if (isset($_GET['islem']) && $_GET['islem'] === 'cikis') {
  *
  * Yapı: storage/security/login_attempts/ altında IP bazlı JSON dosyaları.
  */
-$guvenlikDizini = dirname(__DIR__, 1) . '/../storage/security/login_attempts';
+$guvenlikDizini = __DIR__ . '/../storage/security/login_attempts';
 if (!is_dir($guvenlikDizini)) {
     @mkdir($guvenlikDizini, 0755, true);
 }
