@@ -10,6 +10,7 @@ use App\Core\Env;
 use App\Core\Http\Request;
 use App\Core\Http\Response;
 use App\Core\Log\LoggerInterface;
+use App\Domain\Membership\MembershipRepositoryInterface;
 
 /**
  * Üye Ol sayfası.
@@ -21,10 +22,11 @@ use App\Core\Log\LoggerInterface;
 final class MembershipController
 {
     public function __construct(
-        private readonly PageResponder     $responder,
-        private readonly MembershipService $membershipService,
-        private readonly Request           $request,
-        private readonly LoggerInterface   $logger,
+        private readonly PageResponder                $responder,
+        private readonly MembershipService            $membershipService,
+        private readonly MembershipRepositoryInterface $membershipRepository,
+        private readonly Request                      $request,
+        private readonly LoggerInterface              $logger,
     ) {
     }
 
@@ -54,6 +56,32 @@ final class MembershipController
             'styles'       => ['membership.css'],
             'scripts'      => ['membership.js'],
         ]);
+    }
+
+    /**
+     * AJAX: Telefon numarasının sistemde kayıtlı olup olmadığını kontrol eder.
+     *
+     * GET /uye-ol/telefon-kontrol?telefon=XXXXXXXXX  (9 haneli suffix)
+     *
+     * Yanıt: {"kayitli": true|false}
+     *
+     * Güvenlik:
+     *  - Yalnızca rakam içeren 9 haneli giriş kabul edilir.
+     *  - Sadece boolean döner; kullanıcı bilgisi açıklanmaz.
+     *  - Kötüye kullanımı sınırlamak için geçersiz girişte 400 döner.
+     */
+    public function checkTelefon(): Response
+    {
+        $suffix = trim((string) ($this->request->query['telefon'] ?? ''));
+
+        if (!preg_match('/^[0-9]{9}$/', $suffix)) {
+            return Response::json(['hata' => 'Geçersiz telefon formatı.'], 400);
+        }
+
+        $telefonTam = '05' . $suffix;
+        $kayitli = $this->membershipRepository->existsByTelefon($telefonTam);
+
+        return Response::json(['kayitli' => $kayitli]);
     }
 
     /**

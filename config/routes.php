@@ -33,6 +33,7 @@ return [
     ['POST', '/iletisim', ContactController::class, 'store', 'contact.store'],
     ['GET',  '/uye-ol', MembershipController::class, 'index', 'membership.index'],
     ['POST', '/uye-ol', MembershipController::class, 'store', 'membership.store'],
+    ['GET',  '/uye-ol/telefon-kontrol', MembershipController::class, 'checkTelefon', 'membership.checkTelefon'],
 
     ['GET', '/sitemap.xml', SitemapController::class, 'index', 'sitemap'],
 ];

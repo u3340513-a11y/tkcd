@@ -319,7 +319,29 @@
       this.value = sadeceSayilar;
     });
 
-    elTelefon.addEventListener('blur', dogrulaTelefon);
+    elTelefon.addEventListener('blur', function () {
+      // Önce format doğrulaması — hatalıysa AJAX'a gerek yok
+      if (!dogrulaTelefon()) return;
+
+      const deger = elTelefon.value.trim();
+
+      // Tam 9 rakam varsa sunucuda unique kontrolü yap
+      fetch('/uye-ol/telefon-kontrol?telefon=' + encodeURIComponent(deger))
+        .then(function (res) { return res.json(); })
+        .then(function (veri) {
+          if (veri.kayitli) {
+            hataGoster(
+              elTelefon,
+              'Bu telefon numarası sistemde zaten kayıtlıdır. Daha önce başvuru yaptıysanız tekrar göndermenize gerek yoktur.'
+            );
+          } else {
+            hataSil(elTelefon);
+          }
+        })
+        .catch(function () {
+          // Ağ hatası — sessizce geç; sunucu gönderimde yine kontrol eder
+        });
+    });
   }
 
   /**
