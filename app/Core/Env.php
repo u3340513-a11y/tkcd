@@ -38,7 +38,8 @@ final class Env
         foreach ($lines as $line) {
             $line = trim($line);
 
-            if ($line === '' || str_starts_with($line, '#') || !str_contains($line, '=')) {
+            // PHP 7.x uyumlu: str_starts_with ve str_contains yerine strpos
+            if ($line === '' || $line[0] === '#' || strpos($line, '=') === false) {
                 continue;
             }
 
