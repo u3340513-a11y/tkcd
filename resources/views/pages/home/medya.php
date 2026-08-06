@@ -30,7 +30,10 @@ $videoUrl = $videoId !== '' ? 'https://www.youtube.com/watch?v=' . $videoId : $y
             src="https://www.youtube-nocookie.com/embed/<?= $view->e($videoId) ?>?autoplay=1&mute=1&loop=1&playlist=<?= $view->e($videoId) ?>&controls=0&rel=0&modestbranding=1&playsinline=1&disablekb=1&iv_load_policy=3"
             title="Tanıtım videosu (arka plan)"
             tabindex="-1"
-            allow="autoplay; encrypted-media; picture-in-picture"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allowfullscreen
         ></iframe>
     </div>
 <?php endif; ?>
