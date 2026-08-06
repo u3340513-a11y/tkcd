@@ -25,7 +25,14 @@ $videoUrl = $videoId !== '' ? 'https://www.youtube.com/watch?v=' . $videoId : $y
 ?>
 <section class="medya" aria-labelledby="medya-baslik"<?= $videoId !== '' ? ' data-medya-video-id="' . $view->e($videoId) . '"' : '' ?>>
 <?php if ($videoId !== ''): ?>
-    <div class="medya__arkaplan" data-medya-arkaplan aria-hidden="true"></div>
+    <div class="medya__arkaplan" aria-hidden="true">
+        <iframe
+            src="https://www.youtube-nocookie.com/embed/<?= $view->e($videoId) ?>?autoplay=1&mute=1&loop=1&playlist=<?= $view->e($videoId) ?>&controls=0&rel=0&modestbranding=1&playsinline=1&disablekb=1&iv_load_policy=3"
+            title="Tanıtım videosu (arka plan)"
+            tabindex="-1"
+            allow="autoplay; encrypted-media; picture-in-picture"
+        ></iframe>
+    </div>
 <?php endif; ?>
 
     <div class="medya__katman" aria-hidden="true"></div>
