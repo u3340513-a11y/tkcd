@@ -144,7 +144,7 @@
     const bolum = document.querySelector('[data-medya-video-id]');
     const alan = bolum && bolum.querySelector('[data-medya-arkaplan]');
 
-    if (!bolum || !alan || HAREKET_AZALT) {
+    if (!bolum || !alan) {
       return;
     }
 
@@ -155,6 +155,11 @@
     }
 
     const videoyuYukle = () => {
+      // Çift yüklemeyi önle
+      if (alan.querySelector('iframe')) {
+        return;
+      }
+
       const iframe = document.createElement('iframe');
       const parametreler = new URLSearchParams({
         autoplay: '1',
@@ -168,20 +173,20 @@
         playsinline: '1',
         disablekb: '1',
         iv_load_policy: '3',
+        enablejsapi: '0',
       });
 
       iframe.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(videoId)}?${parametreler.toString()}`;
       iframe.title = 'Tanıtım videosu (arka plan)';
-      iframe.loading = 'lazy';
       iframe.setAttribute('tabindex', '-1');
       iframe.setAttribute('aria-hidden', 'true');
-      iframe.allow = 'autoplay; encrypted-media';
+      iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
       alan.appendChild(iframe);
     };
 
+    // IntersectionObserver yoksa direkt yükle
     if (!('IntersectionObserver' in window)) {
       videoyuYukle();
-
       return;
     }
 
@@ -191,15 +196,25 @@
           if (!giris.isIntersecting) {
             return;
           }
-
           videoyuYukle();
           gozlemci.unobserve(giris.target);
         });
       },
-      { rootMargin: '200px 0px' },
+      // rootMargin: Hero section zaten görünür alanda olduğundan
+      // negatif margin kaldırıldı — sıfır tolerans ile anında tetiklenir
+      { rootMargin: '0px 0px', threshold: 0 },
     );
 
     gozlemci.observe(bolum);
+
+    // Güvence: sayfa yüklendiğinde section zaten görünür alanındaysa
+    // IntersectionObserver bazen tetiklemiyor — setTimeout ile kontrol et
+    setTimeout(() => {
+      const kutu = bolum.getBoundingClientRect();
+      if (kutu.top < window.innerHeight && kutu.bottom > 0) {
+        videoyuYukle();
+      }
+    }, 300);
   };
 
   /* ------------------------------------------------------------------ */
