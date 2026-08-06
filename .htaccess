@@ -19,7 +19,9 @@
     RewriteRule (^|/)\. - [F,L]
 
     # Tüm istekleri public/ önyüzüne yönlendir.
+    # Yönetim paneli (/yonetim/) ve .well-known bu kuraldan muaftır.
     RewriteCond %{REQUEST_URI} !^/public/
+    RewriteCond %{REQUEST_URI} !^/yonetim/
     RewriteRule ^(.*)$ public/$1 [L]
 </IfModule>
 

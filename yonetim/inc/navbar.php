@@ -1,0 +1,48 @@
+<nav class="navbar navbar-expand-lg navbar-trabzon mb-4 shadow-sm">
+  <div class="container-fluid px-4">
+    <a class="navbar-brand d-flex align-items-center fw-bold" href="/yonetim/">
+      <img src="assets/logo.webp" alt="Logo" width="45" height="45" class="d-inline-block align-text-top me-2">
+      T.K.Ç.D. Panel
+    </a>
+    
+    <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+    </button>
+    
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-1">
+        <li class="nav-item">
+          <a class="nav-link" href="/yonetim/">
+            <i class="fa-solid fa-chart-pie me-1"></i> Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="index.php?sayfa=uyeler">
+            <i class="fa-solid fa-users me-1"></i> Üye Listesi & Temsilciler
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="index.php?sayfa=bekleyen-uyeler">
+            <i class="fa-solid fa-user-clock me-1"></i> Bekleyen Başvurular
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="index.php?sayfa=uye-ekle">
+            <i class="fa-solid fa-user-plus me-1"></i> Yeni Üye Ekle
+          </a>
+        </li>
+      </ul>
+      
+      <div class="d-flex align-items-center gap-3">
+        <span class="text-white">
+          <i class="fa-solid fa-user-shield me-1"></i> 
+          Hoş geldin, <strong><?= htmlspecialchars($_SESSION['kullanici_adi']); ?></strong>
+        </span>
+        <a href="/yonetim/?islem=cikis" class="btn btn-outline-light btn-sm fw-bold px-3">
+          <i class="fa-solid fa-right-from-bracket me-1"></i> Çıkış
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+<div class="container-fluid px-4">

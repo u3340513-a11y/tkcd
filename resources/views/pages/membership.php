@@ -268,12 +268,14 @@ $calismaSekilleri = ['Tam Zamanlı', 'Yarı Zamanlı', 'Sözleşmeli', 'Emekli K
                 <!-- Trabzon İlçesi (Nüfusa Kayıtlı) -->
                 <div class="ub-form__alan">
                     <label class="ub-form__etiket" for="ub-trabzon-ilce">
-                        Trabzon İlçesi (Nüfusa Kayıtlı)
+                        Trabzon İlçesi (Nüfusa Kayıtlı) <span class="ub-form__zorunlu" aria-label="zorunlu">*</span>
                     </label>
                     <select
                         class="ub-form__girdi ub-form__secim"
                         id="ub-trabzon-ilce"
                         name="trabzon_ilce"
+                        required
+                        aria-required="true"
                     >
                         <option value="">-- İlçe Seçiniz --</option>
                         <?php foreach ($trabzonIlceleri as $ilce): ?>

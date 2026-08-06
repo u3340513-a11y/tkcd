@@ -50,6 +50,9 @@
     ikametIl: {
       bos: 'İkamet edilen ili seçiniz.',
     },
+    trabzonIlce: {
+      bos: 'Trabzon ilçesini seçiniz.',
+    },
     kvkk: {
       onay: 'KVKK metnini okuyup onaylamanız gerekmektedir.',
     },
@@ -61,12 +64,13 @@
   const form        = document.getElementById('uyelik-basvuru-formu');
   if (!form) return;
 
-  const elAdSoyad   = document.getElementById('ub-ad-soyad');
-  const elTelefon   = document.getElementById('ub-telefon');
-  const elEposta    = document.getElementById('ub-eposta');
-  const elDogum     = document.getElementById('ub-dogum-tarihi');
-  const elIl        = document.getElementById('ub-ikamet-il');
-  const elKvkk      = document.getElementById('ub-kvkk');
+  const elAdSoyad    = document.getElementById('ub-ad-soyad');
+  const elTelefon    = document.getElementById('ub-telefon');
+  const elEposta     = document.getElementById('ub-eposta');
+  const elDogum      = document.getElementById('ub-dogum-tarihi');
+  const elIl         = document.getElementById('ub-ikamet-il');
+  const elTrabzonIlce = document.getElementById('ub-trabzon-ilce');
+  const elKvkk       = document.getElementById('ub-kvkk');
 
   // -----------------------------------------------------------------------
   // Hata göster / temizle
@@ -177,10 +181,18 @@
       return false;
     }
 
-    const dogum  = new Date(deger);
+    // Timezone kaymasını önlemek için UTC olarak parse ediyoruz.
+    // new Date('YYYY-MM-DD') UTC gece yarısı olarak yorumlar; yerel saat
+    // farkından kaynaklanan -1 gün hatasını ortadan kaldırır.
+    const parcalar = deger.split('-');
+    const dogum    = new Date(Date.UTC(
+      parseInt(parcalar[0], 10),
+      parseInt(parcalar[1], 10) - 1,
+      parseInt(parcalar[2], 10)
+    ));
     const bugun  = new Date();
-    const yasMin = new Date(bugun.getFullYear() - 18, bugun.getMonth(), bugun.getDate());
-    const yasMax = new Date(1930, 0, 1);
+    const yasMin = new Date(Date.UTC(bugun.getFullYear() - 18, bugun.getMonth(), bugun.getDate()));
+    const yasMax = new Date(Date.UTC(1930, 0, 1));
 
     if (dogum > yasMin) {
       hataGoster(elDogum, HATALAR.dogumTarihi.yasMin);
@@ -196,11 +208,20 @@
   }
 
   function dogrulaIkametIl() {
-    if (!elIl.value) {
+    if (!elIl.value || elIl.value === '') {
       hataGoster(elIl, HATALAR.ikametIl.bos);
       return false;
     }
     hataSil(elIl);
+    return true;
+  }
+
+  function dogrulaTrabzonIlce() {
+    if (!elTrabzonIlce || !elTrabzonIlce.value || elTrabzonIlce.value === '') {
+      if (elTrabzonIlce) hataGoster(elTrabzonIlce, HATALAR.trabzonIlce.bos);
+      return false;
+    }
+    hataSil(elTrabzonIlce);
     return true;
   }
 
@@ -310,6 +331,13 @@
   }
 
   /**
+   * Trabzon İlçesi — change'de doğrulama.
+   */
+  if (elTrabzonIlce) {
+    elTrabzonIlce.addEventListener('change', dogrulaTrabzonIlce);
+  }
+
+  /**
    * KVKK — change'de doğrulama.
    */
   if (elKvkk) {
@@ -327,6 +355,7 @@
       dogrulaEposta(),
       dogrulaDogumTarihi(),
       dogrulaIkametIl(),
+      dogrulaTrabzonIlce(),
       dogrulaKvkk(),
     ];
 

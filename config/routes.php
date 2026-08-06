@@ -31,7 +31,8 @@ return [
     ['GET', '/yonetim-kurulu', BoardController::class, 'index', 'board.index'],
     ['GET',  '/iletisim', ContactController::class, 'index', 'contact.index'],
     ['POST', '/iletisim', ContactController::class, 'store', 'contact.store'],
-    ['GET', '/uye-ol', MembershipController::class, 'index', 'membership.index'],
+    ['GET',  '/uye-ol', MembershipController::class, 'index', 'membership.index'],
+    ['POST', '/uye-ol', MembershipController::class, 'store', 'membership.store'],
 
     ['GET', '/sitemap.xml', SitemapController::class, 'index', 'sitemap'],
 ];

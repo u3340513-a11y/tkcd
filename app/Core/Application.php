@@ -21,12 +21,15 @@ use App\Domain\Content\Repository\DistrictRepositoryInterface;
 use App\Domain\Content\Repository\EventRepositoryInterface;
 use App\Domain\Content\Repository\MilestoneRepositoryInterface;
 use App\Domain\Content\Repository\StatisticRepositoryInterface;
+use App\Domain\Membership\MembershipRepositoryInterface;
 use App\Infrastructure\Content\PhpFileActivityAreaRepository;
 use App\Infrastructure\Content\PhpFileAnnouncementRepository;
 use App\Infrastructure\Content\PhpFileDistrictRepository;
 use App\Infrastructure\Content\PhpFileEventRepository;
 use App\Infrastructure\Content\PhpFileMilestoneRepository;
 use App\Infrastructure\Content\PhpFileStatisticRepository;
+use App\Infrastructure\Membership\PdoMembershipRepository;
+use PDO;
 use Throwable;
 
 /**
@@ -129,6 +132,32 @@ final class Application
         $this->container->bind(ActivityAreaRepositoryInterface::class, PhpFileActivityAreaRepository::class);
         $this->container->bind(DistrictRepositoryInterface::class, PhpFileDistrictRepository::class);
         $this->container->bind(MilestoneRepositoryInterface::class, PhpFileMilestoneRepository::class);
+
+        // Üyelik başvurusu: PDO bağlantısı yalnızca form gönderildiğinde
+        // (save() çağrısında) kurulur; GET isteğinde bağlantı denenmez.
+        $this->container->factory(
+            MembershipRepositoryInterface::class,
+            static function (): PdoMembershipRepository {
+                $pdoFactory = static function (): PDO {
+                    $host    = Env::string('DB_HOST',     '127.0.0.1');
+                    $port    = Env::string('DB_PORT',     '3306');
+                    $dbname  = Env::string('DB_DATABASE', '');
+                    $user    = Env::string('DB_USERNAME', '');
+                    $pass    = Env::string('DB_PASSWORD', '');
+                    $charset = Env::string('DB_CHARSET',  'utf8mb4');
+
+                    $dsn = "mysql:host={$host};port={$port};dbname={$dbname};charset={$charset}";
+
+                    return new PDO($dsn, $user, $pass, [
+                        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+                        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                        PDO::ATTR_EMULATE_PREPARES   => false,
+                    ]);
+                };
+
+                return new PdoMembershipRepository($pdoFactory);
+            }
+        );
     }
 
     private function composeLayoutData(Request $request): void
