@@ -69,7 +69,6 @@ use App\Core\View\SeoMeta;
                         <?= $view->icon('camera') ?>
                     </span>
                     <?php endif; ?>
-                    <figcaption class="gl-kart__altyazi"><?= $view->e($gorsel['alt']) ?></figcaption>
                 </figure>
             </li>
             <?php endforeach; ?>
