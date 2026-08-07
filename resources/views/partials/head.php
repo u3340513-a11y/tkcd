@@ -48,10 +48,17 @@ $siteName = (string) ($site['name'] ?? '');
     <link rel="icon" href="<?= $view->e($view->asset('assets/img/logo.webp')) ?>" type="image/webp">
     <link rel="apple-touch-icon" href="<?= $view->e($view->asset('assets/img/logo.png')) ?>">
 
+    <link rel="preconnect" href="https://www.youtube-nocookie.com">
+    <link rel="dns-prefetch" href="https://www.youtube-nocookie.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
     <link rel="preload" as="image" href="<?= $view->e($view->asset('assets/img/logo.webp')) ?>" type="image/webp">
     <link rel="stylesheet" href="<?= $view->e($view->asset('assets/css/app.css')) ?>">
 <?php foreach ($styles as $style): ?>
-    <link rel="stylesheet" href="<?= $view->e($view->asset('assets/css/' . $style)) ?>">
+    <link rel="preload" href="<?= $view->e($view->asset('assets/css/' . $style)) ?>" as="style"
+          onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="<?= $view->e($view->asset('assets/css/' . $style)) ?>"></noscript>
 <?php endforeach; ?>
 
     <!-- JavaScript kapalıysa görünürlük animasyonları devre dışı bırakılır,

@@ -135,20 +135,18 @@
   /* ------------------------------------------------------------------ */
   /* Tanıtım bölümü: arka planda sessiz/döngüsel YouTube videosu.        */
   /*                                                                      */
-  /* Video, ilk sayfa yükleme performansını korumak için bölüm görünüm   */
-  /* alanına yaklaşana kadar gömülmez ve "hareketi azalt" tercih edildi- */
-  /* ğinde hiç yüklenmez; bu durumlarda bölüm markanın degrade zemini    */
-  /* üzerinde durmaya devam eder.                                        */
+  /* Performans: Video, sayfa etkileşimli hale geldikten 2.5 saniye      */
+  /* sonra yüklenir. Bu sayede youtube-nocookie.com kritik oluşturma     */
+  /* yolundan çıkarılır ve LCP/FCP skorları iyileşir.                   */
   /* ------------------------------------------------------------------ */
   const tanitimVideosu = () => {
-    const bolum = document.querySelector('[data-medya-video-id]');
-    const alan = bolum && bolum.querySelector('[data-medya-arkaplan]');
+    const alan = document.querySelector('[data-medya-arkaplan][data-medya-video-id]');
 
-    if (!bolum || !alan) {
+    if (!alan) {
       return;
     }
 
-    const videoId = bolum.dataset.medyaVideoId || '';
+    const videoId = alan.dataset.medyaVideoId || '';
 
     if (videoId === '') {
       return;
@@ -167,54 +165,29 @@
         loop: '1',
         playlist: videoId,
         controls: '0',
-        showinfo: '0',
         rel: '0',
         modestbranding: '1',
         playsinline: '1',
         disablekb: '1',
         iv_load_policy: '3',
-        enablejsapi: '0',
       });
 
       iframe.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(videoId)}?${parametreler.toString()}`;
       iframe.title = 'Tanıtım videosu (arka plan)';
       iframe.setAttribute('tabindex', '-1');
       iframe.setAttribute('aria-hidden', 'true');
-      iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
+      iframe.setAttribute('frameborder', '0');
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
       alan.appendChild(iframe);
     };
 
-    // IntersectionObserver yoksa direkt yükle
-    if (!('IntersectionObserver' in window)) {
-      videoyuYukle();
-      return;
+    // Sayfa etkileşimli olduktan 2.5 saniye sonra yükle.
+    // Bu, youtube-nocookie.com'u kritik oluşturma yolundan çıkarır.
+    if (document.readyState === 'complete') {
+      setTimeout(videoyuYukle, 2500);
+    } else {
+      window.addEventListener('load', () => setTimeout(videoyuYukle, 2500), { once: true });
     }
-
-    const gozlemci = new IntersectionObserver(
-      (girisler) => {
-        girisler.forEach((giris) => {
-          if (!giris.isIntersecting) {
-            return;
-          }
-          videoyuYukle();
-          gozlemci.unobserve(giris.target);
-        });
-      },
-      // rootMargin: Hero section zaten görünür alanda olduğundan
-      // negatif margin kaldırıldı — sıfır tolerans ile anında tetiklenir
-      { rootMargin: '0px 0px', threshold: 0 },
-    );
-
-    gozlemci.observe(bolum);
-
-    // Güvence: sayfa yüklendiğinde section zaten görünür alanındaysa
-    // IntersectionObserver bazen tetiklemiyor — setTimeout ile kontrol et
-    setTimeout(() => {
-      const kutu = bolum.getBoundingClientRect();
-      if (kutu.top < window.innerHeight && kutu.bottom > 0) {
-        videoyuYukle();
-      }
-    }, 300);
   };
 
   /* ------------------------------------------------------------------ */
