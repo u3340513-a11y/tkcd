@@ -99,7 +99,8 @@ final class AboutController
         $gorseller = require dirname(__DIR__, 3) . '/resources/data/gallery.php';
 
         return $this->responder->page('pages/gallery', $seo, [
-            'styles'   => ['about.css', 'gallery.css'],
+            'styles'    => ['about.css', 'gallery.css'],
+            'scripts'   => ['gallery.js'],
             'gorseller' => $gorseller,
         ]);
     }

@@ -198,3 +198,210 @@
     grid-column: span 1;
   }
 }
+
+/* ============================================================
+   KART BUTONU (tıklanabilir kaplama)
+   ============================================================ */
+
+.gl-kart__btn {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: none;
+  cursor: zoom-in;
+  text-align: left;
+}
+
+.gl-kart__btn:focus-visible {
+  outline: 3px solid var(--renk-marka);
+  outline-offset: 2px;
+}
+
+/* Zoom ikonu overlay */
+.gl-kart__zum {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(22, 10, 14, 0);
+  transition: background 0.25s ease;
+  color: #fff;
+  pointer-events: none;
+}
+
+.gl-kart__zum .icon {
+  width: 2.2rem;
+  height: 2.2rem;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
+}
+
+.gl-kart__btn:hover .gl-kart__zum,
+.gl-kart__btn:focus-visible .gl-kart__zum {
+  background: rgba(22, 10, 14, 0.38);
+}
+
+.gl-kart__btn:hover .gl-kart__zum .icon,
+.gl-kart__btn:focus-visible .gl-kart__zum .icon {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ============================================================
+   LIGHTBOX MODAL
+   ============================================================ */
+
+.gl-lightbox {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  overflow: hidden;
+  z-index: 900;
+}
+
+.gl-lightbox:not([open]) {
+  display: none;
+}
+
+/* Koyu arka plan */
+.gl-lightbox__arka {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 5, 8, 0.92);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  cursor: pointer;
+}
+
+/* İçerik alanı */
+.gl-lightbox__ic {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--bosluk-3);
+  padding: clamp(2.5rem, 5vw, 4rem) clamp(1rem, 4vw, 3rem);
+}
+
+/* Görsel kap */
+.gl-lightbox__gorsel-kap {
+  position: relative;
+  max-width: 88vw;
+  max-height: 88vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gl-lightbox__gorsel {
+  max-width: 100%;
+  max-height: 88vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: var(--yuvarlak-md);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.7);
+  display: block;
+  transform: scale(0.94);
+  opacity: 0;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
+}
+
+.gl-lightbox[open] .gl-lightbox__gorsel {
+  transform: scale(1);
+  opacity: 1;
+}
+
+/* Kapat butonu */
+.gl-lightbox__kapat {
+  position: absolute;
+  top: clamp(0.75rem, 2vw, 1.25rem);
+  right: clamp(0.75rem, 2vw, 1.25rem);
+  z-index: 10;
+  width: 2.75rem;
+  height: 2.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--yuvarlak-tam);
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.gl-lightbox__kapat:hover {
+  background: rgba(255, 255, 255, 0.22);
+  transform: scale(1.08);
+}
+
+.gl-lightbox__kapat .icon {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+/* Önceki / sonraki okları */
+.gl-lightbox__nav {
+  flex-shrink: 0;
+  width: 2.75rem;
+  height: 2.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--yuvarlak-tam);
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.gl-lightbox__nav:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.gl-lightbox__nav--onceki:hover { transform: translateX(-3px); }
+.gl-lightbox__nav--sonraki:hover { transform: translateX(3px); }
+
+.gl-lightbox__nav .icon {
+  width: 1.3rem;
+  height: 1.3rem;
+}
+
+/* Mobil */
+@media (max-width: 600px) {
+  .gl-lightbox__ic {
+    gap: var(--bosluk-2);
+    padding: 3.5rem 0.5rem 1rem;
+  }
+
+  .gl-lightbox__nav {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  .gl-lightbox__gorsel-kap {
+    max-width: 95vw;
+  }
+
+  .gl-lightbox__gorsel {
+    max-height: 80vh;
+  }
+}
