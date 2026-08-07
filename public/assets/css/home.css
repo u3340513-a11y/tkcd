@@ -77,11 +77,15 @@
   gap: clamp(2.5rem, 5vw, 3.5rem);
   align-items: center;
   width: 100%;
+
+  /* Mobil: ortala */
+  text-align: center;
 }
 
 @media (min-width: 1024px) {
   .kahraman__izgara {
     grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
+    text-align: left;
   }
 }
 
@@ -135,6 +139,34 @@
   align-items: center;
   gap: var(--bosluk-4);
   margin-top: var(--bosluk-6);
+
+  /* Mobil: ortala */
+  justify-content: center;
+  text-align: center;
+}
+
+/* Mobil: iki buton yan yana, tam genişlikte değil */
+.kahraman__eylemler .dugme {
+  flex: 0 1 auto;
+}
+
+/* Sosyal medya listesi tam satır kaplasın ve ortalansın */
+.kahraman__eylemler .sosyal-liste {
+  flex-basis: 100%;
+  justify-content: center;
+}
+
+/* Masaüstü: sola yasla */
+@media (min-width: 1024px) {
+  .kahraman__eylemler {
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  .kahraman__eylemler .sosyal-liste {
+    flex-basis: auto;
+    justify-content: flex-start;
+  }
 }
 
 /* Sayaçlar */
