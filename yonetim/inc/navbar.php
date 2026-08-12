@@ -48,7 +48,7 @@
           Hoş geldin, <strong><?= htmlspecialchars($_SESSION['kullanici_adi']); ?></strong>
           <?php
           $rol_etiketleri = [
-              'admin' => ['Tam Yetkili', 'light'],
+              'admin' => ['Tam Yetkili', 'success'],
               'denetci' => ['Denetçi', 'info'],
               'moderator' => ['Moderatör', 'warning'],
               'yonetim' => ['Yönetim', 'primary'],
