@@ -107,7 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['kullanici_adi'])) {
         $sifre     = trim($_POST['sifre']);
 
         if (!empty($kullanici) && !empty($sifre)) {
-            $sorgu = $db_baglanti->prepare("SELECT id, kullanici_adi, sifre, rol FROM dernek_yoneticiler WHERE kullanici_adi = ?");
+            $sorgu = $db_baglanti->prepare("SELECT id, kullanici_adi, sifre, rol, sorumlu_il, sorumlu_ilce, sorumlu_kurum FROM dernek_yoneticiler WHERE kullanici_adi = ?");
             $sorgu->execute([$kullanici]);
             $user = $sorgu->fetch();
 
@@ -119,6 +119,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['kullanici_adi'])) {
                 $_SESSION['id'] = $user['id'];
                 $_SESSION['kullanici_adi'] = $user['kullanici_adi'];
                 $_SESSION['rol'] = $user['rol'] ?? 'admin';
+                $_SESSION['sorumlu_il']    = $user['sorumlu_il'] ?? null;
+                $_SESSION['sorumlu_ilce']  = $user['sorumlu_ilce'] ?? null;
+                $_SESSION['sorumlu_kurum'] = $user['sorumlu_kurum'] ?? null;
                 $_SESSION['son_aktivite'] = time();
 
                 // Başarılı giriş: deneme sayacını temizle
@@ -146,6 +149,15 @@ $kullanici_rolu = $_SESSION['rol'] ?? 'admin';
 $is_denetci   = ($kullanici_rolu === 'denetci');
 $is_moderator = ($kullanici_rolu === 'moderator');
 
+// ─── YENİ ROLLER (mevcut rollere dokunulmaz) ─────────────────────────
+$is_admin             = ($kullanici_rolu === 'admin');
+$is_yonetim           = ($kullanici_rolu === 'yonetim');
+$is_il_baskani        = ($kullanici_rolu === 'il_baskani');
+$is_ilce_baskani      = ($kullanici_rolu === 'ilce_baskani');
+$is_kurum_temsilcisi  = ($kullanici_rolu === 'kurum_temsilcisi');
+$is_kisitli_rol       = ($is_il_baskani || $is_ilce_baskani || $is_kurum_temsilcisi);
+$is_yetki_var         = ($is_admin || $is_yonetim);
+
 $sayfa = isset($_GET['sayfa']) ? trim($_GET['sayfa']) : 'dashboard';
 
 include 'inc/header.php';
@@ -166,6 +178,8 @@ switch ($sayfa) {
     case 'uye-ekle':
         if ($is_denetci) {
             echo '<div class="container py-5"><div class="alert alert-danger text-center fw-bold"><i class="fa-solid fa-lock me-2"></i>Erişim Engellendi: Üye ekleme yetkiniz bulunmamaktadır.</div></div>';
+        } elseif ($is_kisitli_rol) {
+            echo '<div class="container py-5"><div class="alert alert-danger text-center fw-bold"><i class="fa-solid fa-lock me-2"></i>Erişim Engellendi: Bu hesap türü ile üye ekleme işlemi yapılamaz.</div></div>';
         } else {
             include 'inc/uye-ekle.php';
         }
@@ -178,13 +192,91 @@ switch ($sayfa) {
     case 'bekleyen-uyeler':
         if ($is_denetci) {
             echo '<div class="container py-5"><div class="alert alert-danger text-center fw-bold"><i class="fa-solid fa-lock me-2"></i>Erişim Engellendi: Bekleyen başvuruları inceleme yetkiniz bulunmamaktadır.</div></div>';
+        } elseif ($is_kisitli_rol) {
+            echo '<div class="container py-5"><div class="alert alert-danger text-center fw-bold"><i class="fa-solid fa-lock me-2"></i>Erişim Engellendi: Bu hesap türü ile bekleyen başvuruları görüntüleyemezsiniz.</div></div>';
         } else {
             include 'inc/bekleyen-uyeler.php';
+        }
+        break;
+
+    case 'hesap-yonetimi':
+        if (!$is_admin) {
+            echo '<div class="container py-5"><div class="alert alert-danger text-center fw-bold"><i class="fa-solid fa-lock me-2"></i>Erişim Engellendi: Hesap yönetimi sadece tam yetkili yöneticilere açıktır.</div></div>';
+        } else {
+            include 'inc/hesap-yonetimi.php';
         }
         break;
         
     case 'dashboard':
     default:
+        // ─── KISITLI ROLLER İÇİN ÖZEL DASHBOARD ─────────────────────────
+        if ($is_kisitli_rol) {
+            $kisitli_baslik = 'Kontrol Paneli';
+            $kisitli_aciklama = '';
+            $kisitli_ikon = 'fa-chart-pie';
+            $kisitli_renk = 'primary';
+            $kisitli_where = "onay_durumu = 'onayli'";
+            $kisitli_param = null;
+
+            if ($is_il_baskani && !empty($_SESSION['sorumlu_il'])) {
+                $kisitli_baslik = htmlspecialchars($_SESSION['sorumlu_il']) . ' İli';
+                $kisitli_aciklama = htmlspecialchars($_SESSION['sorumlu_il']) . ' iline ait kayıtlı üyeler.';
+                $kisitli_ikon = 'fa-building-flag';
+                $kisitli_renk = 'success';
+                $kisitli_where .= " AND ikamet_ili = ?";
+                $kisitli_param = $_SESSION['sorumlu_il'];
+            } elseif ($is_ilce_baskani && !empty($_SESSION['sorumlu_ilce'])) {
+                $kisitli_baslik = htmlspecialchars($_SESSION['sorumlu_ilce']) . ' İlçesi';
+                $kisitli_aciklama = htmlspecialchars($_SESSION['sorumlu_ilce']) . ' ilçesine ait kayıtlı üyeler.';
+                $kisitli_ikon = 'fa-map-location-dot';
+                $kisitli_renk = 'purple';
+                $kisitli_where .= " AND trabzon_ilcesi = ?";
+                $kisitli_param = $_SESSION['sorumlu_ilce'];
+            } elseif ($is_kurum_temsilcisi && !empty($_SESSION['sorumlu_kurum'])) {
+                $kisitli_baslik = htmlspecialchars($_SESSION['sorumlu_kurum']);
+                $kisitli_aciklama = htmlspecialchars($_SESSION['sorumlu_kurum']) . ' kurumuna ait kayıtlı üyeler.';
+                $kisitli_ikon = 'fa-building-user';
+                $kisitli_renk = 'warning';
+                $kisitli_where .= " AND kurum = ?";
+                $kisitli_param = $_SESSION['sorumlu_kurum'];
+            }
+
+            try {
+                $k_sorgu = $db_baglanti->prepare("SELECT COUNT(*) FROM dernek_uyeler WHERE " . $kisitli_where);
+                if ($kisitli_param !== null) {
+                    $k_sorgu->execute([$kisitli_param]);
+                } else {
+                    $k_sorgu->execute();
+                }
+                $kisitli_uye_sayisi = $k_sorgu->fetchColumn();
+            } catch (\PDOException $e) {
+                error_log('Kısıtlı dashboard hatası: ' . $e->getMessage());
+                $kisitli_uye_sayisi = 0;
+            }
+            ?>
+            <div class="container-fluid py-4 px-md-4">
+                <div class="row mb-4">
+                    <div class="col-12 text-center">
+                        <div class="bg-white p-5 rounded shadow-sm border">
+                            <div class="mb-3">
+                                <span class="badge bg-<?= $kisitli_renk; ?> px-3 py-2 fs-6 rounded-pill">
+                                    <i class="fa-solid fa-<?= $kisitli_ikon; ?> me-1"></i> <?= $kisitli_baslik; ?>
+                                </span>
+                            </div>
+                            <h2 class="fw-bold text-dark mb-2"><i class="fa-solid fa-users me-2 text-<?= $kisitli_renk; ?>"></i><?= $kisitli_uye_sayisi; ?> Kayıtlı Üye</h2>
+                            <p class="text-muted mb-4"><?= $kisitli_aciklama; ?></p>
+                            <a href="index.php?sayfa=uyeler" class="btn btn-dark fw-bold px-4 shadow-sm">
+                                <i class="fa-solid fa-list me-2"></i>Üye Listesini Görüntüle
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php
+            break;
+        }
+
+        // ─── STANDART DASHBOARD (admin, denetci, moderator, yonetim) ────
         try {
             $toplam_uye = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli'")->fetchColumn();
             $toplam_il  = $db_baglanti->query("SELECT COUNT(DISTINCT ikamet_ili) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND ikamet_ili IS NOT NULL AND ikamet_ili != ''")->fetchColumn();

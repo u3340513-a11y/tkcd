@@ -6,6 +6,12 @@ if (!isset($_SESSION['oturum']) || $_SESSION['oturum'] !== true) {
     die("Yetkisiz erişim!");
 }
 
+// Dosya indirme sadece tam yetkili hesaba (admin) açıktır
+$rol = $_SESSION['rol'] ?? 'admin';
+if ($rol !== 'admin') {
+    die("Yetkisiz erişim! Dosya indirme yalnızca tam yetkili hesaplara açıktır.");
+}
+
 $arama_kelimesi = isset($_GET['arama']) ? trim($_GET['arama']) : '';
 $aktif_filtre   = isset($_GET['filtre']) ? trim($_GET['filtre']) : '';
 

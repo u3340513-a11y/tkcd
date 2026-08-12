@@ -8,12 +8,20 @@ $kullanici_rolu = isset($_SESSION['rol']) ? $_SESSION['rol'] : 'admin';
 $is_denetci = ($kullanici_rolu === 'denetci');
 $is_moderator = ($kullanici_rolu === 'moderator');
 
+// Yeni roller (mevcut rollere dokunulmaz)
+$is_admin             = ($kullanici_rolu === 'admin');
+$is_yonetim           = ($kullanici_rolu === 'yonetim');
+$is_il_baskani        = ($kullanici_rolu === 'il_baskani');
+$is_ilce_baskani      = ($kullanici_rolu === 'ilce_baskani');
+$is_kurum_temsilcisi  = ($kullanici_rolu === 'kurum_temsilcisi');
+$is_kisitli_rol       = ($is_il_baskani || $is_ilce_baskani || $is_kurum_temsilcisi);
+
 // İşlem sonrası aynı sayfaya geri yönlendirme linki
 $geri_link = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : 'index.php?sayfa=uyeler';
 
 // --- ÜYE SİLME MOTORU ---
 if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'uye_sil' && isset($_GET['id'])) {
-    if ($is_denetci || $is_moderator) {
+    if ($is_denetci || $is_moderator || $is_kisitli_rol) {
         die("Erişim Engellendi: Bu işlemi yapmaya yetkiniz yok!");
     }
     $uye_id = intval($_GET['id']);
@@ -32,7 +40,7 @@ if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'uye_sil' && isset($_GET['id
 
 // --- ANA STATÜ DEĞİŞTİRME MOTORU ---
 if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'statü_degistir' && isset($_GET['id']) && isset($_GET['tur'])) {
-    if ($is_denetci || $is_moderator) {
+    if ($is_denetci || $is_moderator || $is_kisitli_rol) {
         die("Erişim Engellendi: Bu işlemi yapmaya yetkiniz yok!");
     }
     $uye_id = intval($_GET['id']);
@@ -62,7 +70,7 @@ if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'statü_degistir' && isset($
 
 // --- EK GÖREV DEĞİŞTİRME VE SİLME MOTORU ---
 if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'ek_gorev_degistir' && isset($_GET['id']) && isset($_GET['gorev'])) {
-    if ($is_denetci || $is_moderator) {
+    if ($is_denetci || $is_moderator || $is_kisitli_rol) {
         die("Erişim Engellendi: Bu işlemi yapmaya yetkiniz yok!");
     }
     $uye_id = intval($_GET['id']);
@@ -94,40 +102,78 @@ $offset = ($mevcut_sayfa - 1) * $limit;
 
 $iller_modu = false;
 
+// ─── ROL BAZLI EK FİLTRE (mevcut filtre mantığına dokunulmaz) ────────
+$rol_ek_where = '';
+$rol_ek_parametreler = [];
+
+if ($is_il_baskani && !empty($_SESSION['sorumlu_il'])) {
+    $rol_ek_where = " AND ikamet_ili = ?";
+    $rol_ek_parametreler[] = $_SESSION['sorumlu_il'];
+} elseif ($is_ilce_baskani && !empty($_SESSION['sorumlu_ilce'])) {
+    $rol_ek_where = " AND trabzon_ilcesi = ?";
+    $rol_ek_parametreler[] = $_SESSION['sorumlu_ilce'];
+} elseif ($is_kurum_temsilcisi && !empty($_SESSION['sorumlu_kurum'])) {
+    $rol_ek_where = " AND kurum = ?";
+    $rol_ek_parametreler[] = $_SESSION['sorumlu_kurum'];
+}
+
 try {
     if ($aktif_filtre === 'kurum_temsilcisi') {
-        $toplam_onayli = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Kurum Temsilcisi' OR ek_gorev = 'Kurum Temsilcisi')")->fetchColumn();
+        $say_sql = "SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Kurum Temsilcisi' OR ek_gorev = 'Kurum Temsilcisi')" . $rol_ek_where;
+        $say_sorgu = $db_baglanti->prepare($say_sql);
+        $say_sorgu->execute($rol_ek_parametreler);
+        $toplam_onayli = $say_sorgu->fetchColumn();
         $toplam_sayfa = ceil($toplam_onayli / $limit);
-        $sorgu = $db_baglanti->prepare("SELECT * FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Kurum Temsilcisi' OR ek_gorev = 'Kurum Temsilcisi') ORDER BY adi_soyadi ASC LIMIT ? OFFSET ?");
+        $sorgu = $db_baglanti->prepare("SELECT * FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Kurum Temsilcisi' OR ek_gorev = 'Kurum Temsilcisi')" . $rol_ek_where . " ORDER BY adi_soyadi ASC LIMIT ? OFFSET ?");
     } elseif ($aktif_filtre === 'yonetim_kurulu') {
-        $toplam_onayli = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Yönetim Kurulu Üyesi' OR temsilci_turu = 'Yönetim Kurulu Üyesi Yedek' OR temsilci_turu = 'Yönetici' OR ek_gorev = 'Yönetim Kurulu Üyesi' OR ek_gorev = 'Yönetim Kurulu Üyesi Yedek' OR ek_gorev = 'Yönetici')")->fetchColumn();
+        $say_sql = "SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Yönetim Kurulu Üyesi' OR temsilci_turu = 'Yönetim Kurulu Üyesi Yedek' OR temsilci_turu = 'Yönetici' OR ek_gorev = 'Yönetim Kurulu Üyesi' OR ek_gorev = 'Yönetim Kurulu Üyesi Yedek' OR ek_gorev = 'Yönetici')" . $rol_ek_where;
+        $say_sorgu = $db_baglanti->prepare($say_sql);
+        $say_sorgu->execute($rol_ek_parametreler);
+        $toplam_onayli = $say_sorgu->fetchColumn();
         $toplam_sayfa = ceil($toplam_onayli / $limit);
-        $sorgu = $db_baglanti->prepare("SELECT * FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Yönetim Kurulu Üyesi' OR temsilci_turu = 'Yönetim Kurulu Üyesi Yedek' OR temsilci_turu = 'Yönetici' OR ek_gorev = 'Yönetim Kurulu Üyesi' OR ek_gorev = 'Yönetim Kurulu Üyesi Yedek' OR ek_gorev = 'Yönetici') ORDER BY adi_soyadi ASC LIMIT ? OFFSET ?");
+        $sorgu = $db_baglanti->prepare("SELECT * FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Yönetim Kurulu Üyesi' OR temsilci_turu = 'Yönetim Kurulu Üyesi Yedek' OR temsilci_turu = 'Yönetici' OR ek_gorev = 'Yönetim Kurulu Üyesi' OR ek_gorev = 'Yönetim Kurulu Üyesi Yedek' OR ek_gorev = 'Yönetici')" . $rol_ek_where . " ORDER BY adi_soyadi ASC LIMIT ? OFFSET ?");
     } elseif ($aktif_filtre === 'bolge_koordinatoru') {
-        $toplam_onayli = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Bölge Koordinatörü' OR ek_gorev = 'Bölge Koordinatörü')")->fetchColumn();
+        $say_sql = "SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Bölge Koordinatörü' OR ek_gorev = 'Bölge Koordinatörü')" . $rol_ek_where;
+        $say_sorgu = $db_baglanti->prepare($say_sql);
+        $say_sorgu->execute($rol_ek_parametreler);
+        $toplam_onayli = $say_sorgu->fetchColumn();
         $toplam_sayfa = ceil($toplam_onayli / $limit);
-        $sorgu = $db_baglanti->prepare("SELECT * FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Bölge Koordinatörü' OR ek_gorev = 'Bölge Koordinatörü') ORDER BY adi_soyadi ASC LIMIT ? OFFSET ?");
+        $sorgu = $db_baglanti->prepare("SELECT * FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Bölge Koordinatörü' OR ek_gorev = 'Bölge Koordinatörü')" . $rol_ek_where . " ORDER BY adi_soyadi ASC LIMIT ? OFFSET ?");
     } elseif ($aktif_filtre === 'il_baskani') {
-        $toplam_onayli = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'İl Başkanı' OR temsilci_turu = 'İl Temsilcisi' OR ek_gorev = 'İl Başkanı' OR ek_gorev = 'İl Temsilcisi')")->fetchColumn();
+        $say_sql = "SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'İl Başkanı' OR temsilci_turu = 'İl Temsilcisi' OR ek_gorev = 'İl Başkanı' OR ek_gorev = 'İl Temsilcisi')" . $rol_ek_where;
+        $say_sorgu = $db_baglanti->prepare($say_sql);
+        $say_sorgu->execute($rol_ek_parametreler);
+        $toplam_onayli = $say_sorgu->fetchColumn();
         $toplam_sayfa = ceil($toplam_onayli / $limit);
-        $sorgu = $db_baglanti->prepare("SELECT * FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'İl Başkanı' OR temsilci_turu = 'İl Temsilcisi' OR ek_gorev = 'İl Başkanı' OR ek_gorev = 'İl Temsilcisi') ORDER BY adi_soyadi ASC LIMIT ? OFFSET ?");
+        $sorgu = $db_baglanti->prepare("SELECT * FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'İl Başkanı' OR temsilci_turu = 'İl Temsilcisi' OR ek_gorev = 'İl Başkanı' OR ek_gorev = 'İl Temsilcisi')" . $rol_ek_where . " ORDER BY adi_soyadi ASC LIMIT ? OFFSET ?");
     } elseif ($aktif_filtre === 'ilce_baskani') {
-        $toplam_onayli = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'İlçe Başkanı' OR temsilci_turu = 'İlçe Temsilcisi' OR ek_gorev = 'İlçe Başkanı' OR ek_gorev = 'İlçe Temsilcisi')")->fetchColumn();
+        $say_sql = "SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'İlçe Başkanı' OR temsilci_turu = 'İlçe Temsilcisi' OR ek_gorev = 'İlçe Başkanı' OR ek_gorev = 'İlçe Temsilcisi')" . $rol_ek_where;
+        $say_sorgu = $db_baglanti->prepare($say_sql);
+        $say_sorgu->execute($rol_ek_parametreler);
+        $toplam_onayli = $say_sorgu->fetchColumn();
         $toplam_sayfa = ceil($toplam_onayli / $limit);
-        $sorgu = $db_baglanti->prepare("SELECT * FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'İlçe Başkanı' OR temsilci_turu = 'İlçe Temsilcisi' OR ek_gorev = 'İlçe Başkanı' OR ek_gorev = 'İlçe Temsilcisi') ORDER BY adi_soyadi ASC LIMIT ? OFFSET ?");
+        $sorgu = $db_baglanti->prepare("SELECT * FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'İlçe Başkanı' OR temsilci_turu = 'İlçe Temsilcisi' OR ek_gorev = 'İlçe Başkanı' OR ek_gorev = 'İlçe Temsilcisi')" . $rol_ek_where . " ORDER BY adi_soyadi ASC LIMIT ? OFFSET ?");
     } elseif ($aktif_filtre === 'aktif_iller') {
         $iller_modu = true;
         $toplam_onayli = $db_baglanti->query("SELECT COUNT(DISTINCT ikamet_ili) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND ikamet_ili IS NOT NULL AND ikamet_ili != ''")->fetchColumn();
         $toplam_sayfa = ceil($toplam_onayli / $limit);
         $sorgu = $db_baglanti->prepare("SELECT ikamet_ili, COUNT(*) as uye_adet FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND ikamet_ili IS NOT NULL AND ikamet_ili != '' GROUP BY ikamet_ili ORDER BY ikamet_ili ASC LIMIT ? OFFSET ?");
     } else {
-        $toplam_onayli = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli'")->fetchColumn();
+        $say_sql = "SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli'" . $rol_ek_where;
+        $say_sorgu = $db_baglanti->prepare($say_sql);
+        $say_sorgu->execute($rol_ek_parametreler);
+        $toplam_onayli = $say_sorgu->fetchColumn();
         $toplam_sayfa = ceil($toplam_onayli / $limit);
-        $sorgu = $db_baglanti->prepare("SELECT * FROM dernek_uyeler WHERE onay_durumu = 'onayli' ORDER BY adi_soyadi ASC LIMIT ? OFFSET ?");
+        $sorgu = $db_baglanti->prepare("SELECT * FROM dernek_uyeler WHERE onay_durumu = 'onayli'" . $rol_ek_where . " ORDER BY adi_soyadi ASC LIMIT ? OFFSET ?");
     }
     
-    $sorgu->bindValue(1, $limit, PDO::PARAM_INT);
-    $sorgu->bindValue(2, $offset, PDO::PARAM_INT);
+    // Parametreleri bind et: önce rol parametreleri, sonra limit/offset
+    $param_idx = 1;
+    foreach ($rol_ek_parametreler as $rp) {
+        $sorgu->bindValue($param_idx++, $rp, PDO::PARAM_STR);
+    }
+    $sorgu->bindValue($param_idx++, $limit, PDO::PARAM_INT);
+    $sorgu->bindValue($param_idx, $offset, PDO::PARAM_INT);
     $sorgu->execute();
     $veriler = $sorgu->fetchAll(PDO::FETCH_ASSOC);
 } catch (\PDOException $e) {
@@ -160,7 +206,7 @@ try {
                     <!-- Readonly hilesi ile klavye tamamlama baloncuğu tamamen engellendi -->
                     <input type="text" id="tabloCanliAra" readonly onfocus="this.removeAttribute('readonly');" <?= $iller_modu ? 'disabled placeholder="İl modunda arama devre dışı..."' : 'oninput="canliVeritabanıArama(this.value)" placeholder="Arama..."'; ?> class="form-control rounded-start px-3" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
                     
-                    <?php if(!$iller_modu && !$is_moderator && !$is_denetci): ?>
+                    <?php if(!$iller_modu && !$is_moderator && !$is_denetci && !$is_kisitli_rol && !$is_yonetim): ?>
                     <button type="button" onclick="dosyaYonlendir('excel')" class="btn btn-success fw-bold px-2 px-sm-3 d-flex align-items-center justify-content-center btn-sm">
                         <i class="fa-solid fa-file-excel me-1"></i> Excel
                     </button>
@@ -351,6 +397,8 @@ try {
                                             <span class="badge bg-secondary text-white px-2 py-1"><i class="fa-solid fa-eye me-1"></i>Sadece İnceleme</span>
                                         <?php elseif ($is_moderator): ?>
                                             <span class="badge bg-warning text-dark px-2 py-1"><i class="fa-solid fa-lock me-1"></i>Yetki Yok</span>
+                                        <?php elseif ($is_kisitli_rol): ?>
+                                            <span class="badge bg-info text-dark px-2 py-1"><i class="fa-solid fa-eye me-1"></i>Sadece Görüntüleme</span>
                                         <?php else: ?>
                                             <div class="btn-group dropup position-static">
                                                 <button class="btn btn-dark btn-sm dropdown-toggle fw-bold shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-popper-config='{"strategy":"fixed"}'>
@@ -514,7 +562,7 @@ function canliVeritabanıArama(deger) {
 }
 
 function dosyaYonlendir(tur) {
-    <?php if ($is_moderator || $is_denetci): ?>
+    <?php if ($is_moderator || $is_denetci || $is_kisitli_rol || $is_yonetim): ?>
         alert('Bu kullanıcı yetkisi ile dosya indirme işlemi kısıtlanmıştır.');
         return;
     <?php endif; ?>

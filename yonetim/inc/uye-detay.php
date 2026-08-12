@@ -13,6 +13,13 @@ $is_admin     = ($kullanici_rolu === 'admin');
 $is_denetci   = ($kullanici_rolu === 'denetci');
 $is_moderator = ($kullanici_rolu === 'moderator');
 
+// Yeni roller
+$is_yonetim           = ($kullanici_rolu === 'yonetim');
+$is_il_baskani        = ($kullanici_rolu === 'il_baskani');
+$is_ilce_baskani      = ($kullanici_rolu === 'ilce_baskani');
+$is_kurum_temsilcisi  = ($kullanici_rolu === 'kurum_temsilcisi');
+$is_kisitli_rol       = ($is_il_baskani || $is_ilce_baskani || $is_kurum_temsilcisi);
+
 // --- GÜNCELLEME: SORUMLU BÖLGE / İLÇE EL İLE GÜNCELLEME MOTORU (SADECE ADMİN) ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bolge_guncelle'])) {
     if (!$is_admin) {
@@ -31,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bolge_guncelle'])) {
 
 // --- ARKA PLANDA ÇALIŞAN SAF JAVASCRIPT / AJAX NOT SİLME MOTORU (DENETÇİYE KAPALI) ---
 if (isset($_GET['ajax_islem']) && $_GET['ajax_islem'] === 'ajax_not_sil' && isset($_GET['silinecek_not_id'])) {
-    if ($is_denetci) {
+    if ($is_denetci || $is_kisitli_rol) {
         echo "hata";
         exit;
     }
@@ -56,7 +63,7 @@ if (isset($_GET['ajax_islem']) && $_GET['ajax_islem'] === 'ajax_not_sil' && isse
 
 // --- NOT EKLEME MOTORU (DENETÇİYE KAPALI) ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['not_ekle'])) {
-    if ($is_denetci) {
+    if ($is_denetci || $is_kisitli_rol) {
         die("Erişim Engellendi: Bu işlemi yapmaya yetkiniz yok!");
     }
     $not_icerik = trim($_POST['not_icerik']);
@@ -81,6 +88,24 @@ try {
     if (!$uye) {
         echo '<div class="alert alert-warning m-4">Böyle bir üye bulunamadı!</div>';
         exit;
+    }
+
+    // Kısıtlı roller için yetki alanı kontrolü
+    if ($is_il_baskani && !empty($_SESSION['sorumlu_il'])) {
+        if (trim($uye['ikamet_ili']) !== trim($_SESSION['sorumlu_il'])) {
+            echo '<div class="container py-5"><div class="alert alert-danger text-center fw-bold"><i class="fa-solid fa-lock me-2"></i>Erişim Engellendi: Bu üye sizin yetki alanınız dışındadır.</div></div>';
+            exit;
+        }
+    } elseif ($is_ilce_baskani && !empty($_SESSION['sorumlu_ilce'])) {
+        if (trim($uye['trabzon_ilcesi']) !== trim($_SESSION['sorumlu_ilce'])) {
+            echo '<div class="container py-5"><div class="alert alert-danger text-center fw-bold"><i class="fa-solid fa-lock me-2"></i>Erişim Engellendi: Bu üye sizin yetki alanınız dışındadır.</div></div>';
+            exit;
+        }
+    } elseif ($is_kurum_temsilcisi && !empty($_SESSION['sorumlu_kurum'])) {
+        if (trim($uye['kurum']) !== trim($_SESSION['sorumlu_kurum'])) {
+            echo '<div class="container py-5"><div class="alert alert-danger text-center fw-bold"><i class="fa-solid fa-lock me-2"></i>Erişim Engellendi: Bu üye sizin yetki alanınız dışındadır.</div></div>';
+            exit;
+        }
     }
 
     // --- ÜYEYE AİT NOTLARI ÇEK (En yeni not en üstte) ---
@@ -219,7 +244,7 @@ if (!empty($uye['uyelik_tarihi']) && $uye['uyelik_tarihi'] !== '0000-00-00') {
                 </div>
                 <div class="card-body p-4 d-flex flex-column flex-grow-1">
                     
-                    <?php if (!$is_denetci): ?>
+                    <?php if (!$is_denetci && !$is_kisitli_rol): ?>
                         <form action="index.php?sayfa=uye-detay&id=<?= $uye_id; ?>" method="POST" class="mb-4">
                             <div class="input-group">
                                 <textarea name="not_icerik" class="form-control" rows="2" placeholder="Üye hakkında bir not veya özel açıklama ekleyin..." required></textarea>
@@ -235,7 +260,7 @@ if (!empty($uye['uyelik_tarihi']) && $uye['uyelik_tarihi'] !== '0000-00-00') {
                             <?php foreach ($notlar as $not): ?>
                                 <div id="not-kapsayici-<?= $not['id']; ?>" class="bg-light p-3 rounded-3 border mb-3 shadow-sm position-relative transition-not">
                                     
-                                    <?php if (!$is_denetci): ?>
+                                    <?php if (!$is_denetci && !$is_kisitli_rol): ?>
                                         <a href="javascript:void(0);" onclick="notuGörünmezSil(<?= $not['id']; ?>)" class="position-absolute text-danger text-decoration-none btn-not-sil" title="Notu Sil" style="top: 10px; right: 15px; font-size: 1.4rem; font-weight: bold; line-height: 1; cursor: pointer;">
                                             &times;
                                         </a>
@@ -292,7 +317,7 @@ if (!empty($uye['uyelik_tarihi']) && $uye['uyelik_tarihi'] !== '0000-00-00') {
 
 <script>
 function notuGörünmezSil(notId) {
-    <?php if (!$is_denetci): ?>
+    <?php if (!$is_denetci && !$is_kisitli_rol): ?>
     if (confirm('Bu notu tamamen silmek istediğinize emin misiniz?')) {
         let url = 'index.php?sayfa=uye-detay&id=<?= $uye_id; ?>&ajax_islem=ajax_not_sil&silinecek_not_id=' + notId;
         

@@ -10,6 +10,14 @@ $kullanici_rolu = isset($_SESSION['rol']) ? $_SESSION['rol'] : 'admin';
 $is_denetci   = ($kullanici_rolu === 'denetci');
 $is_moderator = ($kullanici_rolu === 'moderator');
 
+// Yeni roller
+$is_admin             = ($kullanici_rolu === 'admin');
+$is_yonetim           = ($kullanici_rolu === 'yonetim');
+$is_il_baskani        = ($kullanici_rolu === 'il_baskani');
+$is_ilce_baskani      = ($kullanici_rolu === 'ilce_baskani');
+$is_kurum_temsilcisi  = ($kullanici_rolu === 'kurum_temsilcisi');
+$is_kisitli_rol       = ($is_il_baskani || $is_ilce_baskani || $is_kurum_temsilcisi);
+
 $arama_kelimesi = isset($_GET['kelime']) ? trim($_GET['kelime']) : '';
 $aktif_filtre   = isset($_GET['filtre']) ? trim($_GET['filtre']) : '';
 
@@ -17,6 +25,18 @@ try {
     // Dinamik taban SQL şartı oluşturuyoruz
     $where_sartlari = ["onay_durumu = 'onayli'"];
     $parametreler   = [];
+
+    // Rol bazlı ek filtre
+    if ($is_il_baskani && !empty($_SESSION['sorumlu_il'])) {
+        $where_sartlari[] = "ikamet_ili = ?";
+        $parametreler[] = $_SESSION['sorumlu_il'];
+    } elseif ($is_ilce_baskani && !empty($_SESSION['sorumlu_ilce'])) {
+        $where_sartlari[] = "trabzon_ilcesi = ?";
+        $parametreler[] = $_SESSION['sorumlu_ilce'];
+    } elseif ($is_kurum_temsilcisi && !empty($_SESSION['sorumlu_kurum'])) {
+        $where_sartlari[] = "kurum = ?";
+        $parametreler[] = $_SESSION['sorumlu_kurum'];
+    }
 
     // 1. Dashboard kart filtreleri (Hem ana statüye hem ek göreve bakar)
     if ($aktif_filtre === 'kurum_temsilcisi') {
@@ -117,6 +137,8 @@ try {
                 $islem_icerik = '<span class="badge bg-secondary text-white px-2 py-1"><i class="fa-solid fa-eye me-1"></i>Sadece İnceleme</span>';
             } elseif ($is_moderator) {
                 $islem_icerik = '<span class="badge bg-warning text-dark px-2 py-1"><i class="fa-solid fa-lock me-1"></i>Yetki Yok</span>';
+            } elseif ($is_kisitli_rol) {
+                $islem_icerik = '<span class="badge bg-info text-dark px-2 py-1"><i class="fa-solid fa-eye me-1"></i>Sadece Görüntüleme</span>';
             } else {
                 $islem_icerik = '
                 <div class="btn-group dropup position-static">
