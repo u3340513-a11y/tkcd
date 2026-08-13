@@ -148,11 +148,9 @@ try {
          ORDER BY ikamet_ili ASC"
     )->fetchAll(PDO::FETCH_COLUMN);
 
-    $ilceler = $db_baglanti->query(
-        "SELECT DISTINCT trabzon_ilcesi FROM dernek_uyeler 
-         WHERE onay_durumu = 'onayli' AND trabzon_ilcesi IS NOT NULL AND trabzon_ilcesi != '' 
-         ORDER BY trabzon_ilcesi ASC"
-    )->fetchAll(PDO::FETCH_COLUMN);
+    // İlçe verileri statik dosyadan yüklenir (81 il, tüm ilçeler)
+    $turkiye_il_ilce = include __DIR__ . '/turkiye-ilce-verileri.php';
+    $turkiye_illeri = array_keys($turkiye_il_ilce);
 
     $kurumlar = $db_baglanti->query(
         "SELECT DISTINCT kurum FROM dernek_uyeler 
@@ -320,10 +318,20 @@ $rol_etiketleri = [
                                 <?php endforeach; ?>
                             </select>
                         </div>
+                        <div class="col-md-6" id="ilceIlAlani" style="display: none;">
+                            <label class="form-label fw-bold">Önce İl Seçin <span class="text-danger">*</span></label>
+                            <select id="ilceIcinIlSec" class="form-select" onchange="ilceListesiDoldur(this.value)">
+                                <option value="">— İl Seçin —</option>
+                                <?php foreach ($turkiye_illeri as $il): ?>
+                                    <option value="<?= htmlspecialchars($il); ?>"><?= htmlspecialchars($il); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
                         <div class="col-md-6" id="ilceAlani" style="display: none;">
                             <label class="form-label fw-bold">Sorumlu İlçe <span class="text-danger">*</span></label>
-                            <input type="text" name="sorumlu_ilce" class="form-control" placeholder="Örn: Kadıköy, Akçaabat, Osmangazi..." autocomplete="off">
-                            <small class="text-muted">İlçe adını yazın (Türkiye geneli tüm ilçeler geçerlidir).</small>
+                            <select name="sorumlu_ilce" id="ilceSecimi" class="form-select">
+                                <option value="">— Önce il seçin —</option>
+                            </select>
                         </div>
                         <div class="col-md-6" id="kurumAlani" style="display: none;">
                             <label class="form-label fw-bold">Sorumlu Kurum <span class="text-danger">*</span></label>
@@ -384,10 +392,37 @@ $rol_etiketleri = [
 /**
  * Rol seçimine göre dinamik alanları göster/gizle.
  */
+// Türkiye il-ilçe verileri (PHP'den aktarılıyor)
+var turkiyeIlIlce = <?= json_encode($turkiye_il_ilce, JSON_UNESCAPED_UNICODE); ?>;
+
 function rolDegisti(rol) {
     document.getElementById('ilAlani').style.display = (rol === 'il_baskani') ? 'block' : 'none';
+    document.getElementById('ilceIlAlani').style.display = (rol === 'ilce_baskani') ? 'block' : 'none';
     document.getElementById('ilceAlani').style.display = (rol === 'ilce_baskani') ? 'block' : 'none';
     document.getElementById('kurumAlani').style.display = (rol === 'kurum_temsilcisi') ? 'block' : 'none';
+    
+    // Temizle
+    if (rol !== 'ilce_baskani') {
+        document.getElementById('ilceIcinIlSec').value = '';
+        document.getElementById('ilceSecimi').innerHTML = '<option value="">— Önce il seçin —</option>';
+    }
+}
+
+/**
+ * Seçilen ile göre ilçe dropdown'ını dinamik doldurur.
+ */
+function ilceListesiDoldur(il) {
+    var select = document.getElementById('ilceSecimi');
+    select.innerHTML = '<option value="">— İlçe Seçin —</option>';
+    
+    if (il && turkiyeIlIlce[il]) {
+        turkiyeIlIlce[il].forEach(function(ilce) {
+            var opt = document.createElement('option');
+            opt.value = ilce;
+            opt.textContent = ilce;
+            select.appendChild(opt);
+        });
+    }
 }
 
 /**
