@@ -133,6 +133,15 @@ $calismaSekilleri = ['Tam Zamanlı', 'Yarı Zamanlı', 'Sözleşmeli', 'Emekli K
                     <p style="margin-top:0.4rem;font-size:0.9rem">Hata olduğunu düşünüyorsanız <a href="mailto:<?= $view->e($site['email'] ?? 'info@trabzonlukamucalisanlaridernegi.com') ?>">bizimle iletişime geçin</a>.</p>
                 </div>
             </div>
+            <?php elseif ($durum === 'eposta_kayitli'): ?>
+            <div class="ub-bildiri ub-bildiri--uyari" role="alert">
+                <?= $view->icon('alert-triangle') ?>
+                <div>
+                    <strong>Bu E-posta Adresi Zaten Kayıtlı</strong>
+                    <p>Girdiğiniz e-posta adresi ile daha önce başvuru yapılmıştır. Tekrar göndermenize gerek yoktur.</p>
+                    <p style="margin-top:0.4rem;font-size:0.9rem">Hata olduğunu düşünüyorsanız <a href="mailto:<?= $view->e($site['email'] ?? 'info@trabzonlukamucalisanlaridernegi.com') ?>">bizimle iletişime geçin</a>.</p>
+                </div>
+            </div>
             <?php elseif ($durum === 'hata'): ?>
             <div class="ub-bildiri ub-bildiri--hata" role="alert">
                 <?= $view->icon('alert-circle') ?>

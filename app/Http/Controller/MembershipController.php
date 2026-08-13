@@ -116,6 +116,11 @@ final class MembershipController
                 return Response::redirect('/uye-ol?durum=kisi_kayitli');
             }
 
+            // E-posta adresi zaten kayıtlı
+            if ($e->getMessage() === '__EPOSTA_KAYITLI__') {
+                return Response::redirect('/uye-ol?durum=eposta_kayitli');
+            }
+
             $this->logger->error('Üyelik başvurusu doğrulama hatası: ' . $e->getMessage());
 
             return Response::redirect('/uye-ol?durum=hata&hata_mesaji=' . urlencode($e->getMessage()));

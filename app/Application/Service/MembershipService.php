@@ -88,6 +88,11 @@ final class MembershipService
             throw new \InvalidArgumentException('__KISI_ZATEN_KAYITLI__');
         }
 
+        // E-posta unique kontrolü: aynı e-posta zaten kayıtlıysa reddet
+        if ($eposta !== '' && $this->repository->existsByEposta($eposta)) {
+            throw new \InvalidArgumentException('__EPOSTA_KAYITLI__');
+        }
+
         // Görüntülenebilir formata çevir: "0551 605 59 69" (yönetim panelinde okunabilir)
         $telefonGosterim = $this->formatTelefon($telefonTam);
 

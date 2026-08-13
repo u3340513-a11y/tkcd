@@ -39,4 +39,12 @@ interface MembershipRepositoryInterface
      * @return bool true → zaten kayıtlı
      */
     public function existsByAdSoyadiVeDogumTarihi(string $adiSoyadi, string $dogumTarihi): bool;
+
+    /**
+     * Verilen e-posta adresi veritabanında kayıtlı mı kontrol eder.
+     *
+     * @param string $eposta E-posta adresi
+     * @return bool true → zaten kayıtlı
+     */
+    public function existsByEposta(string $eposta): bool;
 }

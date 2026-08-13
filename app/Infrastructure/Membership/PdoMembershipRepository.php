@@ -105,6 +105,20 @@ final class PdoMembershipRepository implements MembershipRepositoryInterface
     }
 
     /**
+     * E-posta adresiyle mükerrer kayıt kontrolü yapar.
+     * Büyük/küçük harf duyarsız karşılaştırma yapar.
+     */
+    public function existsByEposta(string $eposta): bool
+    {
+        $stmt = $this->connection()->prepare(
+            "SELECT COUNT(*) FROM dernek_uyeler WHERE LOWER(TRIM(eposta)) = LOWER(TRIM(?)) LIMIT 1"
+        );
+        $stmt->execute([$eposta]);
+
+        return (int) $stmt->fetchColumn() > 0;
+    }
+
+    /**
      * İlk çağrıda bağlantıyı kurar, sonrasında aynı nesneyi döndürür.
      */
     private function connection(): PDO
