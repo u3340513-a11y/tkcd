@@ -25,31 +25,33 @@ if (isset($_GET['islem']) && $_GET['islem'] === 'cikis') {
 
 // ─── BRUTE-FORCE KORUMASI ───────────────────────────────────────────────
 /**
- * IP bazlı login deneme sayacı.
+ * Kullanıcı adı bazlı login deneme sayacı.
  *
  * Neden dosya tabanlı: Yönetim paneli Composer/framework kullanmıyor;
  * DB'de ayrı bir tablo oluşturmak yerine basit bir dosya tabanlı
  * mekanizma yeterli ve bağımsız çalışır.
  *
- * Yapı: storage/security/login_attempts/ altında IP bazlı JSON dosyaları.
+ * Yapı: storage/security/login_attempts_user/ altında kullanıcı bazlı JSON dosyaları.
+ * Her kullanıcı kendi kilit sayacına sahiptir, bir kullanıcının hatalı
+ * girişleri diğer kullanıcıları etkilemez.
  */
-$guvenlikDizini = __DIR__ . '/../storage/security/login_attempts';
+$guvenlikDizini = __DIR__ . '/../storage/security/login_attempts_user';
 if (!is_dir($guvenlikDizini)) {
     @mkdir($guvenlikDizini, 0755, true);
 }
 
 /**
- * Belirtilen IP'nin kilitli olup olmadığını kontrol eder.
+ * Belirtilen kullanıcının kilitli olup olmadığını kontrol eder.
  *
- * @param string $ip        İstemci IP adresi
- * @param string $dizin     Depolama dizini
- * @param int    $maxDeneme Maksimum başarısız deneme (varsayılan: 5)
- * @param int    $kilitSure  Kilit süresi saniye cinsinden (varsayılan: 900 = 15 dk)
- * @return bool true ise IP kilitli, giriş engellenmeli
+ * @param string $kullaniciAdi Giriş yapılmaya çalışılan kullanıcı adı
+ * @param string $dizin        Depolama dizini
+ * @param int    $maxDeneme    Maksimum başarısız deneme (varsayılan: 5)
+ * @param int    $kilitSure    Kilit süresi saniye cinsinden (varsayılan: 900 = 15 dk)
+ * @return bool true ise hesap kilitli, giriş engellenmeli
  */
-function login_kilitli_mi(string $ip, string $dizin, int $maxDeneme = 5, int $kilitSure = 900): bool
+function login_kilitli_mi(string $kullaniciAdi, string $dizin, int $maxDeneme = 5, int $kilitSure = 900): bool
 {
-    $dosya = $dizin . '/' . md5($ip) . '.json';
+    $dosya = $dizin . '/' . md5($kullaniciAdi) . '.json';
     if (!is_file($dosya)) {
         return false;
     }
@@ -67,10 +69,13 @@ function login_kilitli_mi(string $ip, string $dizin, int $maxDeneme = 5, int $ki
 
 /**
  * Başarısız login denemesini kaydeder.
+ *
+ * @param string $kullaniciAdi Hatalı giriş yapılan kullanıcı adı
+ * @param string $dizin        Depolama dizini
  */
-function login_basarisiz_kaydet(string $ip, string $dizin): void
+function login_basarisiz_kaydet(string $kullaniciAdi, string $dizin): void
 {
-    $dosya = $dizin . '/' . md5($ip) . '.json';
+    $dosya = $dizin . '/' . md5($kullaniciAdi) . '.json';
     $veri = ['deneme' => 0, 'son_deneme' => time()];
     if (is_file($dosya)) {
         $okunan = json_decode((string) file_get_contents($dosya), true);
@@ -85,55 +90,54 @@ function login_basarisiz_kaydet(string $ip, string $dizin): void
 
 /**
  * Başarılı login sonrası deneme sayacını sıfırlar.
+ *
+ * @param string $kullaniciAdi Başarılı giriş yapılan kullanıcı adı
+ * @param string $dizin        Depolama dizini
  */
-function login_basarili_temizle(string $ip, string $dizin): void
+function login_basarili_temizle(string $kullaniciAdi, string $dizin): void
 {
-    $dosya = $dizin . '/' . md5($ip) . '.json';
+    $dosya = $dizin . '/' . md5($kullaniciAdi) . '.json';
     if (is_file($dosya)) {
         @unlink($dosya);
     }
 }
 
-$istemciIp = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
-
 // ─── LOGIN İŞLEMİ ──────────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['kullanici_adi'])) {
 
-    // Brute-force kontrolü
-    if (login_kilitli_mi($istemciIp, $guvenlikDizini)) {
-        $hata_mesaji = "Çok fazla başarısız giriş denemesi. Lütfen 15 dakika sonra tekrar deneyin.";
-    } else {
-        $kullanici = trim($_POST['kullanici_adi']);
-        $sifre     = trim($_POST['sifre']);
+    $kullanici = trim($_POST['kullanici_adi']);
+    $sifre     = trim($_POST['sifre']);
 
-        if (!empty($kullanici) && !empty($sifre)) {
-            $sorgu = $db_baglanti->prepare("SELECT id, kullanici_adi, sifre, rol, sorumlu_il, sorumlu_ilce, sorumlu_kurum FROM dernek_yoneticiler WHERE kullanici_adi = ?");
-            $sorgu->execute([$kullanici]);
-            $user = $sorgu->fetch();
+    // Brute-force kontrolü: kullanıcı adı bazlı
+    if (!empty($kullanici) && login_kilitli_mi($kullanici, $guvenlikDizini)) {
+        $hata_mesaji = "Bu hesap için çok fazla başarısız giriş denemesi. Lütfen 15 dakika sonra tekrar deneyin.";
+    } elseif (!empty($kullanici) && !empty($sifre)) {
+        $sorgu = $db_baglanti->prepare("SELECT id, kullanici_adi, sifre, rol, sorumlu_il, sorumlu_ilce, sorumlu_kurum FROM dernek_yoneticiler WHERE kullanici_adi = ?");
+        $sorgu->execute([$kullanici]);
+        $user = $sorgu->fetch();
 
-            if ($user && password_verify($sifre, $user['sifre'])) {
-                // Session fixation koruması: login sonrası yeni session ID üret
-                session_regenerate_id(true);
+        if ($user && password_verify($sifre, $user['sifre'])) {
+            // Session fixation koruması: login sonrası yeni session ID üret
+            session_regenerate_id(true);
 
-                $_SESSION['oturum'] = true;
-                $_SESSION['id'] = $user['id'];
-                $_SESSION['kullanici_adi'] = $user['kullanici_adi'];
-                $_SESSION['rol'] = $user['rol'] ?? 'admin';
-                $_SESSION['sorumlu_il']    = $user['sorumlu_il'] ?? null;
-                $_SESSION['sorumlu_ilce']  = $user['sorumlu_ilce'] ?? null;
-                $_SESSION['sorumlu_kurum'] = $user['sorumlu_kurum'] ?? null;
-                $_SESSION['son_aktivite'] = time();
+            $_SESSION['oturum'] = true;
+            $_SESSION['id'] = $user['id'];
+            $_SESSION['kullanici_adi'] = $user['kullanici_adi'];
+            $_SESSION['rol'] = $user['rol'] ?? 'admin';
+            $_SESSION['sorumlu_il']    = $user['sorumlu_il'] ?? null;
+            $_SESSION['sorumlu_ilce']  = $user['sorumlu_ilce'] ?? null;
+            $_SESSION['sorumlu_kurum'] = $user['sorumlu_kurum'] ?? null;
+            $_SESSION['son_aktivite'] = time();
 
-                // Başarılı giriş: deneme sayacını temizle
-                login_basarili_temizle($istemciIp, $guvenlikDizini);
+            // Başarılı giriş: deneme sayacını temizle
+            login_basarili_temizle($kullanici, $guvenlikDizini);
 
-                header("Location: /yonetim/");
-                exit;
-            } else {
-                // Başarısız giriş: sayacı artır
-                login_basarisiz_kaydet($istemciIp, $guvenlikDizini);
-                $hata_mesaji = "Kullanıcı adı veya şifre hatalı!";
-            }
+            header("Location: /yonetim/");
+            exit;
+        } else {
+            // Başarısız giriş: sayacı artır
+            login_basarisiz_kaydet($kullanici, $guvenlikDizini);
+            $hata_mesaji = "Kullanıcı adı veya şifre hatalı!";
         }
     }
 }
