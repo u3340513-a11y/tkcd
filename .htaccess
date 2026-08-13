@@ -18,10 +18,14 @@
     RewriteCond %{REQUEST_URI} !^/\.well-known/
     RewriteRule (^|/)\. - [F,L]
 
+    # /yonetim (slash'sız) → /yonetim/ (slash'lı) yönlendirmesi.
+    # Kullanıcılar URL sonuna slash koymadan girdiğinde 404 almasını engeller.
+    RewriteRule ^yonetim$ /yonetim/ [R=301,L]
+
     # Tüm istekleri public/ önyüzüne yönlendir.
-    # Yönetim paneli (/yonetim/) ve .well-known bu kuraldan muaftır.
+    # Yönetim paneli (/yonetim ve /yonetim/) ve .well-known bu kuraldan muaftır.
     RewriteCond %{REQUEST_URI} !^/public/
-    RewriteCond %{REQUEST_URI} !^/yonetim/
+    RewriteCond %{REQUEST_URI} !^/yonetim(/|$)
     RewriteRule ^(.*)$ public/$1 [L]
 </IfModule>
 
