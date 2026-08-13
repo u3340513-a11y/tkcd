@@ -322,12 +322,8 @@ $rol_etiketleri = [
                         </div>
                         <div class="col-md-6" id="ilceAlani" style="display: none;">
                             <label class="form-label fw-bold">Sorumlu İlçe <span class="text-danger">*</span></label>
-                            <select name="sorumlu_ilce" class="form-select">
-                                <option value="">— İlçe Seçin —</option>
-                                <?php foreach ($ilceler as $ilce): ?>
-                                    <option value="<?= htmlspecialchars($ilce); ?>"><?= htmlspecialchars($ilce); ?></option>
-                                <?php endforeach; ?>
-                            </select>
+                            <input type="text" name="sorumlu_ilce" class="form-control" placeholder="Örn: Kadıköy, Akçaabat, Osmangazi..." autocomplete="off">
+                            <small class="text-muted">İlçe adını yazın (Türkiye geneli tüm ilçeler geçerlidir).</small>
                         </div>
                         <div class="col-md-6" id="kurumAlani" style="display: none;">
                             <label class="form-label fw-bold">Sorumlu Kurum <span class="text-danger">*</span></label>
