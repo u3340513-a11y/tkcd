@@ -23,7 +23,7 @@ $mesaj_turu = "";
 
 // ─── YENİ HESAP OLUŞTURMA ──────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['hesap_olustur'])) {
-    $yeni_kullanici = trim($_POST['kullanici_adi'] ?? '');
+    $yeni_kullanici = trim($_POST['yeni_kullanici_adi'] ?? '');
     $yeni_sifre     = trim($_POST['sifre'] ?? '');
     $yeni_rol       = trim($_POST['rol'] ?? '');
     $yeni_il        = trim($_POST['sorumlu_il'] ?? '') ?: null;
@@ -288,7 +288,7 @@ $rol_etiketleri = [
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Kullanıcı Adı <span class="text-danger">*</span></label>
-                            <input type="text" name="kullanici_adi" class="form-control" required autocomplete="off" 
+                            <input type="text" name="yeni_kullanici_adi" class="form-control" required autocomplete="off" 
                                    placeholder="Örn: il_istanbul" pattern="[a-zA-Z0-9_]+" title="Sadece harf, rakam ve alt çizgi kullanılabilir">
                             <small class="text-muted">Sadece harf, rakam ve alt çizgi (_) kullanın.</small>
                         </div>
