@@ -85,6 +85,26 @@ final class PdoMembershipRepository implements MembershipRepositoryInterface
     }
 
     /**
+     * Ad-soyad ve doğum tarihi kombinasyonuyla mükerrer kayıt kontrolü yapar.
+     * Aynı kişinin farklı telefon numarasıyla tekrar kaydolmasını engeller.
+     *
+     * Neden: LOWER() ile büyük/küçük harf farkı göz ardı edilir.
+     * Hem onaylı hem bekleyen kayıtlar kontrol edilir.
+     */
+    public function existsByAdSoyadiVeDogumTarihi(string $adiSoyadi, string $dogumTarihi): bool
+    {
+        $stmt = $this->connection()->prepare(
+            "SELECT COUNT(*) FROM dernek_uyeler 
+             WHERE LOWER(TRIM(adi_soyadi)) = LOWER(TRIM(?)) 
+             AND dogum_tarihi = ? 
+             LIMIT 1"
+        );
+        $stmt->execute([$adiSoyadi, $dogumTarihi]);
+
+        return (int) $stmt->fetchColumn() > 0;
+    }
+
+    /**
      * İlk çağrıda bağlantıyı kurar, sonrasında aynı nesneyi döndürür.
      */
     private function connection(): PDO

@@ -29,4 +29,14 @@ interface MembershipRepositoryInterface
      * @return bool true → zaten kayıtlı
      */
     public function existsByTelefon(string $telefon): bool;
+
+    /**
+     * Verilen ad-soyad ve doğum tarihi kombinasyonu veritabanında kayıtlı mı kontrol eder.
+     * Aynı kişinin farklı telefon numarasıyla tekrar kayıt olmasını engeller.
+     *
+     * @param string $adiSoyadi Ad ve soyad (büyük/küçük harf duyarsız)
+     * @param string $dogumTarihi Doğum tarihi (YYYY-MM-DD formatı)
+     * @return bool true → zaten kayıtlı
+     */
+    public function existsByAdSoyadiVeDogumTarihi(string $adiSoyadi, string $dogumTarihi): bool;
 }

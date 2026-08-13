@@ -82,6 +82,12 @@ final class MembershipService
             throw new \InvalidArgumentException('__TELEFON_KAYITLI__');
         }
 
+        // Ad-soyad + doğum tarihi mükerrer kontrolü:
+        // Aynı kişinin farklı telefon numarasıyla tekrar kaydolmasını engeller
+        if ($dogumTarihi !== '' && $this->repository->existsByAdSoyadiVeDogumTarihi($adiSoyadi, $dogumTarihi)) {
+            throw new \InvalidArgumentException('__KISI_ZATEN_KAYITLI__');
+        }
+
         // Görüntülenebilir formata çevir: "0551 605 59 69" (yönetim panelinde okunabilir)
         $telefonGosterim = $this->formatTelefon($telefonTam);
 
