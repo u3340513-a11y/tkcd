@@ -499,7 +499,7 @@
 .hakkinda__izgara {
   display: grid;
   gap: clamp(2rem, 4vw, 3rem);
-  align-items: center;
+  align-items: stretch;
 }
 
 @media (min-width: 900px) {
@@ -508,7 +508,7 @@
 
 .hakkinda__gorsel {
   position: relative;
-  aspect-ratio: 4 / 3;
+  min-height: 280px;
   border-radius: var(--yuvarlak-xl);
   overflow: hidden;
   box-shadow: var(--golge-lg);
@@ -518,11 +518,7 @@
 .hakkinda__gorsel img {
   width: 100%;
   height: 100%;
-  /* "cover" her iki yüzde de kesilmesine yol açarken "contain" görseli
-     tamamen gösterir; beraberinde verilen object-position değeri, dikey
-     görselin kart içinde yatay ve dikey eksende tam ortalanmasını garanti
-     eder. */
-  object-fit: contain;
+  object-fit: cover;
   object-position: center;
 }
 
