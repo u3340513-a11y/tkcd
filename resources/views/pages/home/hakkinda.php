@@ -24,8 +24,8 @@ use App\Core\View\PhpViewRenderer;
         <div class="hakkinda__izgara">
             <div class="hakkinda__gorsel belirme">
 <?= $view->partial('components/gorsel', [
-    'src' => '/assets/img/trabzon-kamu-masa.webp',
-    'alt' => 'Trabzon kamu çalışanları dayanışma masası etkinliğinden bir kare',
+    'src' => '/assets/img/IMG_1381.jpg',
+    'alt' => 'Trabzonlu kamu çalışanları derneği etkinliğinden bir kare',
     'yukleme' => 'lazy',
     'yedekIkon' => 'landmark',
 ]) ?>
