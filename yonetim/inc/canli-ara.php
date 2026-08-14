@@ -49,6 +49,8 @@ try {
         $where_sartlari[] = "(temsilci_turu = 'İl Başkanı' OR temsilci_turu = 'İl Temsilcisi' OR ek_gorev = 'İl Başkanı' OR ek_gorev = 'İl Temsilcisi')";
     } elseif ($aktif_filtre === 'ilce_baskani') {
         $where_sartlari[] = "(temsilci_turu = 'İlçe Başkanı' OR temsilci_turu = 'İlçe Temsilcisi' OR ek_gorev = 'İlçe Başkanı' OR ek_gorev = 'İlçe Temsilcisi')";
+    } elseif ($aktif_filtre === 'teskilatlanma_sorumlusu') {
+        $where_sartlari[] = "(temsilci_turu = 'Teşkilatlanma Sorumlu Başkan' OR ek_gorev = 'Teşkilatlanma Sorumlu Başkan')";
     }
 
     // 2. Canlı arama kutusu
@@ -179,6 +181,9 @@ try {
                         }
                         if ($ek_gorev_kontrol !== 'Yönetim Kurulu Üyesi Yedek' && $temsilci_turu_kontrol !== 'Yönetim Kurulu Üyesi Yedek') {
                             $islem_icerik .= '<li><a class="dropdown-item text-info fw-bold py-1" href="index.php?sayfa=uyeler&aksiyon=ek_gorev_degistir&id='.$uye['id'].'&gorev=Yönetim+Kurulu+Üyesi+Yedek"><i class="fa-solid fa-plus me-1.5"></i>+ Görev: Y. Kurulu Yedek Yap</a></li>';
+                        }
+                        if ($ek_gorev_kontrol !== 'Teşkilatlanma Sorumlu Başkan' && $temsilci_turu_kontrol !== 'Teşkilatlanma Sorumlu Başkan') {
+                            $islem_icerik .= '<li><a class="dropdown-item fw-bold py-1" style="color: #e65100;" href="index.php?sayfa=uyeler&aksiyon=ek_gorev_degistir&id='.$uye['id'].'&gorev=Teşkilatlanma+Sorumlu+Başkan"><i class="fa-solid fa-plus me-1.5"></i>+ Görev: Teşkilatlanma Sor. Bşk.</a></li>';
                         }
 
                         if (!empty($ek_gorev_kontrol)) {

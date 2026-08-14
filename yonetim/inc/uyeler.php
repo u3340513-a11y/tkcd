@@ -153,6 +153,13 @@ try {
         $toplam_onayli = $say_sorgu->fetchColumn();
         $toplam_sayfa = ceil($toplam_onayli / $limit);
         $sorgu = $db_baglanti->prepare("SELECT * FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'İlçe Başkanı' OR temsilci_turu = 'İlçe Temsilcisi' OR ek_gorev = 'İlçe Başkanı' OR ek_gorev = 'İlçe Temsilcisi')" . $rol_ek_where . " ORDER BY adi_soyadi ASC LIMIT ? OFFSET ?");
+    } elseif ($aktif_filtre === 'teskilatlanma_sorumlusu') {
+        $say_sql = "SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Teşkilatlanma Sorumlu Başkan' OR ek_gorev = 'Teşkilatlanma Sorumlu Başkan')" . $rol_ek_where;
+        $say_sorgu = $db_baglanti->prepare($say_sql);
+        $say_sorgu->execute($rol_ek_parametreler);
+        $toplam_onayli = $say_sorgu->fetchColumn();
+        $toplam_sayfa = ceil($toplam_onayli / $limit);
+        $sorgu = $db_baglanti->prepare("SELECT * FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Teşkilatlanma Sorumlu Başkan' OR ek_gorev = 'Teşkilatlanma Sorumlu Başkan')" . $rol_ek_where . " ORDER BY adi_soyadi ASC LIMIT ? OFFSET ?");
     } elseif ($aktif_filtre === 'aktif_iller') {
         $iller_modu = true;
         $toplam_onayli = $db_baglanti->query("SELECT COUNT(DISTINCT ikamet_ili) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND ikamet_ili IS NOT NULL AND ikamet_ili != ''")->fetchColumn();
@@ -195,6 +202,7 @@ try {
                 elseif($aktif_filtre === 'bolge_koordinatoru') echo 'Filtrelenen: Bölge Koordinatörleri Listesi';
                 elseif($aktif_filtre === 'il_baskani') echo 'Filtrelenen: İl Başkanları Listesi';
                 elseif($aktif_filtre === 'ilce_baskani') echo 'Filtrelenen: İlçe Başkanları Listesi';
+                elseif($aktif_filtre === 'teskilatlanma_sorumlusu') echo 'Filtrelenen: Teşkilatlanma, Komiteler ve Temsilcilerden Sorumlu Başkan Listesi';
                 elseif($aktif_filtre === 'aktif_iller') echo 'Filtrelenen: Aktif İl Listesi (Toplam ' . $toplam_onayli . ' İl)';
                 else echo 'Derneğe kayıtlı aktif üyeler listesi.';
                 ?>
@@ -442,6 +450,10 @@ try {
 
                                                     <?php if($ek_gorev_kontrol !== 'Yönetim Kurulu Üyesi Yedek' && $temsilci_turu_kontrol !== 'Yönetim Kurulu Üyesi Yedek'): ?>
                                                         <li><a class="dropdown-item text-info fw-bold py-1" href="index.php?sayfa=uyeler&aksiyon=ek_gorev_degistir&id=<?= $uye['id']; ?>&gorev=Yönetim+Kurulu+Üyesi+Yedek"><i class="fa-solid fa-plus me-1.5"></i>+ Görev: Y. Kurulu Yedek Yap</a></li>
+                                                    <?php endif; ?>
+
+                                                    <?php if($ek_gorev_kontrol !== 'Teşkilatlanma Sorumlu Başkan' && $temsilci_turu_kontrol !== 'Teşkilatlanma Sorumlu Başkan'): ?>
+                                                        <li><a class="dropdown-item fw-bold py-1" style="color: #e65100;" href="index.php?sayfa=uyeler&aksiyon=ek_gorev_degistir&id=<?= $uye['id']; ?>&gorev=Teşkilatlanma+Sorumlu+Başkan"><i class="fa-solid fa-plus me-1.5"></i>+ Görev: Teşkilatlanma Sor. Bşk.</a></li>
                                                     <?php endif; ?>
 
                                                     <?php if(!empty($ek_gorev_kontrol)): ?>

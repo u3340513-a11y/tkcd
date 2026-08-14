@@ -170,7 +170,7 @@ include 'inc/navbar.php';
 switch ($sayfa) {
     case 'uyeler':
         $aktif_filtre = isset($_GET['filtre']) ? trim($_GET['filtre']) : '';
-        $izinli_filtreler = ['yonetim_kurulu', 'bolge_koordinatoru', 'il_baskani', 'ilce_baskani', 'kurum_temsilcisi'];
+        $izinli_filtreler = ['yonetim_kurulu', 'bolge_koordinatoru', 'il_baskani', 'ilce_baskani', 'kurum_temsilcisi', 'teskilatlanma_sorumlusu'];
         
         if ($is_denetci && (empty($aktif_filtre) || !in_array($aktif_filtre, $izinli_filtreler))) {
             echo '<div class="container py-5"><div class="alert alert-warning text-center fw-bold"><i class="fa-solid fa-triangle-exclamation me-2"></i>Bu filtreyi veya genel liste görünümünü inceleme yetkiniz bulunmamaktadır.</div></div>';
@@ -290,6 +290,7 @@ switch ($sayfa) {
             $il_baskanlari = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'İl Başkanı' OR temsilci_turu = 'İl Temsilcisi' OR ek_gorev = 'İl Başkanı' OR ek_gorev = 'İl Temsilcisi')")->fetchColumn();
             $ilce_baskanlari = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'İlçe Başkanı' OR temsilci_turu = 'İlçe Temsilcisi' OR ek_gorev = 'İlçe Başkanı' OR ek_gorev = 'İlçe Temsilcisi')")->fetchColumn();
             $kurum_temsilcileri = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Kurum Temsilcisi' OR ek_gorev = 'Kurum Temsilcisi')")->fetchColumn();
+            $teskilatlanma_sorumlusu = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Teşkilatlanma Sorumlu Başkan' OR ek_gorev = 'Teşkilatlanma Sorumlu Başkan')")->fetchColumn();
 
             $bekleyen_uye_sayisi = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'bekleyen'")->fetchColumn();
 
@@ -418,6 +419,21 @@ switch ($sayfa) {
                                     <h2 class="fw-bold mb-0 text-dark"><?= $ilce_baskanlari; ?></h2>
                                 </div>
                                 <div class="p-3 rounded" style="background-color: rgba(106, 27, 154, 0.1); color: #6a1b9a;"><i class="fa-solid fa-route fa-xl"></i></div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Teşkilatlanma Sorumlu Başkan (Herkes İçin Açık) -->
+                <div class="col">
+                    <a href="index.php?sayfa=uyeler&filtre=teskilatlanma_sorumlusu" class="text-decoration-none text-dark d-block" style="transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <div class="card card-stat bg-white h-100 p-3 border-0 border-start border-5 shadow-sm" style="border-left-color: #e65100 !important; cursor: pointer;">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <h6 class="text-uppercase small fw-bold mb-1" style="font-size: 0.75rem; color: #e65100;">Teşkilatlanma Sor. Bşk.</h6>
+                                    <h2 class="fw-bold mb-0 text-dark"><?= $teskilatlanma_sorumlusu; ?></h2>
+                                </div>
+                                <div class="p-3 rounded" style="background-color: rgba(230, 81, 0, 0.1); color: #e65100;"><i class="fa-solid fa-sitemap fa-xl"></i></div>
                             </div>
                         </div>
                     </a>
