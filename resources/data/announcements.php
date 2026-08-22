@@ -22,7 +22,7 @@ return [
         'summary'      => '27 Ağustos Perşembe günü saat 18.30\'da Choco Gusto Eczacılık Şubesi\'nde '
             . '(İsmet İnönü 2 Bulvarı 51/A Uluönder) Eskişehir İl Başkanlığı toplantısı düzenlenecektir. '
             . 'Tüm üyelerimiz davetlidir.',
-        'category'     => 'etkinlik',
+        'category'     => 'duyuru',
         'published_at' => '2026-08-22',
         'highlighted'  => true,
     ],
