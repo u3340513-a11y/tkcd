@@ -166,8 +166,6 @@ try {
 
 $rol_etiketleri = [
     'admin'              => ['Tam Yetkili', 'bg-dark text-white'],
-    'denetci'            => ['Denetçi', 'bg-info text-dark'],
-    'moderator'          => ['Moderatör', 'bg-warning text-dark'],
     'yonetim'            => ['Yönetim', 'bg-primary text-white'],
     'il_baskani'         => ['İl Başkanı', 'bg-success text-white'],
     'ilce_baskani'       => ['İlçe Başkanı', 'text-white'],

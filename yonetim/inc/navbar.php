@@ -48,12 +48,10 @@
           Hoş geldin, <strong><?= htmlspecialchars($_SESSION['kullanici_adi']); ?></strong>
           <?php
           $rol_etiketleri = [
-              'admin' => ['Tam Yetkili', 'success'],
-              'denetci' => ['Denetçi', 'info'],
-              'moderator' => ['Moderatör', 'warning'],
-              'yonetim' => ['Yönetim', 'primary'],
-              'il_baskani' => ['İl Başkanı', 'success'],
-              'ilce_baskani' => ['İlçe Başkanı', 'purple'],
+              'admin'           => ['Tam Yetkili', 'success'],
+              'yonetim'         => ['Yönetim', 'primary'],
+              'il_baskani'      => ['İl Başkanı', 'success'],
+              'ilce_baskani'    => ['İlçe Başkanı', 'purple'],
               'kurum_temsilcisi' => ['Kurum Temsilcisi', 'warning'],
           ];
           $etiket = $rol_etiketleri[$kullanici_rolu] ?? ['Bilinmeyen', 'secondary'];

@@ -6,17 +6,15 @@ if (!isset($_SESSION['oturum']) || $_SESSION['oturum'] !== true) {
     die("Yetkisiz erişim!");
 }
 
-$kullanici_rolu = isset($_SESSION['rol']) ? $_SESSION['rol'] : 'admin';
-$is_denetci   = ($kullanici_rolu === 'denetci');
-$is_moderator = ($kullanici_rolu === 'moderator');
+$kullanici_rolu      = isset($_SESSION['rol']) ? $_SESSION['rol'] : 'admin';
 
-// Yeni roller
-$is_admin             = ($kullanici_rolu === 'admin');
-$is_yonetim           = ($kullanici_rolu === 'yonetim');
-$is_il_baskani        = ($kullanici_rolu === 'il_baskani');
-$is_ilce_baskani      = ($kullanici_rolu === 'ilce_baskani');
-$is_kurum_temsilcisi  = ($kullanici_rolu === 'kurum_temsilcisi');
-$is_kisitli_rol       = ($is_il_baskani || $is_ilce_baskani || $is_kurum_temsilcisi);
+// Roller
+$is_admin            = ($kullanici_rolu === 'admin');
+$is_yonetim          = ($kullanici_rolu === 'yonetim');
+$is_il_baskani       = ($kullanici_rolu === 'il_baskani');
+$is_ilce_baskani     = ($kullanici_rolu === 'ilce_baskani');
+$is_kurum_temsilcisi = ($kullanici_rolu === 'kurum_temsilcisi');
+$is_kisitli_rol      = ($is_il_baskani || $is_ilce_baskani || $is_kurum_temsilcisi);
 
 $arama_kelimesi = isset($_GET['kelime']) ? trim($_GET['kelime']) : '';
 $aktif_filtre   = isset($_GET['filtre']) ? trim($_GET['filtre']) : '';
@@ -135,11 +133,7 @@ try {
             $dogum = !empty($uye['dogum_tarihi']) ? date('d.m.Y', strtotime($uye['dogum_tarihi'])) : (!empty($uye['dogum_yili']) ? $uye['dogum_yili'] : '-');
             
             // İŞLEM / YETKİ HÜCRESİ
-            if ($is_denetci) {
-                $islem_icerik = '<span class="badge bg-secondary text-white px-2 py-1"><i class="fa-solid fa-eye me-1"></i>Sadece İnceleme</span>';
-            } elseif ($is_moderator) {
-                $islem_icerik = '<span class="badge bg-warning text-dark px-2 py-1"><i class="fa-solid fa-lock me-1"></i>Yetki Yok</span>';
-            } elseif ($is_kisitli_rol) {
+            if ($is_kisitli_rol) {
                 $islem_icerik = '<span class="badge bg-info text-dark px-2 py-1"><i class="fa-solid fa-eye me-1"></i>Sadece Görüntüleme</span>';
             } else {
                 $islem_icerik = '

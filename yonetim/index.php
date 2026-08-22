@@ -149,18 +149,14 @@ if (!isset($_SESSION['oturum']) || $_SESSION['oturum'] !== true) {
 }
 
 // ─── ROL KONTROLLERİ ───────────────────────────────────────────────────
-$kullanici_rolu = $_SESSION['rol'] ?? 'admin';
-$is_denetci   = ($kullanici_rolu === 'denetci');
-$is_moderator = ($kullanici_rolu === 'moderator');
-
-// ─── YENİ ROLLER (mevcut rollere dokunulmaz) ─────────────────────────
-$is_admin             = ($kullanici_rolu === 'admin');
-$is_yonetim           = ($kullanici_rolu === 'yonetim');
-$is_il_baskani        = ($kullanici_rolu === 'il_baskani');
-$is_ilce_baskani      = ($kullanici_rolu === 'ilce_baskani');
-$is_kurum_temsilcisi  = ($kullanici_rolu === 'kurum_temsilcisi');
-$is_kisitli_rol       = ($is_il_baskani || $is_ilce_baskani || $is_kurum_temsilcisi);
-$is_yetki_var         = ($is_admin || $is_yonetim);
+$kullanici_rolu      = $_SESSION['rol'] ?? 'admin';
+$is_admin            = ($kullanici_rolu === 'admin');
+$is_yonetim          = ($kullanici_rolu === 'yonetim');
+$is_il_baskani       = ($kullanici_rolu === 'il_baskani');
+$is_ilce_baskani     = ($kullanici_rolu === 'ilce_baskani');
+$is_kurum_temsilcisi = ($kullanici_rolu === 'kurum_temsilcisi');
+$is_kisitli_rol      = ($is_il_baskani || $is_ilce_baskani || $is_kurum_temsilcisi);
+$is_yetki_var        = ($is_admin || $is_yonetim);
 
 $sayfa = isset($_GET['sayfa']) ? trim($_GET['sayfa']) : 'dashboard';
 
@@ -169,20 +165,11 @@ include 'inc/navbar.php';
 
 switch ($sayfa) {
     case 'uyeler':
-        $aktif_filtre = isset($_GET['filtre']) ? trim($_GET['filtre']) : '';
-        $izinli_filtreler = ['yonetim_kurulu', 'bolge_koordinatoru', 'il_baskani', 'ilce_baskani', 'kurum_temsilcisi', 'teskilatlanma_sorumlusu'];
-        
-        if ($is_denetci && (empty($aktif_filtre) || !in_array($aktif_filtre, $izinli_filtreler))) {
-            echo '<div class="container py-5"><div class="alert alert-warning text-center fw-bold"><i class="fa-solid fa-triangle-exclamation me-2"></i>Bu filtreyi veya genel liste görünümünü inceleme yetkiniz bulunmamaktadır.</div></div>';
-        } else {
-            include 'inc/uyeler.php';
-        }
+        include 'inc/uyeler.php';
         break;
         
     case 'uye-ekle':
-        if ($is_denetci) {
-            echo '<div class="container py-5"><div class="alert alert-danger text-center fw-bold"><i class="fa-solid fa-lock me-2"></i>Erişim Engellendi: Üye ekleme yetkiniz bulunmamaktadır.</div></div>';
-        } elseif ($is_kisitli_rol) {
+        if ($is_kisitli_rol) {
             echo '<div class="container py-5"><div class="alert alert-danger text-center fw-bold"><i class="fa-solid fa-lock me-2"></i>Erişim Engellendi: Bu hesap türü ile üye ekleme işlemi yapılamaz.</div></div>';
         } else {
             include 'inc/uye-ekle.php';
@@ -194,9 +181,7 @@ switch ($sayfa) {
         break;
 
     case 'bekleyen-uyeler':
-        if ($is_denetci) {
-            echo '<div class="container py-5"><div class="alert alert-danger text-center fw-bold"><i class="fa-solid fa-lock me-2"></i>Erişim Engellendi: Bekleyen başvuruları inceleme yetkiniz bulunmamaktadır.</div></div>';
-        } elseif ($is_kisitli_rol) {
+        if ($is_kisitli_rol) {
             echo '<div class="container py-5"><div class="alert alert-danger text-center fw-bold"><i class="fa-solid fa-lock me-2"></i>Erişim Engellendi: Bu hesap türü ile bekleyen başvuruları görüntüleyemezsiniz.</div></div>';
         } else {
             include 'inc/bekleyen-uyeler.php';
@@ -280,7 +265,7 @@ switch ($sayfa) {
             break;
         }
 
-        // ─── STANDART DASHBOARD (admin, denetci, moderator, yonetim) ────
+        // ─── STANDART DASHBOARD (admin, yonetim, il_baskani, ilce_baskani, kurum_temsilcisi) ────
         try {
             $toplam_uye = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli'")->fetchColumn();
             $toplam_il  = $db_baglanti->query("SELECT COUNT(DISTINCT ikamet_ili) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND ikamet_ili IS NOT NULL AND ikamet_ili != ''")->fetchColumn();
@@ -324,33 +309,25 @@ switch ($sayfa) {
 
             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-xl-4 g-4 mb-4">
                 
-                <!-- Toplam Üye (Kart görünüyor, denetçi için sayı gizli, Moderatör ve Admin görür) -->
+                <!-- Toplam Üye -->
                 <div class="col">
-                    <?php if (!$is_denetci): ?>
-                        <a href="index.php?sayfa=uyeler" class="text-decoration-none text-dark d-block" style="transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
-                    <?php endif; ?>
-                        <div class="card card-stat bg-white h-100 p-3 border-0 border-start border-primary border-5 shadow-sm" style="<?= $is_denetci ? 'cursor: default;' : 'cursor: pointer;'; ?>">
+                    <a href="index.php?sayfa=uyeler" class="text-decoration-none text-dark d-block" style="transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <div class="card card-stat bg-white h-100 p-3 border-0 border-start border-primary border-5 shadow-sm" style="cursor: pointer;">
                             <div class="d-flex align-items-center justify-content-between">
                                 <div>
                                     <h6 class="text-muted text-uppercase small fw-bold mb-1" style="font-size: 0.75rem;">Toplam Üye</h6>
-                                    <h2 class="fw-bold mb-0 text-dark">
-                                        <?= $is_denetci ? '<span class="text-muted fs-4" title="Gizli Veri">***</span>' : $toplam_uye; ?>
-                                    </h2>
+                                    <h2 class="fw-bold mb-0 text-dark"><?= $toplam_uye; ?></h2>
                                 </div>
                                 <div class="bg-primary bg-opacity-10 p-3 rounded text-primary"><i class="fa-solid fa-users fa-xl"></i></div>
                             </div>
                         </div>
-                    <?php if (!$is_denetci): ?>
-                        </a>
-                    <?php endif; ?>
+                    </a>
                 </div>
 
-                <!-- Aktif İller (Denetçiye Kapalı, Moderatör ve Admin Açık) -->
+                <!-- Aktif İller -->
                 <div class="col">
-                    <?php if (!$is_denetci): ?>
-                        <a href="index.php?sayfa=uyeler&filtre=aktif_iller" class="text-decoration-none text-dark d-block" style="transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
-                    <?php endif; ?>
-                        <div class="card card-stat bg-white h-100 p-3 border-0 border-start border-danger border-5 shadow-sm" style="<?= $is_denetci ? 'cursor: default;' : 'cursor: pointer;'; ?>">
+                    <a href="index.php?sayfa=uyeler&filtre=aktif_iller" class="text-decoration-none text-dark d-block" style="transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <div class="card card-stat bg-white h-100 p-3 border-0 border-start border-danger border-5 shadow-sm" style="cursor: pointer;">
                             <div class="d-flex align-items-center justify-content-between">
                                 <div>
                                     <h6 class="text-muted text-uppercase small fw-bold mb-1" style="font-size: 0.75rem;">Aktif İller</h6>
@@ -359,9 +336,7 @@ switch ($sayfa) {
                                 <div class="bg-danger bg-opacity-10 p-3 rounded text-danger"><i class="fa-solid fa-map-location-dot fa-xl"></i></div>
                             </div>
                         </div>
-                    <?php if (!$is_denetci): ?>
-                        </a>
-                    <?php endif; ?>
+                    </a>
                 </div>
 
                 <!-- Yönetim Kurulu (Herkes İçin Açık) -->
@@ -454,12 +429,10 @@ switch ($sayfa) {
                     </a>
                 </div>
 
-                <!-- Bekleyen Başvuru (Denetçiye Kapalı, Moderatör ve Admin Açık) -->
+                <!-- Bekleyen Başvuru -->
                 <div class="col">
-                    <?php if (!$is_denetci): ?>
-                        <a href="index.php?sayfa=bekleyen-uyeler" class="text-decoration-none d-block">
-                    <?php endif; ?>
-                        <div class="card card-stat bg-white h-100 p-3 border-0 border-start border-danger border-5 shadow-sm position-relative" style="transition: transform 0.2s; <?= $is_denetci ? 'cursor: default;' : 'cursor: pointer;'; ?>" onmouseover="<?= $is_denetci ? '' : "this.style.transform='translateY(-3px)'"; ?>" onmouseout="<?= $is_denetci ? '' : "this.style.transform='translateY(0)'"; ?>">
+                    <a href="index.php?sayfa=bekleyen-uyeler" class="text-decoration-none d-block">
+                        <div class="card card-stat bg-white h-100 p-3 border-0 border-start border-danger border-5 shadow-sm position-relative" style="transition: transform 0.2s; cursor: pointer;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
                             <div class="d-flex align-items-center justify-content-between">
                                 <div>
                                     <h6 class="text-danger text-uppercase small fw-bold mb-1" style="font-size: 0.75rem;">Bekleyen Başvuru</h6>
@@ -471,9 +444,7 @@ switch ($sayfa) {
                                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="margin-left: -15px; margin-top: 5px;">Yeni</span>
                             <?php endif; ?>
                         </div>
-                    <?php if (!$is_denetci): ?>
-                        </a>
-                    <?php endif; ?>
+                    </a>
                 </div>
 
             </div>
@@ -503,14 +474,12 @@ switch ($sayfa) {
                         <h4 class="fw-bold text-dark">T.K.Ç.D. Yönetim Paneli</h4>
                         <p class="text-muted small px-3 mb-4">Sistem genelindeki verilere ve üyelere yukarıdaki menüyü kullanarak anında erişebilirsiniz.</p>
                         
-                        <?php if (!$is_denetci): ?>
-                            <div class="d-flex gap-2">
-                                <a href="index.php?sayfa=bekleyen-uyeler" class="btn btn-danger btn-sm fw-bold px-3 shadow-sm"><i class="fa-solid fa-user-clock me-1"></i>Başvuruları İncele</a>
-                                <?php if (!$is_moderator): ?>
-                                    <a href="index.php?sayfa=uye-ekle" class="btn btn-dark btn-sm fw-bold px-3 shadow-sm"><i class="fa-solid fa-user-plus me-1"></i>Üye Ekle</a>
-                                <?php endif; ?>
-                            </div>
-                        <?php endif; ?>
+                        <div class="d-flex gap-2">
+                            <a href="index.php?sayfa=bekleyen-uyeler" class="btn btn-danger btn-sm fw-bold px-3 shadow-sm"><i class="fa-solid fa-user-clock me-1"></i>Başvuruları İncele</a>
+                            <?php if (!$is_kisitli_rol): ?>
+                                <a href="index.php?sayfa=uye-ekle" class="btn btn-dark btn-sm fw-bold px-3 shadow-sm"><i class="fa-solid fa-user-plus me-1"></i>Üye Ekle</a>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </div>
             </div>

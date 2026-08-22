@@ -8,17 +8,15 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
 
 $uye_id = intval($_GET['id']);
 
-$kullanici_rolu = isset($_SESSION['rol']) ? $_SESSION['rol'] : 'admin';
-$is_admin     = ($kullanici_rolu === 'admin');
-$is_denetci   = ($kullanici_rolu === 'denetci');
-$is_moderator = ($kullanici_rolu === 'moderator');
+$kullanici_rolu      = isset($_SESSION['rol']) ? $_SESSION['rol'] : 'admin';
+$is_admin            = ($kullanici_rolu === 'admin');
 
-// Yeni roller
-$is_yonetim           = ($kullanici_rolu === 'yonetim');
-$is_il_baskani        = ($kullanici_rolu === 'il_baskani');
-$is_ilce_baskani      = ($kullanici_rolu === 'ilce_baskani');
-$is_kurum_temsilcisi  = ($kullanici_rolu === 'kurum_temsilcisi');
-$is_kisitli_rol       = ($is_il_baskani || $is_ilce_baskani || $is_kurum_temsilcisi);
+// Roller
+$is_yonetim          = ($kullanici_rolu === 'yonetim');
+$is_il_baskani       = ($kullanici_rolu === 'il_baskani');
+$is_ilce_baskani     = ($kullanici_rolu === 'ilce_baskani');
+$is_kurum_temsilcisi = ($kullanici_rolu === 'kurum_temsilcisi');
+$is_kisitli_rol      = ($is_il_baskani || $is_ilce_baskani || $is_kurum_temsilcisi);
 
 // --- GÜNCELLEME: SORUMLU BÖLGE / İLÇE EL İLE GÜNCELLEME MOTORU (SADECE ADMİN) ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bolge_guncelle'])) {
@@ -38,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bolge_guncelle'])) {
 
 // --- ARKA PLANDA ÇALIŞAN SAF JAVASCRIPT / AJAX NOT SİLME MOTORU (DENETÇİYE KAPALI) ---
 if (isset($_GET['ajax_islem']) && $_GET['ajax_islem'] === 'ajax_not_sil' && isset($_GET['silinecek_not_id'])) {
-    if ($is_denetci || $is_kisitli_rol) {
+    if ($is_kisitli_rol) {
         echo "hata";
         exit;
     }
@@ -63,7 +61,7 @@ if (isset($_GET['ajax_islem']) && $_GET['ajax_islem'] === 'ajax_not_sil' && isse
 
 // --- NOT EKLEME MOTORU (DENETÇİYE KAPALI) ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['not_ekle'])) {
-    if ($is_denetci || $is_kisitli_rol) {
+    if ($is_kisitli_rol) {
         die("Erişim Engellendi: Bu işlemi yapmaya yetkiniz yok!");
     }
     $not_icerik = trim($_POST['not_icerik']);
@@ -244,7 +242,7 @@ if (!empty($uye['uyelik_tarihi']) && $uye['uyelik_tarihi'] !== '0000-00-00') {
                 </div>
                 <div class="card-body p-4 d-flex flex-column flex-grow-1">
                     
-                    <?php if (!$is_denetci && !$is_kisitli_rol): ?>
+                    <?php if (!$is_kisitli_rol): ?>
                         <form action="index.php?sayfa=uye-detay&id=<?= $uye_id; ?>" method="POST" class="mb-4">
                             <div class="input-group">
                                 <textarea name="not_icerik" class="form-control" rows="2" placeholder="Üye hakkında bir not veya özel açıklama ekleyin..." required></textarea>
@@ -260,7 +258,7 @@ if (!empty($uye['uyelik_tarihi']) && $uye['uyelik_tarihi'] !== '0000-00-00') {
                             <?php foreach ($notlar as $not): ?>
                                 <div id="not-kapsayici-<?= $not['id']; ?>" class="bg-light p-3 rounded-3 border mb-3 shadow-sm position-relative transition-not">
                                     
-                                    <?php if (!$is_denetci && !$is_kisitli_rol): ?>
+                                    <?php if (!$is_kisitli_rol): ?>
                                         <a href="javascript:void(0);" onclick="notuGörünmezSil(<?= $not['id']; ?>)" class="position-absolute text-danger text-decoration-none btn-not-sil" title="Notu Sil" style="top: 10px; right: 15px; font-size: 1.4rem; font-weight: bold; line-height: 1; cursor: pointer;">
                                             &times;
                                         </a>
@@ -317,7 +315,7 @@ if (!empty($uye['uyelik_tarihi']) && $uye['uyelik_tarihi'] !== '0000-00-00') {
 
 <script>
 function notuGörünmezSil(notId) {
-    <?php if (!$is_denetci && !$is_kisitli_rol): ?>
+    <?php if (!$is_kisitli_rol): ?>
     if (confirm('Bu notu tamamen silmek istediğinize emin misiniz?')) {
         let url = 'index.php?sayfa=uye-detay&id=<?= $uye_id; ?>&ajax_islem=ajax_not_sil&silinecek_not_id=' + notId;
         

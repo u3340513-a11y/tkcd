@@ -7,9 +7,7 @@
 require_once __DIR__ . '/inc/baglan.php';
 
 $kullanicilar = [
-    'admin61'   => 'TKC.61.tkc!',
-    'denetci'   => 'TCK.Denet.61!',
-    'moderator' => 'TCK.Mod.61!',
+    'admin61' => 'TKC.61.tkc!',
 ];
 
 echo "<pre style='font-family:monospace; font-size:14px; padding:20px;'>";

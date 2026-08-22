@@ -4,24 +4,20 @@
 $mesaj = "";
 $mesaj_turu = "";
 
-$kullanici_rolu = isset($_SESSION['rol']) ? $_SESSION['rol'] : 'admin';
-$is_denetci = ($kullanici_rolu === 'denetci');
-$is_moderator = ($kullanici_rolu === 'moderator');
-
-// Yeni roller (mevcut rollere dokunulmaz)
-$is_admin             = ($kullanici_rolu === 'admin');
-$is_yonetim           = ($kullanici_rolu === 'yonetim');
-$is_il_baskani        = ($kullanici_rolu === 'il_baskani');
-$is_ilce_baskani      = ($kullanici_rolu === 'ilce_baskani');
-$is_kurum_temsilcisi  = ($kullanici_rolu === 'kurum_temsilcisi');
-$is_kisitli_rol       = ($is_il_baskani || $is_ilce_baskani || $is_kurum_temsilcisi);
+$kullanici_rolu      = isset($_SESSION['rol']) ? $_SESSION['rol'] : 'admin';
+$is_admin            = ($kullanici_rolu === 'admin');
+$is_yonetim          = ($kullanici_rolu === 'yonetim');
+$is_il_baskani       = ($kullanici_rolu === 'il_baskani');
+$is_ilce_baskani     = ($kullanici_rolu === 'ilce_baskani');
+$is_kurum_temsilcisi = ($kullanici_rolu === 'kurum_temsilcisi');
+$is_kisitli_rol      = ($is_il_baskani || $is_ilce_baskani || $is_kurum_temsilcisi);
 
 // İşlem sonrası aynı sayfaya geri yönlendirme linki
 $geri_link = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : 'index.php?sayfa=uyeler';
 
 // --- ÜYE SİLME MOTORU ---
 if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'uye_sil' && isset($_GET['id'])) {
-    if ($is_denetci || $is_moderator || $is_kisitli_rol) {
+    if ($is_kisitli_rol) {
         die("Erişim Engellendi: Bu işlemi yapmaya yetkiniz yok!");
     }
     $uye_id = intval($_GET['id']);
@@ -40,7 +36,7 @@ if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'uye_sil' && isset($_GET['id
 
 // --- ANA STATÜ DEĞİŞTİRME MOTORU ---
 if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'statü_degistir' && isset($_GET['id']) && isset($_GET['tur'])) {
-    if ($is_denetci || $is_moderator || $is_kisitli_rol) {
+    if ($is_kisitli_rol) {
         die("Erişim Engellendi: Bu işlemi yapmaya yetkiniz yok!");
     }
     $uye_id = intval($_GET['id']);
@@ -70,7 +66,7 @@ if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'statü_degistir' && isset($
 
 // --- EK GÖREV DEĞİŞTİRME VE SİLME MOTORU ---
 if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'ek_gorev_degistir' && isset($_GET['id']) && isset($_GET['gorev'])) {
-    if ($is_denetci || $is_moderator || $is_kisitli_rol) {
+    if ($is_kisitli_rol) {
         die("Erişim Engellendi: Bu işlemi yapmaya yetkiniz yok!");
     }
     $uye_id = intval($_GET['id']);
@@ -214,7 +210,7 @@ try {
                     <!-- Readonly hilesi ile klavye tamamlama baloncuğu tamamen engellendi -->
                     <input type="text" id="tabloCanliAra" readonly onfocus="this.removeAttribute('readonly');" <?= $iller_modu ? 'disabled placeholder="İl modunda arama devre dışı..."' : 'oninput="canliVeritabanıArama(this.value)" placeholder="Arama..."'; ?> class="form-control rounded-start px-3" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
                     
-                    <?php if(!$iller_modu && !$is_moderator && !$is_denetci && !$is_kisitli_rol && !$is_yonetim): ?>
+                    <?php if(!$iller_modu && !$is_kisitli_rol && !$is_yonetim): ?>
                     <button type="button" onclick="dosyaYonlendir('excel')" class="btn btn-success fw-bold px-2 px-sm-3 d-flex align-items-center justify-content-center btn-sm">
                         <i class="fa-solid fa-file-excel me-1"></i> Excel
                     </button>
@@ -275,7 +271,7 @@ try {
                             <th style="width: 130px; white-space: nowrap;">Kurum / Ünvan</th>
                             <th style="width: 85px; white-space: nowrap;">Çalışma</th>
                             <th style="width: 150px; white-space: nowrap;" class="text-center">Statü</th>
-                            <th class="text-center pe-3" style="width: 100px; white-space: nowrap;"><?= ($is_denetci || $is_moderator) ? 'Yetki' : 'İşlemler'; ?></th>
+                            <th class="text-center pe-3" style="width: 100px; white-space: nowrap;">İşlemler</th>
                         </tr>
                     </thead>
                     <tbody id="uyeTabloGövdesi">
@@ -401,11 +397,7 @@ try {
                                         </div>
                                     </td>
                                     <td class="text-center pe-3">
-                                        <?php if ($is_denetci): ?>
-                                            <span class="badge bg-secondary text-white px-2 py-1"><i class="fa-solid fa-eye me-1"></i>Sadece İnceleme</span>
-                                        <?php elseif ($is_moderator): ?>
-                                            <span class="badge bg-warning text-dark px-2 py-1"><i class="fa-solid fa-lock me-1"></i>Yetki Yok</span>
-                                        <?php elseif ($is_kisitli_rol): ?>
+                                        <?php if ($is_kisitli_rol): ?>
                                             <span class="badge bg-info text-dark px-2 py-1"><i class="fa-solid fa-eye me-1"></i>Sadece Görüntüleme</span>
                                         <?php else: ?>
                                             <div class="btn-group dropup position-static">
@@ -504,7 +496,7 @@ try {
     </div>
 </div>
 
-<?php if (!$is_denetci && !$is_moderator): ?>
+<?php if (!$is_kisitli_rol): ?>
 <div class="modal fade" id="bolgeModal" tabindex="-1" aria-labelledby="bolgeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content border-0 shadow-lg">
@@ -574,7 +566,7 @@ function canliVeritabanıArama(deger) {
 }
 
 function dosyaYonlendir(tur) {
-    <?php if ($is_moderator || $is_denetci || $is_kisitli_rol || $is_yonetim): ?>
+    <?php if ($is_kisitli_rol || $is_yonetim): ?>
         alert('Bu kullanıcı yetkisi ile dosya indirme işlemi kısıtlanmıştır.');
         return;
     <?php endif; ?>
@@ -601,7 +593,7 @@ function dosyaYonlendir(tur) {
 }
 
 function bolgeSecimPenceresi(uyeId) {
-    <?php if (!$is_denetci && !$is_moderator): ?>
+    <?php if (!$is_kisitli_rol): ?>
     document.getElementById("modalUyeId").value = uyeId;
     var myModal = new bootstrap.Modal(document.getElementById('bolgeModal'));
     myModal.show();
@@ -609,7 +601,7 @@ function bolgeSecimPenceresi(uyeId) {
 }
 
 function bolgeAta(bolgeAdi) {
-    <?php if (!$is_denetci && !$is_moderator): ?>
+    <?php if (!$is_kisitli_rol): ?>
     var uyeId = document.getElementById("modalUyeId").value;
     if(uyeId) {
         window.location.href = 'index.php?sayfa=uyeler&aksiyon=statü_degistir&id=' + uyeId + '&tur=Bölge+Koordinatörü&bolge=' + encodeURIComponent(bolgeAdi);

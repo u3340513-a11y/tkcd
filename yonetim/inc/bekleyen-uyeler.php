@@ -4,14 +4,13 @@
 $mesaj = "";
 $mesaj_turu = "";
 
-$kullanici_rolu = isset($_SESSION['rol']) ? $_SESSION['rol'] : 'admin';
-$is_moderator = ($kullanici_rolu === 'moderator');
+$kullanici_rolu      = isset($_SESSION['rol']) ? $_SESSION['rol'] : 'admin';
 
-// Yeni roller
-$is_il_baskani        = ($kullanici_rolu === 'il_baskani');
-$is_ilce_baskani      = ($kullanici_rolu === 'ilce_baskani');
-$is_kurum_temsilcisi  = ($kullanici_rolu === 'kurum_temsilcisi');
-$is_kisitli_rol       = ($is_il_baskani || $is_ilce_baskani || $is_kurum_temsilcisi);
+// Roller
+$is_il_baskani       = ($kullanici_rolu === 'il_baskani');
+$is_ilce_baskani     = ($kullanici_rolu === 'ilce_baskani');
+$is_kurum_temsilcisi = ($kullanici_rolu === 'kurum_temsilcisi');
+$is_kisitli_rol      = ($is_il_baskani || $is_ilce_baskani || $is_kurum_temsilcisi);
 
 // --- BAŞVURU ONAYLAMA MOTORU ---
 if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'basvuru_onayla' && isset($_GET['id'])) {
@@ -57,11 +56,8 @@ if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'basvuru_onayla' && isset($_
     }
 }
 
-// --- BAŞVURU REDDETME / SİLME MOTORU (MODERATÖRE KAPALI) ---
+// --- BAŞVURU REDDETME / SİLME MOTORU ---
 if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'basvuru_reddet' && isset($_GET['id'])) {
-    if ($is_moderator) {
-        die("Erişim Engellendi: Moderatör rolü ile başvuru reddetme yetkiniz bulunmamaktadır.");
-    }
     $uye_id = intval($_GET['id']);
     try {
         $red_sorgu = $db_baglanti->prepare("DELETE FROM dernek_uyeler WHERE id = ? AND onay_durumu = 'bekleyen'");
@@ -185,7 +181,7 @@ try {
                                             <a href="index.php?sayfa=bekleyen-uyeler&aksiyon=basvuru_onayla&id=<?= $b['id']; ?>" class="btn btn-success btn-sm fw-bold px-2.5 shadow-sm" onclick="return confirm('<?= htmlspecialchars($b['adi_soyadi']); ?> isimli adayı derneğe üye olarak onaylıyor musunuz?');">
                                                 <i class="fa-solid fa-user-check me-1"></i> Onayla
                                             </a>
-                                            <?php if (!$is_moderator && !$is_kisitli_rol): ?>
+                                            <?php if (!$is_kisitli_rol): ?>
                                                 <a href="index.php?sayfa=bekleyen-uyeler&aksiyon=basvuru_reddet&id=<?= $b['id']; ?>" class="btn btn-outline-danger btn-sm fw-bold px-2.5 shadow-sm" onclick="return confirm('<?= htmlspecialchars($b['adi_soyadi']); ?> isimli başvuruyu tamamen silmek istediğinize emin misiniz?');">
                                                     <i class="fa-solid fa-user-xmark me-1"></i> Reddet
                                                 </a>
