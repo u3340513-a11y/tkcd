@@ -97,4 +97,18 @@ return [
         'eposta'   => '',
         'ilceler'  => [],
     ],
+    '41' => [
+        'il_adi'   => 'Kocaeli',
+        'temsilci' => 'Tuncay Dağ',
+        'telefon'  => '0545 641 11 61',
+        'eposta'   => '',
+        'ilceler'  => [],
+    ],
+    '67' => [
+        'il_adi'   => 'Zonguldak',
+        'temsilci' => 'Sinan Taşkın',
+        'telefon'  => '0532 403 02 47',
+        'eposta'   => '',
+        'ilceler'  => [],
+    ],
 ];
