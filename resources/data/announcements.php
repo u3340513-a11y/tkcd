@@ -17,6 +17,16 @@ declare(strict_types=1);
  */
 return [
     [
+        'slug'         => 'eskisehir-il-baskanligi-toplantisi-agustos-2026',
+        'title'        => 'Eskişehir İl Başkanlığı Toplantısı',
+        'summary'      => '27 Ağustos Perşembe günü saat 18.30\'da Choco Gusto Eczacılık Şubesi\'nde '
+            . '(İsmet İnönü 2 Bulvarı 51/A Uluönder) Eskişehir İl Başkanlığı toplantısı düzenlenecektir. '
+            . 'Tüm üyelerimiz davetlidir.',
+        'category'     => 'etkinlik',
+        'published_at' => '2026-08-22',
+        'highlighted'  => true,
+    ],
+    [
         'slug'         => '2025-yili-faaliyet-raporu',
         'title'        => '2025 Yılı Faaliyet Raporu Yayınlandı',
         'summary'      => 'Yılın ilk yarısında gerçekleştirdiğimiz projeler ve mali tablolarımızı '
