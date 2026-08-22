@@ -111,4 +111,11 @@ return [
         'eposta'   => '',
         'ilceler'  => [],
     ],
+    '26' => [
+        'il_adi'   => 'Eskişehir',
+        'temsilci' => 'Özlem Dinç Yılmaz',
+        'telefon'  => '0552 461 26 53',
+        'eposta'   => '',
+        'ilceler'  => [],
+    ],
 ];
