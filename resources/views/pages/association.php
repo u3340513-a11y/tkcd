@@ -278,19 +278,16 @@ $sayilar = [
             <p class="da-galeri__baslik">Faaliyetlerimizden Kareler</p>
             <ul class="da-galeri-mozaik">
 <?php
-$galeriGorseller = [
-    ['src' => '/assets/img/trabzon-kamu-masa.webp',  'alt' => 'Dernek toplantısından bir kare',           'buyuk' => true],
-    ['src' => '/assets/img/trabzon-hero.webp',        'alt' => 'Trabzon Sümela Manastırı',                 'buyuk' => false],
-    ['src' => '/assets/img/kamu-etkinlik.jpeg',       'alt' => 'Dernek etkinliğinden bir kare',            'buyuk' => false],
-    ['src' => '/assets/img/uzungol-hero.webp',        'alt' => 'Uzungöl',                                  'buyuk' => false],
-    ['src' => '/assets/img/kahraman-uyelik.jpg',      'alt' => 'Dernek faaliyetlerinden bir görüntü',      'buyuk' => false],
-    ['src' => '/assets/img/herog.jpeg',               'alt' => 'Dernek etkinliklerinden bir fotoğraf',     'buyuk' => false],
-];
+/** @var list<array{dosya:string,alt:string,boyut:'buyuk'|'normal'}> $galeriVerisi */
+$galeriVerisi    = require dirname(__DIR__, 3) . '/resources/data/gallery.php';
+$galeriGorseller = array_slice($galeriVerisi, 0, 6);
 foreach ($galeriGorseller as $gorsel):
+    $src   = '/assets/img/' . $gorsel['dosya'];
+    $buyuk = ($gorsel['boyut'] === 'buyuk');
 ?>
-                <li class="da-galeri-mozaik__oge<?= $gorsel['buyuk'] ? ' da-galeri-mozaik__oge--buyuk' : '' ?>">
+                <li class="da-galeri-mozaik__oge<?= $buyuk ? ' da-galeri-mozaik__oge--buyuk' : '' ?>">
 <?= $view->partial('components/gorsel', [
-    'src'       => $gorsel['src'],
+    'src'       => $src,
     'alt'       => $gorsel['alt'],
     'yedekIkon' => 'camera',
 ]) ?>
