@@ -91,13 +91,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['sifre_sifirla'])) {
         $mesaj_turu = "danger";
     } else {
         try {
+            // Hedef hesap adını çek
+            $hedef_ad_sorgu = $db_baglanti->prepare("SELECT kullanici_adi FROM dernek_yoneticiler WHERE id = ?");
+            $hedef_ad_sorgu->execute([$hedef_id]);
+            $hedef_adi = $hedef_ad_sorgu->fetchColumn() ?: ('Bilinmeyen #' . $hedef_id);
+
             $hash = password_hash($yeni_sifre, PASSWORD_DEFAULT);
             $guncelle = $db_baglanti->prepare("UPDATE dernek_yoneticiler SET sifre = ? WHERE id = ?");
             $guncelle->execute([$hash, $hedef_id]);
             $mesaj = "Şifre başarıyla güncellendi!";
             $mesaj_turu = "success";
 
-            log_kaydet($db_baglanti, 'sifre_sifirla', 'Şifre sıfırlandı: hesap #' . $hedef_id, 'dernek_yoneticiler', $hedef_id);
+            log_kaydet($db_baglanti, 'sifre_sifirla', $hedef_adi . ' hesabının şifresi sıfırlandı.', 'dernek_yoneticiler', $hedef_id);
         } catch (\PDOException $e) {
             error_log('Şifre sıfırlama hatası: ' . $e->getMessage());
             $mesaj = "Şifre güncellenirken bir hata oluştu!";

@@ -22,10 +22,15 @@ if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'uye_sil' && isset($_GET['id
     }
     $uye_id = intval($_GET['id']);
     try {
+        // Silme öncesi üye adını çek
+        $ad_sorgu = $db_baglanti->prepare("SELECT adi_soyadi FROM dernek_uyeler WHERE id = ?");
+        $ad_sorgu->execute([$uye_id]);
+        $silinen_ad = $ad_sorgu->fetchColumn() ?: ('Bilinmeyen #' . $uye_id);
+
         $sil_sorgu = $db_baglanti->prepare("DELETE FROM dernek_uyeler WHERE id = ?");
         $durum = $sil_sorgu->execute([$uye_id]);
         if ($durum) {
-            log_kaydet($db_baglanti, 'uye_sil', 'Üye silindi (#' . $uye_id . ')', 'dernek_uyeler', $uye_id);
+            log_kaydet($db_baglanti, 'uye_sil', $silinen_ad . ' adlı üye sistemden silindi.', 'dernek_uyeler', $uye_id);
             echo "<script>window.location.href='".$geri_link."';</script>";
             exit;
         }
@@ -48,6 +53,13 @@ if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'statü_degistir' && isset($
     
     if (in_array($yeni_tur, $gecerli_türler)) {
         try {
+            // Önceki statüyü ve üye adını çek
+            $eski_sorgu = $db_baglanti->prepare("SELECT adi_soyadi, temsilci_turu FROM dernek_uyeler WHERE id = ?");
+            $eski_sorgu->execute([$uye_id]);
+            $eski_veri = $eski_sorgu->fetch(PDO::FETCH_ASSOC);
+            $uye_adi  = $eski_veri['adi_soyadi'] ?? ('Bilinmeyen #' . $uye_id);
+            $eski_tur = $eski_veri['temsilci_turu'] ?? 'Belirtilmemiş';
+
             if ($yeni_tur !== 'Bölge Koordinatörü' && $yeni_tur !== 'İlçe Başkanı') {
                 $bolge = null;
             }
@@ -55,7 +67,11 @@ if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'statü_degistir' && isset($
             $guncelle_sorgu = $db_baglanti->prepare("UPDATE dernek_uyeler SET temsilci_turu = ?, sorumlu_bolge = ? WHERE id = ?");
             $durum = $guncelle_sorgu->execute([$yeni_tur, $bolge, $uye_id]);
             if ($durum) {
-                log_kaydet($db_baglanti, 'temsilci_ata', 'Üye statüsü değiştirildi: ' . $yeni_tur . ' (#' . $uye_id . ')', 'dernek_uyeler', $uye_id);
+                $log_aciklama = $uye_adi . ' — ' . $eski_tur . ' → ' . $yeni_tur;
+                if ($bolge) {
+                    $log_aciklama .= ' (Bölge: ' . $bolge . ')';
+                }
+                log_kaydet($db_baglanti, 'temsilci_ata', $log_aciklama, 'dernek_uyeler', $uye_id);
                 echo "<script>window.location.href='".$geri_link."';</script>";
                 exit;
             }
@@ -79,10 +95,18 @@ if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'ek_gorev_degistir' && isset
     }
 
     try {
+        // Önceki ek görevi ve üye adını çek
+        $eski_ek_sorgu = $db_baglanti->prepare("SELECT adi_soyadi, ek_gorev FROM dernek_uyeler WHERE id = ?");
+        $eski_ek_sorgu->execute([$uye_id]);
+        $eski_ek_veri = $eski_ek_sorgu->fetch(PDO::FETCH_ASSOC);
+        $ek_uye_adi    = $eski_ek_veri['adi_soyadi'] ?? ('Bilinmeyen #' . $uye_id);
+        $eski_ek_gorev = $eski_ek_veri['ek_gorev'] ?? 'Yok';
+
         $ek_guncelle_sorgu = $db_baglanti->prepare("UPDATE dernek_uyeler SET ek_gorev = ? WHERE id = ?");
         $durum = $ek_guncelle_sorgu->execute([$yeni_ek_gorev, $uye_id]);
         if ($durum) {
-            log_kaydet($db_baglanti, 'temsilci_ata', 'Ek görev değiştirildi: ' . ($yeni_ek_gorev ?? 'kaldırıldı') . ' (#' . $uye_id . ')', 'dernek_uyeler', $uye_id);
+            $yeni_label = $yeni_ek_gorev ?? 'Kaldırıldı';
+            log_kaydet($db_baglanti, 'temsilci_ata', $ek_uye_adi . ' — Ek görev: ' . $eski_ek_gorev . ' → ' . $yeni_label, 'dernek_uyeler', $uye_id);
             echo "<script>window.location.href='".$geri_link."';</script>";
             exit;
         }

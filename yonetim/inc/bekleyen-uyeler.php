@@ -17,7 +17,7 @@ if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'basvuru_onayla' && isset($_
     $uye_id = intval($_GET['id']);
     try {
         // 1. ADIM: Onaylanacak üyenin telefon numarasını bekleyen kayıttan çekiyoruz
-        $uye_bul = $db_baglanti->prepare("SELECT telefon FROM dernek_uyeler WHERE id = ?");
+        $uye_bul = $db_baglanti->prepare("SELECT adi_soyadi, telefon FROM dernek_uyeler WHERE id = ?");
         $uye_bul->execute([$uye_id]);
         $mevcut_basvuru = $uye_bul->fetch(PDO::FETCH_ASSOC);
 
@@ -46,7 +46,8 @@ if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'basvuru_onayla' && isset($_
             $onay_sorgu = $db_baglanti->prepare($sql_onay);
             $durum = $onay_sorgu->execute([$uye_id]);
             if ($durum) {
-                log_kaydet($db_baglanti, 'uye_onayla', 'Üye başvurusu onaylandı (#' . $uye_id . ')', 'dernek_uyeler', $uye_id);
+                $onay_adi = $mevcut_basvuru['adi_soyadi'] ?? ('Bilinmeyen #' . $uye_id);
+                log_kaydet($db_baglanti, 'uye_onayla', $onay_adi . ' adlı başvuru onaylandı ve aktif üye yapıldı.', 'dernek_uyeler', $uye_id);
                 echo "<script>window.location.href='index.php?sayfa=bekleyen-uyeler&mesaj_durum=onaylandi';</script>";
                 exit;
             }
@@ -61,10 +62,15 @@ if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'basvuru_onayla' && isset($_
 if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'basvuru_reddet' && isset($_GET['id'])) {
     $uye_id = intval($_GET['id']);
     try {
+        // Silme öncesi üye adını çek
+        $red_ad_sorgu = $db_baglanti->prepare("SELECT adi_soyadi FROM dernek_uyeler WHERE id = ?");
+        $red_ad_sorgu->execute([$uye_id]);
+        $red_adi = $red_ad_sorgu->fetchColumn() ?: ('Bilinmeyen #' . $uye_id);
+
         $red_sorgu = $db_baglanti->prepare("DELETE FROM dernek_uyeler WHERE id = ? AND onay_durumu = 'bekleyen'");
         $durum = $red_sorgu->execute([$uye_id]);
         if ($durum) {
-            log_kaydet($db_baglanti, 'uye_reddet', 'Üye başvurusu reddedildi ve silindi (#' . $uye_id . ')', 'dernek_uyeler', $uye_id);
+            log_kaydet($db_baglanti, 'uye_reddet', $red_adi . ' adlı başvuru reddedildi ve sistemden silindi.', 'dernek_uyeler', $uye_id);
             echo "<script>window.location.href='index.php?sayfa=bekleyen-uyeler&mesaj_durum=reddedildi';</script>";
             exit;
         }

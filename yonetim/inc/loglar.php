@@ -128,21 +128,21 @@ $toplam_sayfa = max(1, (int) ceil($toplam_kayit / $limit));
 
 // İşlem türü → renk ve ikon eşlemesi
 $islem_stilleri = [
-    'giris'            => ['bg-success',   'fa-right-to-bracket',  'Giriş'],
-    'giris_basarisiz'  => ['bg-danger',    'fa-xmark',             'Başarısız Giriş'],
-    'cikis'            => ['bg-secondary', 'fa-right-from-bracket','Çıkış'],
-    'sayfa_goruntulem' => ['bg-info',      'fa-eye',               'Sayfa Görüntüleme'],
-    'uye_onayla'       => ['bg-success',   'fa-check',             'Üye Onay'],
-    'uye_reddet'       => ['bg-danger',    'fa-ban',               'Üye Red'],
-    'uye_sil'          => ['bg-danger',    'fa-trash',             'Üye Silme'],
-    'uye_ekle'         => ['bg-primary',   'fa-user-plus',         'Üye Ekleme'],
-    'uye_duzenle'      => ['bg-warning',   'fa-pen',               'Üye Düzenleme'],
-    'temsilci_ata'     => ['bg-purple',    'fa-user-tag',          'Temsilci Atama'],
-    'hesap_olustur'    => ['bg-primary',   'fa-user-plus',         'Hesap Oluşturma'],
-    'hesap_sil'        => ['bg-danger',    'fa-user-minus',        'Hesap Silme'],
-    'sifre_sifirla'    => ['bg-warning',   'fa-key',               'Şifre Sıfırlama'],
-    'excel_indir'      => ['bg-success',   'fa-file-excel',        'Excel İndirme'],
-    'pdf_indir'        => ['bg-danger',    'fa-file-pdf',          'PDF İndirme'],
+    'giris'            => ['bg-success text-white',   'fa-right-to-bracket',  'Giriş'],
+    'giris_basarisiz'  => ['bg-danger text-white',    'fa-xmark',             'Başarısız Giriş'],
+    'cikis'            => ['bg-secondary text-white', 'fa-right-from-bracket','Çıkış'],
+    'sayfa_goruntulem' => ['bg-dark text-white',       'fa-eye',               'Sayfa'],
+    'uye_onayla'       => ['bg-success text-white',   'fa-check',             'Onay'],
+    'uye_reddet'       => ['bg-danger text-white',    'fa-ban',               'Red'],
+    'uye_sil'          => ['bg-danger text-white',    'fa-trash',             'Silme'],
+    'uye_ekle'         => ['bg-primary text-white',   'fa-user-plus',         'Ekleme'],
+    'uye_duzenle'      => ['bg-dark text-white',      'fa-pen',               'Düzenleme'],
+    'temsilci_ata'     => ['bg-info text-white',      'fa-user-tag',          'Statü'],
+    'hesap_olustur'    => ['bg-primary text-white',   'fa-user-plus',         'Hesap +'],
+    'hesap_sil'        => ['bg-danger text-white',    'fa-user-minus',        'Hesap -'],
+    'sifre_sifirla'    => ['bg-dark text-white',      'fa-key',               'Şifre'],
+    'excel_indir'      => ['bg-success text-white',   'fa-file-excel',        'Excel'],
+    'pdf_indir'        => ['bg-danger text-white',    'fa-file-pdf',          'PDF'],
 ];
 
 /**
@@ -320,8 +320,8 @@ function kisalt_ua(?string $ua): string
                                             <?= $rol_stil[0]; ?>
                                         </span>
                                     </td>
-                                    <td class="text-center">
-                                        <span class="badge <?= $stil[0]; ?> px-2 py-1" style="font-size:0.7rem;">
+                                    <td class="text-center" style="white-space:nowrap;">
+                                        <span class="badge <?= $stil[0]; ?> px-2 py-1" style="font-size:0.75rem;">
                                             <i class="fa-solid <?= $stil[1]; ?> me-1"></i><?= $stil[2]; ?>
                                         </span>
                                     </td>
