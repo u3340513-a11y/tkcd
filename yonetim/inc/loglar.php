@@ -326,7 +326,14 @@ function kisalt_ua(?string $ua): string
                                         </span>
                                     </td>
                                     <td>
-                                        <span class="text-dark"><?= htmlspecialchars($log['islem_aciklama']); ?></span>
+                                        <?php
+                                        $aciklama_tam  = htmlspecialchars($log['islem_aciklama']);
+                                        $kisaltilmis   = mb_strpos($log['islem_aciklama'], '…') !== false;
+                                        ?>
+                                        <span class="text-dark<?= $kisaltilmis ? ' log-tooltip' : ''; ?>"
+                                              <?= $kisaltilmis ? 'data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="log-tip" title="' . $aciklama_tam . '"' : ''; ?>
+                                              style="<?= $kisaltilmis ? 'cursor:help;border-bottom:1px dotted rgba(0,0,0,0.25);' : ''; ?>"
+                                        ><?= $aciklama_tam; ?></span>
                                         <?php if ($log['hedef_tablo']): ?>
                                             <br><small class="text-muted"><i class="fa-solid fa-table me-1"></i><?= htmlspecialchars($log['hedef_tablo']); ?><?= $log['hedef_id'] ? ' #' . $log['hedef_id'] : ''; ?></small>
                                         <?php endif; ?>
@@ -396,3 +403,29 @@ function kisalt_ua(?string $ua): string
         <span class="small text-muted">Log kayıtları yönetim panelindeki tüm kullanıcı işlemlerini kapsar. Kayıtlar silinemez ve değiştirilemez.</span>
     </div>
 </div>
+
+<style>
+.log-tip .tooltip-inner {
+    max-width: 420px;
+    text-align: left;
+    padding: 10px 14px;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    background: #0f1528;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+}
+.log-tip .tooltip-arrow::before {
+    border-top-color: #0f1528;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var tooltipEls = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    tooltipEls.forEach(function(el) {
+        new bootstrap.Tooltip(el);
+    });
+});
+</script>
