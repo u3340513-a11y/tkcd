@@ -143,6 +143,7 @@ try {
     $hesaplar_sorgu = $db_baglanti->query(
         "SELECT id, kullanici_adi, rol, sorumlu_il, sorumlu_ilce, sorumlu_kurum, olusturma_tarihi 
          FROM dernek_yoneticiler 
+         WHERE rol != 'gelistirici'
          ORDER BY id ASC"
     );
     $hesaplar = $hesaplar_sorgu->fetchAll(PDO::FETCH_ASSOC);
