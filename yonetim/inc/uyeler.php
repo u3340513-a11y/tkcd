@@ -25,6 +25,7 @@ if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'uye_sil' && isset($_GET['id
         $sil_sorgu = $db_baglanti->prepare("DELETE FROM dernek_uyeler WHERE id = ?");
         $durum = $sil_sorgu->execute([$uye_id]);
         if ($durum) {
+            log_kaydet($db_baglanti, 'uye_sil', 'Üye silindi (#' . $uye_id . ')', 'dernek_uyeler', $uye_id);
             echo "<script>window.location.href='".$geri_link."';</script>";
             exit;
         }
@@ -54,6 +55,7 @@ if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'statü_degistir' && isset($
             $guncelle_sorgu = $db_baglanti->prepare("UPDATE dernek_uyeler SET temsilci_turu = ?, sorumlu_bolge = ? WHERE id = ?");
             $durum = $guncelle_sorgu->execute([$yeni_tur, $bolge, $uye_id]);
             if ($durum) {
+                log_kaydet($db_baglanti, 'temsilci_ata', 'Üye statüsü değiştirildi: ' . $yeni_tur . ' (#' . $uye_id . ')', 'dernek_uyeler', $uye_id);
                 echo "<script>window.location.href='".$geri_link."';</script>";
                 exit;
             }
@@ -80,6 +82,7 @@ if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'ek_gorev_degistir' && isset
         $ek_guncelle_sorgu = $db_baglanti->prepare("UPDATE dernek_uyeler SET ek_gorev = ? WHERE id = ?");
         $durum = $ek_guncelle_sorgu->execute([$yeni_ek_gorev, $uye_id]);
         if ($durum) {
+            log_kaydet($db_baglanti, 'temsilci_ata', 'Ek görev değiştirildi: ' . ($yeni_ek_gorev ?? 'kaldırıldı') . ' (#' . $uye_id . ')', 'dernek_uyeler', $uye_id);
             echo "<script>window.location.href='".$geri_link."';</script>";
             exit;
         }

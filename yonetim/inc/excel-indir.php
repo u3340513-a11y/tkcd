@@ -1,6 +1,7 @@
 <?php
 // Bu dosya yonetim/inc/excel-indir.php olarak kaydedilecektir.
 require_once __DIR__ . '/../inc/baglan.php';
+require_once __DIR__ . '/../inc/log-kayit.php';
 
 if (!isset($_SESSION['oturum']) || $_SESSION['oturum'] !== true) {
     die("Yetkisiz erişim!");
@@ -8,7 +9,7 @@ if (!isset($_SESSION['oturum']) || $_SESSION['oturum'] !== true) {
 
 // Dosya indirme sadece tam yetkili hesaba (admin) açıktır
 $rol = $_SESSION['rol'] ?? 'admin';
-if ($rol !== 'admin') {
+if ($rol !== 'admin' && $rol !== 'gelistirici') {
     die("Yetkisiz erişim! Dosya indirme yalnızca tam yetkili hesaplara açıktır.");
 }
 
@@ -58,6 +59,8 @@ try {
 
 $bugun = date('Y-m-d');
 $dosya_adi = "Dernek_Uye_Listesi_" . $bugun . ".xls";
+
+log_kaydet($db_baglanti, 'excel_indir', 'Excel dosyası indirildi (' . count($uyeler) . ' üye)', 'dernek_uyeler');
 
 header("Content-Type: application/vnd.ms-excel; charset=UTF-8");
 header("Content-Disposition: attachment; filename=\"$dosya_adi\"");

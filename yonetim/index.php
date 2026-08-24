@@ -12,11 +12,13 @@
  */
 
 require_once 'inc/baglan.php';
+require_once 'inc/log-kayit.php';
 
 $hata_mesaji = "";
 
 // ─── ÇIKIŞ İŞLEMİ ──────────────────────────────────────────────────────
 if (isset($_GET['islem']) && $_GET['islem'] === 'cikis') {
+    log_kaydet($db_baglanti, 'cikis', 'Kullanıcı oturumu kapattı.');
     $_SESSION = [];
     session_destroy();
     header("Location: /yonetim/");
@@ -132,11 +134,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['kullanici_adi'])) {
             // Başarılı giriş: deneme sayacını temizle
             login_basarili_temizle($kullanici, $guvenlikDizini);
 
+            // Log: başarılı giriş
+            log_kaydet($db_baglanti, 'giris', 'Başarılı giriş yapıldı.', 'dernek_yoneticiler', (int) $user['id']);
+
             header("Location: /yonetim/");
             exit;
         } else {
             // Başarısız giriş: sayacı artır
             login_basarisiz_kaydet($kullanici, $guvenlikDizini);
+
+            // Log: başarısız giriş
+            log_kaydet($db_baglanti, 'giris_basarisiz', 'Hatalı giriş denemesi: ' . htmlspecialchars($kullanici), null, null, $kullanici);
+
             $hata_mesaji = "Kullanıcı adı veya şifre hatalı!";
         }
     }
@@ -152,11 +161,12 @@ if (!isset($_SESSION['oturum']) || $_SESSION['oturum'] !== true) {
 $kullanici_rolu      = $_SESSION['rol'] ?? 'admin';
 $is_admin            = ($kullanici_rolu === 'admin');
 $is_yonetim          = ($kullanici_rolu === 'yonetim');
+$is_gelistirici      = ($kullanici_rolu === 'gelistirici');
 $is_il_baskani       = ($kullanici_rolu === 'il_baskani');
 $is_ilce_baskani     = ($kullanici_rolu === 'ilce_baskani');
 $is_kurum_temsilcisi = ($kullanici_rolu === 'kurum_temsilcisi');
 $is_kisitli_rol      = ($is_il_baskani || $is_ilce_baskani || $is_kurum_temsilcisi);
-$is_yetki_var        = ($is_admin || $is_yonetim);
+$is_yetki_var        = ($is_admin || $is_yonetim || $is_gelistirici);
 
 $sayfa = isset($_GET['sayfa']) ? trim($_GET['sayfa']) : 'dashboard';
 
@@ -172,6 +182,7 @@ switch ($sayfa) {
         if ($is_kisitli_rol) {
             echo '<div class="container py-5"><div class="alert alert-danger text-center fw-bold"><i class="fa-solid fa-lock me-2"></i>Erişim Engellendi: Bu hesap türü ile üye ekleme işlemi yapılamaz.</div></div>';
         } else {
+            log_kaydet($db_baglanti, 'sayfa_goruntulem', 'Üye ekleme sayfası açıldı.');
             include 'inc/uye-ekle.php';
         }
         break;
@@ -189,10 +200,19 @@ switch ($sayfa) {
         break;
 
     case 'hesap-yonetimi':
-        if (!$is_admin) {
+        if (!$is_admin && !$is_gelistirici) {
             echo '<div class="container py-5"><div class="alert alert-danger text-center fw-bold"><i class="fa-solid fa-lock me-2"></i>Erişim Engellendi: Hesap yönetimi sadece tam yetkili yöneticilere açıktır.</div></div>';
         } else {
+            log_kaydet($db_baglanti, 'sayfa_goruntulem', 'Hesap yönetimi sayfası açıldı.');
             include 'inc/hesap-yonetimi.php';
+        }
+        break;
+
+    case 'loglar':
+        if (!$is_gelistirici) {
+            echo '<div class="container py-5"><div class="alert alert-danger text-center fw-bold"><i class="fa-solid fa-lock me-2"></i>Erişim Engellendi: Sistem logları sadece geliştirici hesabına açıktır.</div></div>';
+        } else {
+            include 'inc/loglar.php';
         }
         break;
         

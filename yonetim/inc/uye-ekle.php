@@ -43,6 +43,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($durum) {
                 $mesaj = "Üye kaydı başarıyla tamamlandı!";
                 $mesaj_turu = "success";
+
+                log_kaydet($db_baglanti, 'uye_ekle', 'Manuel üye eklendi: ' . $adi_soyadi, 'dernek_uyeler', (int) $db_baglanti->lastInsertId());
             } else {
                 $mesaj = "Kayıt sırasında bir hata oluştu.";
                 $mesaj_turu = "danger";

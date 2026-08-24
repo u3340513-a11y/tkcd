@@ -46,6 +46,7 @@ if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'basvuru_onayla' && isset($_
             $onay_sorgu = $db_baglanti->prepare($sql_onay);
             $durum = $onay_sorgu->execute([$uye_id]);
             if ($durum) {
+                log_kaydet($db_baglanti, 'uye_onayla', 'Üye başvurusu onaylandı (#' . $uye_id . ')', 'dernek_uyeler', $uye_id);
                 echo "<script>window.location.href='index.php?sayfa=bekleyen-uyeler&mesaj_durum=onaylandi';</script>";
                 exit;
             }
@@ -63,6 +64,7 @@ if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'basvuru_reddet' && isset($_
         $red_sorgu = $db_baglanti->prepare("DELETE FROM dernek_uyeler WHERE id = ? AND onay_durumu = 'bekleyen'");
         $durum = $red_sorgu->execute([$uye_id]);
         if ($durum) {
+            log_kaydet($db_baglanti, 'uye_reddet', 'Üye başvurusu reddedildi ve silindi (#' . $uye_id . ')', 'dernek_uyeler', $uye_id);
             echo "<script>window.location.href='index.php?sayfa=bekleyen-uyeler&mesaj_durum=reddedildi';</script>";
             exit;
         }

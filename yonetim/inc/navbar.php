@@ -33,10 +33,17 @@
           </a>
         </li>
         <?php endif; ?>
-        <?php if ($is_admin): ?>
+        <?php if ($is_admin || $is_gelistirici): ?>
         <li class="nav-item">
           <a class="nav-link" href="index.php?sayfa=hesap-yonetimi">
             <i class="fa-solid fa-users-gear me-1"></i> Hesap Yönetimi
+          </a>
+        </li>
+        <?php endif; ?>
+        <?php if ($is_gelistirici): ?>
+        <li class="nav-item">
+          <a class="nav-link" href="index.php?sayfa=loglar" style="color:#00c9a7 !important;">
+            <i class="fa-solid fa-terminal me-1"></i> Sistem Logları
           </a>
         </li>
         <?php endif; ?>
@@ -50,6 +57,7 @@
           $rol_etiketleri = [
               'admin'           => ['Tam Yetkili', 'success'],
               'yonetim'         => ['Yönetim', 'primary'],
+              'gelistirici'     => ['Geliştirici', 'info'],
               'il_baskani'      => ['İl Başkanı', 'success'],
               'ilce_baskani'    => ['İlçe Başkanı', 'purple'],
               'kurum_temsilcisi' => ['Kurum Temsilcisi', 'warning'],

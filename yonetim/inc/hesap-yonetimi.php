@@ -14,7 +14,7 @@ if (!isset($_SESSION['oturum']) || $_SESSION['oturum'] !== true) {
     die("Yetkisiz erişim!");
 }
 $kullanici_rolu = $_SESSION['rol'] ?? 'admin';
-if ($kullanici_rolu !== 'admin') {
+if ($kullanici_rolu !== 'admin' && $kullanici_rolu !== 'gelistirici') {
     die("Erişim Engellendi: Bu sayfa sadece tam yetkili yöneticilere açıktır.");
 }
 
@@ -67,6 +67,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['hesap_olustur'])) {
                 $ekle->execute([$yeni_kullanici, $hash, $yeni_rol, $yeni_il, $yeni_ilce, $yeni_kurum]);
                 $mesaj = "Hesap başarıyla oluşturuldu: " . htmlspecialchars($yeni_kullanici);
                 $mesaj_turu = "success";
+
+                log_kaydet($db_baglanti, 'hesap_olustur', 'Yeni panel hesabı oluşturuldu: ' . $yeni_kullanici . ' (Rol: ' . $yeni_rol . ')', 'dernek_yoneticiler', (int) $db_baglanti->lastInsertId());
             }
         } catch (\PDOException $e) {
             error_log('Hesap oluşturma hatası: ' . $e->getMessage());
@@ -94,6 +96,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['sifre_sifirla'])) {
             $guncelle->execute([$hash, $hedef_id]);
             $mesaj = "Şifre başarıyla güncellendi!";
             $mesaj_turu = "success";
+
+            log_kaydet($db_baglanti, 'sifre_sifirla', 'Şifre sıfırlandı: hesap #' . $hedef_id, 'dernek_yoneticiler', $hedef_id);
         } catch (\PDOException $e) {
             error_log('Şifre sıfırlama hatası: ' . $e->getMessage());
             $mesaj = "Şifre güncellenirken bir hata oluştu!";
@@ -119,6 +123,8 @@ if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'hesap_sil' && isset($_GET['
             $sil->execute([$silinecek_id]);
             $mesaj = "Hesap başarıyla silindi: " . htmlspecialchars($silinecek);
             $mesaj_turu = "success";
+
+            log_kaydet($db_baglanti, 'hesap_sil', 'Panel hesabı silindi: ' . $silinecek, 'dernek_yoneticiler', $silinecek_id);
         }
     } catch (\PDOException $e) {
         error_log('Hesap silme hatası: ' . $e->getMessage());
@@ -167,6 +173,7 @@ try {
 $rol_etiketleri = [
     'admin'              => ['Tam Yetkili', 'bg-dark text-white'],
     'yonetim'            => ['Yönetim', 'bg-primary text-white'],
+    'gelistirici'        => ['Geliştirici', 'bg-info text-white'],
     'il_baskani'         => ['İl Başkanı', 'bg-success text-white'],
     'ilce_baskani'       => ['İlçe Başkanı', 'text-white'],
     'kurum_temsilcisi'   => ['Kurum Temsilcisi', 'bg-warning text-dark'],

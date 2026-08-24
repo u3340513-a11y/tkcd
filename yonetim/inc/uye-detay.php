@@ -27,6 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bolge_guncelle'])) {
     try {
         $bolge_sorgu = $db_baglanti->prepare("UPDATE dernek_uyeler SET sorumlu_bolge = ? WHERE id = ?");
         $bolge_sorgu->execute([$yeni_bolge ?: null, $uye_id]);
+        log_kaydet($db_baglanti, 'uye_duzenle', 'Sorumlu bölge güncellendi: ' . ($yeni_bolge ?: 'boş') . ' (Üye #' . $uye_id . ')', 'dernek_uyeler', $uye_id);
         echo "<script>window.location.href='index.php?sayfa=uye-detay&id=".$uye_id."';</script>";
         exit;
     } catch (\PDOException $e) {
@@ -69,6 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['not_ekle'])) {
         try {
             $not_sorgu = $db_baglanti->prepare("INSERT INTO dernek_notlar (uye_id, not_icerik) VALUES (?, ?)");
             $not_sorgu->execute([$uye_id, $not_icerik]);
+            log_kaydet($db_baglanti, 'uye_duzenle', 'Üye notu eklendi (Üye #' . $uye_id . ')', 'dernek_notlar', (int) $db_baglanti->lastInsertId());
             echo "<script>window.location.href='index.php?sayfa=uye-detay&id=".$uye_id."';</script>";
             exit;
         } catch (\PDOException $e) {
