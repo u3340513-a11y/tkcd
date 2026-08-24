@@ -574,24 +574,26 @@ switch ($sayfa) {
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script>
         window.addEventListener("load", function() {
-            var canvasElement = document.getElementById('ilcePastaGrafik');
-            if(canvasElement) {
-                var etiketler = <?= json_encode($grafik_ekseni); ?>;
-                var veriler   = <?= json_encode($grafik_sayilari); ?>;
 
-                var renkler = [
+            /* ── 1. Trabzon İlçe Dağılımı (Doughnut) ── */
+            var ilceCanvas = document.getElementById('ilcePastaGrafik');
+            if (ilceCanvas) {
+                var ilceEtiketler = <?= json_encode($grafik_ekseni); ?>;
+                var ilceVeriler   = <?= json_encode($grafik_sayilari); ?>;
+
+                var ilceRenkler = [
                     '#e05555','#4a90d9','#50c878','#f5a623','#b388ff',
                     '#80cbc4','#ef9a9a','#ffe082','#a5d6a7','#90caf9',
                     '#ffab91','#f48fb1','#ce93d8','#80deea','#bcaaa4'
                 ];
 
-                new Chart(canvasElement, {
+                new Chart(ilceCanvas, {
                     type: 'doughnut',
                     data: {
-                        labels: etiketler,
+                        labels: ilceEtiketler,
                         datasets: [{
-                            data: veriler,
-                            backgroundColor: renkler.slice(0, etiketler.length),
+                            data: ilceVeriler,
+                            backgroundColor: ilceRenkler.slice(0, ilceEtiketler.length),
                             borderWidth: 3,
                             borderColor: '#16213e',
                             hoverOffset: 8
@@ -624,7 +626,7 @@ switch ($sayfa) {
                                 padding: 12,
                                 callbacks: {
                                     label: function(ctx) {
-                                        var total = ctx.dataset.data.reduce(function(a,b){return a+b;}, 0);
+                                        var total = ctx.dataset.data.reduce(function(a, b) { return a + b; }, 0);
                                         var pct = Math.round(ctx.parsed / total * 100);
                                         return '  ' + ctx.label + ': ' + ctx.parsed + ' üye (%' + pct + ')';
                                     }
@@ -633,9 +635,11 @@ switch ($sayfa) {
                         }
                     }
                 });
-            // ── Aktif İller Bar Grafiği ──
-            var ilBar = document.getElementById('ilBarGrafik');
-            if(ilBar) {
+            }
+
+            /* ── 2. Aktif İller Dağılımı (Horizontal Bar) ── */
+            var ilCanvas = document.getElementById('ilBarGrafik');
+            if (ilCanvas) {
                 var ilEtiketler = <?= json_encode($il_grafik_ekseni); ?>;
                 var ilVeriler   = <?= json_encode($il_grafik_sayilari); ?>;
 
@@ -644,7 +648,7 @@ switch ($sayfa) {
                     return 'rgba(74, 144, 217, ' + Math.max(0.4, opacity) + ')';
                 });
 
-                new Chart(ilBar, {
+                new Chart(ilCanvas, {
                     type: 'bar',
                     data: {
                         labels: ilEtiketler,
@@ -672,7 +676,7 @@ switch ($sayfa) {
                                 padding: 12,
                                 callbacks: {
                                     label: function(ctx) {
-                                        var total = ctx.dataset.data.reduce(function(a,b){return a+b;}, 0);
+                                        var total = ctx.dataset.data.reduce(function(a, b) { return a + b; }, 0);
                                         var pct = Math.round(ctx.parsed.x / total * 100);
                                         return '  ' + ctx.parsed.x + ' üye  (%' + pct + ')';
                                     }
@@ -694,6 +698,7 @@ switch ($sayfa) {
                     }
                 });
             }
+
         });
         </script>
         <?php
