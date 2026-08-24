@@ -292,6 +292,27 @@ switch ($sayfa) {
                 $grafik_ekseni[] = $veri['trabzon_ilcesi'];
                 $grafik_sayilari[] = intval($veri['adet']);
             }
+
+            // Aktif il dağılımı — ikamet_ili'ne göre üye sayısı (en fazla 15 il)
+            $il_sorgu = $db_baglanti->query(
+                "SELECT ikamet_ili, COUNT(*) as adet
+                   FROM dernek_uyeler
+                  WHERE onay_durumu = 'onayli'
+                    AND ikamet_ili IS NOT NULL
+                    AND ikamet_ili != ''
+                  GROUP BY ikamet_ili
+                  ORDER BY adet DESC
+                  LIMIT 15"
+            );
+            $il_verileri = $il_sorgu->fetchAll();
+
+            $il_grafik_ekseni   = [];
+            $il_grafik_sayilari = [];
+            foreach ($il_verileri as $v) {
+                $il_grafik_ekseni[]   = $v['ikamet_ili'];
+                $il_grafik_sayilari[] = intval($v['adet']);
+            }
+
         } catch (\PDOException $e) {
             error_log('Yönetim dashboard hatası: ' . $e->getMessage());
             echo '<div class="container py-5"><div class="alert alert-danger">İstatistikler yüklenirken bir hata oluştu.</div></div>';
@@ -448,12 +469,13 @@ switch ($sayfa) {
                 </div>
             </div>
 
-            <!-- ── İLÇE DAĞILIM GRAFİĞİ (tam genişlik) ── -->
+            <!-- ── GRAFİK BÖLÜMÜ: 2 kart yan yana ── -->
             <div class="row g-4">
-                <div class="col-12">
-                    <div class="rounded-4 shadow-sm overflow-hidden" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); border: 1px solid rgba(255,255,255,0.08);">
 
-                        <!-- Kart Başlığı -->
+                <!-- Sol: Trabzon İlçe Dağılımı -->
+                <div class="col-lg-6">
+                    <div class="rounded-4 shadow-sm overflow-hidden h-100" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); border: 1px solid rgba(255,255,255,0.08);">
+
                         <div class="d-flex align-items-center justify-content-between px-4 pt-4 pb-3" style="border-bottom: 1px solid rgba(255,255,255,0.08);">
                             <div class="d-flex align-items-center gap-3">
                                 <div class="rounded-3 d-flex align-items-center justify-content-center" style="width:44px;height:44px;background:rgba(179,0,0,0.2);border:1px solid rgba(179,0,0,0.35);">
@@ -475,7 +497,6 @@ switch ($sayfa) {
                             </div>
                         </div>
 
-                        <!-- Grafik Alanı -->
                         <div class="p-4">
                             <?php if(count($ilce_verileri) > 0): ?>
                                 <div class="d-flex justify-content-center align-items-center" style="position:relative;height:320px;width:100%;">
@@ -489,7 +510,6 @@ switch ($sayfa) {
                             <?php endif; ?>
                         </div>
 
-                        <!-- Alt Bilgi Şeridi -->
                         <div class="px-4 pb-4">
                             <div class="rounded-3 px-3 py-2 d-flex align-items-center gap-2" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);">
                                 <i class="fa-solid fa-circle-info small" style="color:rgba(255,255,255,0.25);"></i>
@@ -499,6 +519,55 @@ switch ($sayfa) {
 
                     </div>
                 </div>
+
+                <!-- Sağ: Aktif İller Dağılımı -->
+                <div class="col-lg-6">
+                    <div class="rounded-4 shadow-sm overflow-hidden h-100" style="background: linear-gradient(135deg, #0d2137 0%, #0a1f35 50%, #051528 100%); border: 1px solid rgba(255,255,255,0.08);">
+
+                        <div class="d-flex align-items-center justify-content-between px-4 pt-4 pb-3" style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="rounded-3 d-flex align-items-center justify-content-center" style="width:44px;height:44px;background:rgba(74,144,217,0.2);border:1px solid rgba(74,144,217,0.35);">
+                                    <i class="fa-solid fa-chart-bar" style="color:#4a90d9;font-size:1.1rem;"></i>
+                                </div>
+                                <div>
+                                    <h5 class="fw-bold mb-0" style="color:#fff;letter-spacing:-0.02em;">Aktif İller Üye Dağılımı</h5>
+                                    <p class="mb-0 small" style="color:rgba(255,255,255,0.45);">Üye sayısına göre ilk <?= count($il_verileri); ?> il (ikamet iline göre)</p>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge rounded-pill px-3 py-2" style="background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.6);font-size:0.75rem;font-weight:600;letter-spacing:0.04em;">
+                                    <i class="fa-solid fa-database me-1" style="font-size:0.65rem;"></i>
+                                    Canlı Veri
+                                </span>
+                                <span class="badge rounded-pill px-3 py-2" style="background:rgba(74,144,217,0.18);color:#4a90d9;font-size:0.75rem;font-weight:600;letter-spacing:0.04em;">
+                                    <?= count($il_verileri); ?> İl
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="p-4">
+                            <?php if(count($il_verileri) > 0): ?>
+                                <div style="position:relative;height:320px;width:100%;">
+                                    <canvas id="ilBarGrafik"></canvas>
+                                </div>
+                            <?php else: ?>
+                                <div class="text-center py-5" style="color:rgba(255,255,255,0.3);">
+                                    <i class="fa-solid fa-chart-bar fa-3x d-block mb-3" style="opacity:0.25;"></i>
+                                    <p class="mb-0 small">Henüz ikamet ili girilmiş onaylı üye bulunmuyor.</p>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="px-4 pb-4">
+                            <div class="rounded-3 px-3 py-2 d-flex align-items-center gap-2" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);">
+                                <i class="fa-solid fa-circle-info small" style="color:rgba(255,255,255,0.25);"></i>
+                                <span class="small" style="color:rgba(255,255,255,0.35);">En fazla üyeye sahip 15 il gösterilmektedir. Tüm iller üyeler sekmesinden incelenebilir.</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
             </div>
         </div>
 
@@ -560,6 +629,66 @@ switch ($sayfa) {
                                         return '  ' + ctx.label + ': ' + ctx.parsed + ' üye (%' + pct + ')';
                                     }
                                 }
+                            }
+                        }
+                    }
+                });
+            // ── Aktif İller Bar Grafiği ──
+            var ilBar = document.getElementById('ilBarGrafik');
+            if(ilBar) {
+                var ilEtiketler = <?= json_encode($il_grafik_ekseni); ?>;
+                var ilVeriler   = <?= json_encode($il_grafik_sayilari); ?>;
+
+                var ilRenkler = ilVeriler.map(function(_, i) {
+                    var opacity = 1 - (i * 0.045);
+                    return 'rgba(74, 144, 217, ' + Math.max(0.4, opacity) + ')';
+                });
+
+                new Chart(ilBar, {
+                    type: 'bar',
+                    data: {
+                        labels: ilEtiketler,
+                        datasets: [{
+                            data: ilVeriler,
+                            backgroundColor: ilRenkler,
+                            borderColor: 'rgba(74,144,217,0.9)',
+                            borderWidth: 1,
+                            borderRadius: 6,
+                            borderSkipped: false
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: 'rgba(5,21,40,0.95)',
+                                titleColor: '#fff',
+                                bodyColor: 'rgba(255,255,255,0.7)',
+                                borderColor: 'rgba(74,144,217,0.25)',
+                                borderWidth: 1,
+                                padding: 12,
+                                callbacks: {
+                                    label: function(ctx) {
+                                        var total = ctx.dataset.data.reduce(function(a,b){return a+b;}, 0);
+                                        var pct = Math.round(ctx.parsed.x / total * 100);
+                                        return '  ' + ctx.parsed.x + ' üye  (%' + pct + ')';
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { color: 'rgba(255,255,255,0.05)' },
+                                ticks: { color: 'rgba(255,255,255,0.5)', font: { size: 11 } },
+                                border: { color: 'rgba(255,255,255,0.08)' }
+                            },
+                            y: {
+                                grid: { display: false },
+                                ticks: { color: 'rgba(255,255,255,0.75)', font: { size: 11, weight: '600' } },
+                                border: { color: 'rgba(255,255,255,0.08)' }
                             }
                         }
                     }
