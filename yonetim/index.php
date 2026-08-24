@@ -436,7 +436,7 @@ switch ($sayfa) {
                             <div class="d-flex align-items-center justify-content-between">
                                 <div>
                                     <h6 class="text-danger text-uppercase small fw-bold mb-1" style="font-size: 0.75rem;">Bekleyen Başvuru</h6>
-                                    <h2 class="fw-bold mb-0 text-danger"><?= $bekleyen_uye_sayisi; ?></h2>
+                                    <h2 class="fw-bold mb-0 text-dark"><?= $bekleyen_uye_sayisi; ?></h2>
                                 </div>
                                 <div class="bg-danger bg-opacity-10 p-3 rounded text-danger"><i class="fa-solid fa-user-clock fa-xl"></i></div>
                             </div>
@@ -446,40 +446,57 @@ switch ($sayfa) {
                         </div>
                     </a>
                 </div>
-
             </div>
 
+            <!-- ── İLÇE DAĞILIM GRAFİĞİ (tam genişlik) ── -->
             <div class="row g-4">
-                <div class="col-lg-7">
-                    <div class="bg-white p-4 rounded shadow-sm border h-100">
-                        <h5 class="fw-bold text-dark mb-1"><i class="fa-solid fa-chart-pie me-2 text-danger"></i>Trabzon İlçe Dağılımı</h5>
-                        <p class="text-muted small mb-3">Kayıtlı üyelerin Trabzon ilçelerine göre dağılım grafiği.</p>
-                        
-                        <?php if(count($ilce_verileri) > 0): ?>
-                            <div class="d-flex justify-content-center align-items-center mb-2" style="position: relative; height: 280px; width: 100%;">
-                                <canvas id="ilcePastaGrafik"></canvas>
-                            </div>
-                        <?php else: ?>
-                            <div class="text-center py-5 text-muted">
-                                <i class="fa-solid fa-chart-pie fa-2x d-block mb-2 text-secondary"></i>
-                                Grafik oluşturulabilmesi için henüz ilçesi girilmiş bir üye bulunmuyor.
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                </div>
+                <div class="col-12">
+                    <div class="rounded-4 shadow-sm overflow-hidden" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); border: 1px solid rgba(255,255,255,0.08);">
 
-                <div class="col-lg-5">
-                    <div class="bg-white p-4 rounded shadow-sm border text-center h-100 d-flex flex-column justify-content-center align-items-center">
-                        <img src="assets/logo.webp" alt="Logo" width="80" class="img-fluid mb-3">
-                        <h4 class="fw-bold text-dark">T.K.Ç.D. Yönetim Paneli</h4>
-                        <p class="text-muted small px-3 mb-4">Sistem genelindeki verilere ve üyelere yukarıdaki menüyü kullanarak anında erişebilirsiniz.</p>
-                        
-                        <div class="d-flex gap-2">
-                            <a href="index.php?sayfa=bekleyen-uyeler" class="btn btn-danger btn-sm fw-bold px-3 shadow-sm"><i class="fa-solid fa-user-clock me-1"></i>Başvuruları İncele</a>
-                            <?php if (!$is_kisitli_rol): ?>
-                                <a href="index.php?sayfa=uye-ekle" class="btn btn-dark btn-sm fw-bold px-3 shadow-sm"><i class="fa-solid fa-user-plus me-1"></i>Üye Ekle</a>
+                        <!-- Kart Başlığı -->
+                        <div class="d-flex align-items-center justify-content-between px-4 pt-4 pb-3" style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="rounded-3 d-flex align-items-center justify-content-center" style="width:44px;height:44px;background:rgba(179,0,0,0.2);border:1px solid rgba(179,0,0,0.35);">
+                                    <i class="fa-solid fa-chart-pie" style="color:#e05555;font-size:1.1rem;"></i>
+                                </div>
+                                <div>
+                                    <h5 class="fw-bold mb-0" style="color:#fff;letter-spacing:-0.02em;">Trabzon İlçe Üye Dağılımı</h5>
+                                    <p class="mb-0 small" style="color:rgba(255,255,255,0.45);">Kayıtlı üyelerin Trabzon ilçelerine göre anlık dağılımı</p>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge rounded-pill px-3 py-2" style="background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.6);font-size:0.75rem;font-weight:600;letter-spacing:0.04em;">
+                                    <i class="fa-solid fa-database me-1" style="font-size:0.65rem;"></i>
+                                    Canlı Veri
+                                </span>
+                                <span class="badge rounded-pill px-3 py-2" style="background:rgba(179,0,0,0.18);color:#e05555;font-size:0.75rem;font-weight:600;letter-spacing:0.04em;">
+                                    <?= count($ilce_verileri); ?> İlçe
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Grafik Alanı -->
+                        <div class="p-4">
+                            <?php if(count($ilce_verileri) > 0): ?>
+                                <div class="d-flex justify-content-center align-items-center" style="position:relative;height:320px;width:100%;">
+                                    <canvas id="ilcePastaGrafik"></canvas>
+                                </div>
+                            <?php else: ?>
+                                <div class="text-center py-5" style="color:rgba(255,255,255,0.3);">
+                                    <i class="fa-solid fa-chart-pie fa-3x d-block mb-3" style="opacity:0.25;"></i>
+                                    <p class="mb-0 small">Grafik oluşturulabilmesi için henüz ilçesi girilmiş bir üye bulunmuyor.</p>
+                                </div>
                             <?php endif; ?>
                         </div>
+
+                        <!-- Alt Bilgi Şeridi -->
+                        <div class="px-4 pb-4">
+                            <div class="rounded-3 px-3 py-2 d-flex align-items-center gap-2" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);">
+                                <i class="fa-solid fa-circle-info small" style="color:rgba(255,255,255,0.25);"></i>
+                                <span class="small" style="color:rgba(255,255,255,0.35);">Grafik verisi veritabanından anlık olarak çekilmektedir. Yeni üye kaydı yapıldığında otomatik güncellenir.</span>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -491,33 +508,58 @@ switch ($sayfa) {
             var canvasElement = document.getElementById('ilcePastaGrafik');
             if(canvasElement) {
                 var etiketler = <?= json_encode($grafik_ekseni); ?>;
-                var veriler = <?= json_encode($grafik_sayilari); ?>;
+                var veriler   = <?= json_encode($grafik_sayilari); ?>;
 
                 var renkler = [
-                    '#b30000', '#006699', '#2e7d32', '#ef6c00', '#6a1b9a',
-                    '#4e342e', '#c2185b', '#37474f', '#9e9d24', '#00838f',
-                    '#1565c0', '#d84315', '#00695c', '#ad1457', '#558b2f'
+                    '#e05555','#4a90d9','#50c878','#f5a623','#b388ff',
+                    '#80cbc4','#ef9a9a','#ffe082','#a5d6a7','#90caf9',
+                    '#ffab91','#f48fb1','#ce93d8','#80deea','#bcaaa4'
                 ];
 
                 new Chart(canvasElement, {
-                    type: 'pie',
+                    type: 'doughnut',
                     data: {
                         labels: etiketler,
                         datasets: [{
                             data: veriler,
                             backgroundColor: renkler.slice(0, etiketler.length),
-                            borderWidth: 2,
-                            borderColor: '#ffffff'
+                            borderWidth: 3,
+                            borderColor: '#16213e',
+                            hoverOffset: 8
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        cutout: '55%',
                         plugins: {
                             legend: {
                                 display: true,
                                 position: 'right',
-                                labels: { boxWidth: 15, font: { size: 12, weight: 'bold' }, color: '#333333' }
+                                labels: {
+                                    boxWidth: 12,
+                                    boxHeight: 12,
+                                    borderRadius: 4,
+                                    useBorderRadius: true,
+                                    font: { size: 12, weight: '600', family: "'Segoe UI', sans-serif" },
+                                    color: 'rgba(255,255,255,0.75)',
+                                    padding: 14
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(15,20,40,0.95)',
+                                titleColor: '#fff',
+                                bodyColor: 'rgba(255,255,255,0.7)',
+                                borderColor: 'rgba(255,255,255,0.1)',
+                                borderWidth: 1,
+                                padding: 12,
+                                callbacks: {
+                                    label: function(ctx) {
+                                        var total = ctx.dataset.data.reduce(function(a,b){return a+b;}, 0);
+                                        var pct = Math.round(ctx.parsed / total * 100);
+                                        return '  ' + ctx.label + ': ' + ctx.parsed + ' üye (%' + pct + ')';
+                                    }
+                                }
                             }
                         }
                     }
