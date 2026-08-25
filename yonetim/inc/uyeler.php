@@ -133,7 +133,8 @@ if ($is_il_baskani && !empty($_SESSION['sorumlu_il'])) {
     $rol_ek_where = " AND ikamet_ili = ?";
     $rol_ek_parametreler[] = $_SESSION['sorumlu_il'];
 } elseif ($is_ilce_baskani && !empty($_SESSION['sorumlu_ilce'])) {
-    $rol_ek_where = " AND ikamet_ilcesi = ?";
+    $rol_ek_where = " AND (ikamet_ilcesi = ? OR (ikamet_ilcesi IS NULL AND trabzon_ilcesi = ?))";
+    $rol_ek_parametreler[] = $_SESSION['sorumlu_ilce'];
     $rol_ek_parametreler[] = $_SESSION['sorumlu_ilce'];
 } elseif ($is_kurum_temsilcisi && !empty($_SESSION['sorumlu_kurum'])) {
     $rol_ek_where = " AND kurum = ?";
@@ -408,7 +409,7 @@ try {
                                     <td class="text-center"><small><?= htmlspecialchars($dogum); ?></small></td>
                                     <td>
                                         <strong><?= htmlspecialchars($uye['ikamet_ili'] ?: '-'); ?></strong>
-                                        <br><small class="text-muted"><?= htmlspecialchars($uye['trabzon_ilcesi'] ?: '-'); ?></small>
+                                        <br><small class="text-muted"><?= htmlspecialchars(!empty($uye['ikamet_ilcesi']) ? $uye['ikamet_ilcesi'] : ($uye['trabzon_ilcesi'] ?: '-')); ?></small>
                                     </td>
                                     <td>
                                         <small><?= htmlspecialchars($uye['kurum'] ?: '-'); ?></small>
