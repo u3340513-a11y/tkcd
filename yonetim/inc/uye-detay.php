@@ -143,7 +143,16 @@ if ($statü_ismi === 'Yönetim Kurulu Üyesi') {
 // --- DOĞUM TARİHİ AYARI ---
 $dogum_gosterim = "-";
 if (!empty($uye['dogum_tarihi']) && $uye['dogum_tarihi'] !== '0000-00-00') {
-    $dogum_gosterim = date('d.m.Y', strtotime($uye['dogum_tarihi']));
+    $dt = trim($uye['dogum_tarihi']);
+    // DD/MM/YYYY veya DD.MM.YYYY → YYYY-MM-DD'ye çevir
+    if (preg_match('/^(\d{2})[\/\.](\d{2})[\/\.](\d{4})$/', $dt, $m)) {
+        $ts = mktime(0, 0, 0, (int)$m[2], (int)$m[1], (int)$m[3]);
+        $dogum_gosterim = $ts ? date('d.m.Y', $ts) : htmlspecialchars($dt);
+    } elseif (preg_match('/^\d{4}-\d{2}-\d{2}$/', $dt)) {
+        $dogum_gosterim = date('d.m.Y', strtotime($dt));
+    } else {
+        $dogum_gosterim = htmlspecialchars($dt);
+    }
 } elseif (!empty($uye['dogum_yili'])) {
     $dogum_gosterim = htmlspecialchars($uye['dogum_yili']);
 }

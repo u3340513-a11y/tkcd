@@ -377,7 +377,19 @@ try {
                                 }
                                 
                                 $kan = !empty($uye['kan_grubu']) ? $uye['kan_grubu'] : '-';
-                                $dogum = !empty($uye['dogum_tarihi']) ? date('d.m.Y', strtotime($uye['dogum_tarihi'])) : (!empty($uye['dogum_yili']) ? $uye['dogum_yili'] : '-');
+                                if (!empty($uye['dogum_tarihi'])) {
+                                    $dt = trim($uye['dogum_tarihi']);
+                                    if (preg_match('/^(\d{2})[\/\.](\d{2})[\/\.](\d{4})$/', $dt, $m)) {
+                                        $ts = mktime(0, 0, 0, (int)$m[2], (int)$m[1], (int)$m[3]);
+                                        $dogum = $ts ? date('d.m.Y', $ts) : $dt;
+                                    } elseif (preg_match('/^\d{4}-\d{2}-\d{2}$/', $dt)) {
+                                        $dogum = date('d.m.Y', strtotime($dt));
+                                    } else {
+                                        $dogum = $dt;
+                                    }
+                                } else {
+                                    $dogum = !empty($uye['dogum_yili']) ? $uye['dogum_yili'] : '-';
+                                }
                                 ?>
                                 <tr <?= $satir_klasi; ?> style="transition: background-color 0.2s;">
                                     <td class="ps-3 fw-bold">
