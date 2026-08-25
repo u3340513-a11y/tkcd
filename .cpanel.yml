@@ -1,4 +1,4 @@
 ---
 deployment:
   tasks:
-    - bash $REPO/scripts/deploy.sh
+    - /bin/true
