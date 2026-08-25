@@ -125,7 +125,7 @@ sort($iller, SORT_LOCALE_STRING);
                 numaranız doğrulandıktan sonra bilgilerinizi güncelleyebilirsiniz.
             </p>
 
-            <form action="/guncelleme/dogrula" method="POST" class="bg-form" id="bgTelefonForm" autocomplete="off">
+            <form action="/bilgi-guncelleme/dogrula" method="POST" class="bg-form" id="bgTelefonForm" autocomplete="off">
                 <div class="bg-alan-grubu">
                     <label for="telefon" class="bg-etiket">
                         <?= $view->icon('phone') ?>
@@ -203,7 +203,7 @@ sort($iller, SORT_LOCALE_STRING);
                 </div>
             </div>
 
-            <form action="/guncelleme" method="POST" class="bg-form" id="bgGuncellemeForm" autocomplete="off">
+            <form action="/bilgi-guncelleme" method="POST" class="bg-form" id="bgGuncellemeForm" autocomplete="off">
                 <input type="hidden" name="uye_id" value="<?= $uyeId ?>">
                 <input type="hidden" name="telefon_hash" value="<?= $view->e($telefonHash) ?>">
 

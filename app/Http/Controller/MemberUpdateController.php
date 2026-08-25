@@ -17,9 +17,9 @@ use PDO;
  * Mevcut üyelerin doğum tarihi ve ikamet ilçesi bilgilerini
  * cep telefonu doğrulaması ile güncellemelerini sağlar.
  *
- * GET  /guncelleme          → Telefon doğrulama formunu gösterir
- * POST /guncelleme/dogrula  → Telefonu DB'de arar, güncelleme formunu döndürür
- * POST /guncelleme          → Güncellemeyi DB'ye yazar (PRG)
+ * GET  /bilgi-guncelleme          → Telefon doğrulama formunu gösterir
+ * POST /bilgi-guncelleme/dogrula  → Telefonu DB'de arar, güncelleme formunu döndürür
+ * POST /bilgi-guncelleme          → Güncellemeyi DB'ye yazar (PRG)
  */
 final class MemberUpdateController
 {
@@ -38,7 +38,7 @@ final class MemberUpdateController
         $seo = $this->responder->seo(
             title: 'Bilgi Güncelleme',
             description: 'Mevcut üyelerimiz doğum tarihi ve ikamet bilgilerini güncelleyebilir.',
-            canonicalPath: '/guncelleme',
+            canonicalPath: '/bilgi-guncelleme',
             indexable: false,
         );
 
@@ -64,14 +64,14 @@ final class MemberUpdateController
     {
         try {
             if (!$this->verifyMathCaptcha($this->request->body)) {
-                return Response::redirect('/guncelleme?durum=hata');
+                return Response::redirect('/bilgi-guncelleme?durum=hata');
             }
 
             $telefonRaw = trim((string) ($this->request->body['telefon'] ?? ''));
             $telefon    = $this->normalizeTelefon($telefonRaw);
 
             if ($telefon === '') {
-                return Response::redirect('/guncelleme?durum=hata');
+                return Response::redirect('/bilgi-guncelleme?durum=hata');
             }
 
             $pdo = $this->pdo();
@@ -86,13 +86,13 @@ final class MemberUpdateController
             $uye = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$uye) {
-                return Response::redirect('/guncelleme?durum=bulunamadi');
+                return Response::redirect('/bilgi-guncelleme?durum=bulunamadi');
             }
 
             $seo = $this->responder->seo(
                 title: 'Bilgi Güncelleme',
                 description: 'Bilgilerinizi güncelleyin.',
-                canonicalPath: '/guncelleme',
+                canonicalPath: '/bilgi-guncelleme',
                 indexable: false,
             );
 
@@ -114,7 +114,7 @@ final class MemberUpdateController
             ]);
         } catch (\Throwable $e) {
             $this->logger->exception($e);
-            return Response::redirect('/guncelleme?durum=hata');
+            return Response::redirect('/bilgi-guncelleme?durum=hata');
         }
     }
 
@@ -125,7 +125,7 @@ final class MemberUpdateController
     {
         try {
             if (!$this->verifyMathCaptcha($this->request->body)) {
-                return Response::redirect('/guncelleme?durum=hata');
+                return Response::redirect('/bilgi-guncelleme?durum=hata');
             }
 
             $uyeId       = (int) ($this->request->body['uye_id'] ?? 0);
@@ -135,7 +135,7 @@ final class MemberUpdateController
             $ikametIlcesi = trim((string) ($this->request->body['ikamet_ilcesi'] ?? ''));
 
             if ($uyeId <= 0 || $telefonHash === '') {
-                return Response::redirect('/guncelleme?durum=hata');
+                return Response::redirect('/bilgi-guncelleme?durum=hata');
             }
 
             // Telefon hash doğrulama — HMAC ile üye ID ve telefon eşleşmesi
@@ -147,13 +147,13 @@ final class MemberUpdateController
             $uye = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$uye) {
-                return Response::redirect('/guncelleme?durum=hata');
+                return Response::redirect('/bilgi-guncelleme?durum=hata');
             }
 
             // Hash doğrulama
             $expectedHash = hash_hmac('sha256', $uye['id'] . ':' . $uye['telefon'], $this->captchaSecret());
             if (!hash_equals($expectedHash, $telefonHash)) {
-                return Response::redirect('/guncelleme?durum=hata');
+                return Response::redirect('/bilgi-guncelleme?durum=hata');
             }
 
             // Doğum tarihini DB formatına çevir (DD/MM/YYYY → DD/MM/YYYY olarak sakla)
@@ -184,7 +184,7 @@ final class MemberUpdateController
             }
 
             if ($updateFields === []) {
-                return Response::redirect('/guncelleme?durum=hata');
+                return Response::redirect('/bilgi-guncelleme?durum=hata');
             }
 
             $updateValues[] = $uyeId;
@@ -200,10 +200,10 @@ final class MemberUpdateController
                 $ikametIlcesi ?: '-'
             ));
 
-            return Response::redirect('/guncelleme?durum=basarili');
+            return Response::redirect('/bilgi-guncelleme?durum=basarili');
         } catch (\Throwable $e) {
             $this->logger->exception($e);
-            return Response::redirect('/guncelleme?durum=hata');
+            return Response::redirect('/bilgi-guncelleme?durum=hata');
         }
     }
 

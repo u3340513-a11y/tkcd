@@ -36,9 +36,9 @@ return [
     ['POST', '/uye-ol', MembershipController::class, 'store', 'membership.store'],
     ['GET',  '/uye-ol/telefon-kontrol', MembershipController::class, 'checkTelefon', 'membership.checkTelefon'],
 
-    ['GET',  '/guncelleme',         MemberUpdateController::class, 'index',  'member-update.index'],
-    ['POST', '/guncelleme/dogrula', MemberUpdateController::class, 'verify', 'member-update.verify'],
-    ['POST', '/guncelleme',         MemberUpdateController::class, 'store',  'member-update.store'],
+    ['GET',  '/bilgi-guncelleme',         MemberUpdateController::class, 'index',  'member-update.index'],
+    ['POST', '/bilgi-guncelleme/dogrula', MemberUpdateController::class, 'verify', 'member-update.verify'],
+    ['POST', '/bilgi-guncelleme',         MemberUpdateController::class, 'store',  'member-update.store'],
 
     ['GET', '/sitemap.xml', SitemapController::class, 'index', 'sitemap'],
 ];
