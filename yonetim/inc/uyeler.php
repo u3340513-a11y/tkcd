@@ -409,7 +409,12 @@ try {
                                     <td class="text-center"><small><?= htmlspecialchars($dogum); ?></small></td>
                                     <td>
                                         <strong><?= htmlspecialchars($uye['ikamet_ili'] ?: '-'); ?></strong>
-                                        <br><small class="text-muted"><?= htmlspecialchars(!empty($uye['ikamet_ilcesi']) ? $uye['ikamet_ilcesi'] : ($uye['trabzon_ilcesi'] ?: '-')); ?></small>
+                                        <?php if (!empty($uye['ikamet_ilcesi'])): ?>
+                                        <br><small class="text-muted"><?= htmlspecialchars($uye['ikamet_ilcesi']); ?></small>
+                                        <?php endif; ?>
+                                        <?php if (!empty($uye['trabzon_ilcesi'])): ?>
+                                        <br><small class="text-secondary" style="font-size:0.7rem;">Trab: <?= htmlspecialchars($uye['trabzon_ilcesi']); ?></small>
+                                        <?php endif; ?>
                                     </td>
                                     <td>
                                         <small><?= htmlspecialchars($uye['kurum'] ?: '-'); ?></small>

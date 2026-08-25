@@ -207,7 +207,10 @@ try {
                     <td><small class="text-truncate d-inline-block" style="max-width: 140px;">'.htmlspecialchars($uye['eposta'] ?: '-').'</small></td>
                     <td class="text-center"><span class="badge bg-danger text-white">'.htmlspecialchars($kan).'</span></td>
                     <td class="text-center"><small>'.htmlspecialchars($dogum).'</small></td>
-                    <td><strong>'.htmlspecialchars($uye['ikamet_ili'] ?: '-').'</strong><br><small class="text-muted">'.htmlspecialchars(!empty($uye['ikamet_ilcesi']) ? $uye['ikamet_ilcesi'] : ($uye['trabzon_ilcesi'] ?: '-')).'</small></td>
+                    <td><strong>'.htmlspecialchars($uye['ikamet_ili'] ?: '-').'</strong>'
+                    .(!empty($uye['ikamet_ilcesi']) ? '<br><small class="text-muted">'.htmlspecialchars($uye['ikamet_ilcesi']).'</small>' : '')
+                    .(!empty($uye['trabzon_ilcesi']) ? '<br><small class="text-secondary" style="font-size:0.7rem;">Trab: '.htmlspecialchars($uye['trabzon_ilcesi']).'</small>' : '')
+                    .'</td>
                     <td><small>'.htmlspecialchars($uye['kurum'] ?: '-').'</small><br><small class="text-muted">'.htmlspecialchars($uye['gorev_unvan'] ?: '-').'</small></td>
                     <td><small>'.htmlspecialchars($uye['calisma_sekli'] ?: '-').'</small></td>
                     <td class="text-center">
