@@ -64,14 +64,14 @@ final class MemberUpdateController
     {
         try {
             if (!$this->verifyMathCaptcha($this->request->body)) {
-                return Response::redirect('/bilgi-guncelleme?durum=hata');
+                return Response::redirect('/bilgi-guncelleme?durum=hata&step=captcha_fail');
             }
 
             $telefonRaw = trim((string) ($this->request->body['telefon'] ?? ''));
             $telefon    = $this->normalizeTelefon($telefonRaw);
 
             if ($telefon === '') {
-                return Response::redirect('/bilgi-guncelleme?durum=hata');
+                return Response::redirect('/bilgi-guncelleme?durum=hata&step=telefon_bos&raw=' . urlencode($telefonRaw));
             }
 
             $pdo = $this->pdo();
@@ -114,7 +114,9 @@ final class MemberUpdateController
             ]);
         } catch (\Throwable $e) {
             $this->logger->exception($e);
-            return Response::redirect('/bilgi-guncelleme?durum=hata');
+            $msg = urlencode(substr($e->getMessage(), 0, 200));
+            $file = urlencode(basename($e->getFile()) . ':' . $e->getLine());
+            return Response::redirect("/bilgi-guncelleme?durum=hata&debug_msg={$msg}&debug_file={$file}");
         }
     }
 

@@ -108,6 +108,22 @@ sort($iller, SORT_LOCALE_STRING);
                 <div>
                     <strong>Bir Hata Oluştu</strong>
                     <p>Lütfen bilgilerinizi kontrol edip tekrar deneyin. Sorun devam ederse bizimle iletişime geçin.</p>
+                    <?php if (!empty($_GET['debug_msg']) || !empty($_GET['step'])): ?>
+                    <p style="font-size:0.75rem;color:#666;margin-top:0.5rem;word-break:break-all;">
+                        <?php if (!empty($_GET['step'])): ?>
+                        <strong>Step:</strong> <?= htmlspecialchars($_GET['step']) ?><br>
+                        <?php endif; ?>
+                        <?php if (!empty($_GET['raw'])): ?>
+                        <strong>Raw:</strong> <?= htmlspecialchars($_GET['raw']) ?><br>
+                        <?php endif; ?>
+                        <?php if (!empty($_GET['debug_msg'])): ?>
+                        <strong>Msg:</strong> <?= htmlspecialchars($_GET['debug_msg']) ?><br>
+                        <?php endif; ?>
+                        <?php if (!empty($_GET['debug_file'])): ?>
+                        <strong>File:</strong> <?= htmlspecialchars($_GET['debug_file']) ?>
+                        <?php endif; ?>
+                    </p>
+                    <?php endif; ?>
                 </div>
             </div>
             <?php endif; ?>
