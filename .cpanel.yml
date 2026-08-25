@@ -1,0 +1,4 @@
+---
+deployment:
+  tasks:
+    - /usr/local/bin/php -r "if (function_exists('opcache_reset')) { opcache_reset(); }"
