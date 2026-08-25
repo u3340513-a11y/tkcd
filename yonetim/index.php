@@ -647,7 +647,13 @@ switch ($sayfa) {
                                 <div class="d-flex flex-column gap-2">
                                     <?php foreach ($dogum_gunu_uyeleri as $dg): ?>
                                         <?php
-                                        $dogum_ts = strtotime(str_replace('.', '-', $dg['dogum_tarihi']));
+                                        // Üç farklı format desteği: DD/MM/YYYY, DD.MM.YYYY, YYYY-MM-DD
+                                        $dt = $dg['dogum_tarihi'];
+                                        if (preg_match('/^(\d{2})[\/\.](\d{2})[\/\.](\d{4})$/', $dt, $m)) {
+                                            $dogum_ts = mktime(0, 0, 0, (int)$m[2], (int)$m[1], (int)$m[3]);
+                                        } else {
+                                            $dogum_ts = strtotime($dt);
+                                        }
                                         $yas = $dogum_ts ? (int) date('Y') - (int) date('Y', $dogum_ts) : '?';
                                         $unvan = !empty($dg['temsilci_turu']) && $dg['temsilci_turu'] !== 'Normal Üye'
                                             ? $dg['temsilci_turu']
