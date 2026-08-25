@@ -63,14 +63,14 @@ final class MemberUpdateController
     public function verify(): Response
     {
         if (!$this->verifyMathCaptcha($this->request->body)) {
-            return Response::redirect('/bilgi-guncelleme?durum=hata&step=captcha_fail');
+            return Response::redirect('/bilgi-guncelleme?durum=hata');
         }
 
         $telefonRaw = trim((string) ($this->request->body['telefon'] ?? ''));
         $telefon    = $this->normalizeTelefon($telefonRaw);
 
         if ($telefon === '') {
-            return Response::redirect('/bilgi-guncelleme?durum=hata&step=telefon_bos&raw=' . urlencode($telefonRaw));
+            return Response::redirect('/bilgi-guncelleme?durum=hata');
         }
 
         $pdo = $this->pdo();
