@@ -1,0 +1,406 @@
+/* ==========================================================================
+   Bilgi Güncelleme — Üye bilgi güncelleme formu stilleri  (bg-)
+   Tasarım dili membership.css ile tutarlıdır (ub- referans alınmıştır).
+
+   Bölümler:
+     1. Hero             (bg-hero)
+     2. Süreç adımları   (bg-surec)
+     3. Form kutusu      (bg-form)
+     4. Karşılama        (bg-karsilama)
+     5. Durum bildirisi  (bg-bildiri)
+     6. Captcha          (bg-captcha)
+     7. Responsive
+   ========================================================================== */
+
+/* ============================================================
+   1. HERO
+   ============================================================ */
+
+.bg-hero {
+  position: relative;
+  padding-block: clamp(4rem, 8vw, 6.5rem) clamp(4.5rem, 9vw, 7rem);
+  color: #fff;
+  overflow: hidden;
+  text-align: center;
+  background-image:
+    radial-gradient(50rem 28rem at 10% -8%, rgba(75, 156, 206, 0.28), transparent 60%),
+    radial-gradient(36rem 22rem at 88% 110%, rgba(180, 96, 123, 0.20), transparent 55%),
+    linear-gradient(140deg, var(--bordo-800) 0%, var(--bordo-700) 45%, var(--mavi-800) 100%);
+}
+
+.bg-hero__baslik {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin: 0 0 1.25rem;
+  color: #fff;
+}
+
+.bg-hero__baslik span {
+  font-weight: 400;
+}
+
+.bg-hero__ayrac {
+  display: block;
+  width: 3rem;
+  height: 4px;
+  border-radius: 3px;
+  background: var(--degrade-marka);
+  margin: 0 auto 1.5rem;
+}
+
+.bg-hero__aciklama {
+  font-size: var(--olcek-lg);
+  color: rgba(255, 255, 255, 0.75);
+  max-width: 44rem;
+  line-height: 1.65;
+  margin: 0 auto;
+}
+
+/* ============================================================
+   2. SÜREÇ ADIMLARI
+   ============================================================ */
+
+.bg-surec {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: var(--bosluk-4, 1rem);
+  padding: 2rem var(--bosluk-6, 1.5rem);
+  background: var(--bordo-50);
+  border-bottom: 1px solid var(--bordo-100);
+}
+
+.bg-surec__adim {
+  display: flex;
+  align-items: center;
+  gap: var(--bosluk-3, 0.75rem);
+  font-size: var(--olcek-sm);
+  font-weight: 600;
+  color: var(--bordo-300);
+  transition: color 0.3s;
+}
+
+.bg-surec__adim--aktif {
+  color: var(--bordo-700);
+}
+
+.bg-surec__adim svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.bg-surec__ayrac {
+  color: var(--bordo-200);
+  font-weight: 300;
+  font-size: 1.1rem;
+}
+
+/* ============================================================
+   3. FORM KUTUSU
+   ============================================================ */
+
+.bg-alan {
+  padding: var(--bosluk-8, 2rem) 0 var(--bosluk-12, 3rem);
+}
+
+.bg-kutu {
+  max-width: 38rem;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: var(--radius-xl, 1rem);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  padding: var(--bosluk-8, 2rem) var(--bosluk-6, 1.5rem);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.bg-form-baslik {
+  display: flex;
+  align-items: center;
+  gap: var(--bosluk-3, 0.75rem);
+  font-size: var(--olcek-xl, 1.25rem);
+  font-weight: 700;
+  color: var(--bordo-800, #4a0e2e);
+  margin: 0 0 0.5rem;
+}
+
+.bg-form-baslik svg {
+  width: 22px;
+  height: 22px;
+  color: var(--bordo-600);
+}
+
+.bg-form-aciklama {
+  font-size: var(--olcek-sm, 0.875rem);
+  color: var(--gri-500, #6b7280);
+  line-height: 1.6;
+  margin: 0 0 2rem;
+}
+
+.bg-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.bg-alan-grubu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.bg-etiket {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: var(--olcek-sm, 0.875rem);
+  font-weight: 600;
+  color: var(--gri-700, #374151);
+}
+
+.bg-etiket svg {
+  width: 16px;
+  height: 16px;
+  color: var(--bordo-500);
+}
+
+.bg-zorunlu {
+  color: var(--bordo-600, #9f1239);
+}
+
+.bg-girdi {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: var(--olcek-base, 1rem);
+  color: var(--gri-800, #1f2937);
+  background: var(--gri-50, #f9fafb);
+  border: 1.5px solid var(--gri-200, #e5e7eb);
+  border-radius: var(--radius-lg, 0.5rem);
+  transition: border-color 0.25s, box-shadow 0.25s;
+  outline: none;
+  appearance: none;
+}
+
+.bg-girdi:focus {
+  border-color: var(--bordo-400, #be185d);
+  box-shadow: 0 0 0 3px rgba(159, 18, 57, 0.1);
+}
+
+.bg-girdi::placeholder {
+  color: var(--gri-400, #9ca3af);
+}
+
+select.bg-girdi {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236b7280' viewBox='0 0 16 16'%3E%3Cpath d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.5rem;
+}
+
+.bg-ipucu {
+  font-size: 0.78rem;
+  color: var(--gri-400, #9ca3af);
+  margin-top: 0.15rem;
+}
+
+/* ============================================================
+   4. KARŞILAMA
+   ============================================================ */
+
+.bg-karsilama {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 2rem;
+  background: linear-gradient(135deg, var(--bordo-50, #fdf2f8), rgba(75, 156, 206, 0.06));
+  border: 1px solid var(--bordo-100, #fce7f3);
+  border-radius: var(--radius-lg, 0.5rem);
+}
+
+.bg-karsilama__ikon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--bordo-600, #9f1239);
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.bg-karsilama__ikon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.bg-karsilama__baslik {
+  font-size: var(--olcek-lg, 1.125rem);
+  font-weight: 700;
+  color: var(--bordo-800, #4a0e2e);
+  margin: 0 0 0.15rem;
+}
+
+.bg-karsilama__aciklama {
+  font-size: var(--olcek-sm, 0.875rem);
+  color: var(--gri-500, #6b7280);
+  margin: 0;
+}
+
+/* ============================================================
+   5. DURUM BİLDİRİSİ
+   ============================================================ */
+
+.bg-bildiri {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius-lg, 0.5rem);
+  margin-bottom: 1.5rem;
+  font-size: var(--olcek-sm, 0.875rem);
+  line-height: 1.5;
+}
+
+.bg-bildiri svg {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.bg-bildiri strong {
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+.bg-bildiri p {
+  margin: 0;
+}
+
+.bg-bildiri--basarili {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+}
+
+.bg-bildiri--basarili svg {
+  color: #059669;
+}
+
+.bg-bildiri--uyari {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #92400e;
+}
+
+.bg-bildiri--uyari svg {
+  color: #d97706;
+}
+
+.bg-bildiri--hata {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
+
+.bg-bildiri--hata svg {
+  color: #dc2626;
+}
+
+/* ============================================================
+   6. CAPTCHA
+   ============================================================ */
+
+.bg-captcha {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.bg-captcha__icerik {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.bg-captcha__soru {
+  font-size: var(--olcek-lg, 1.125rem);
+  font-weight: 600;
+  color: var(--bordo-700, #be123c);
+  white-space: nowrap;
+}
+
+.bg-captcha__girdi {
+  max-width: 5rem;
+  text-align: center;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+/* ============================================================
+   GÖNDER BUTONU
+   ============================================================ */
+
+.bg-gonder {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.9rem 1.5rem;
+  font-size: var(--olcek-base, 1rem);
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, var(--bordo-700, #be123c) 0%, var(--mavi-700, #1d4ed8) 100%);
+  border: none;
+  border-radius: var(--radius-lg, 0.5rem);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  letter-spacing: 0.02em;
+}
+
+.bg-gonder:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(159, 18, 57, 0.25);
+}
+
+.bg-gonder:active {
+  transform: translateY(0);
+}
+
+.bg-gonder svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* ============================================================
+   7. RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 640px) {
+  .bg-kutu {
+    padding: var(--bosluk-6, 1.5rem) var(--bosluk-4, 1rem);
+  }
+
+  .bg-surec {
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1.25rem 1rem;
+  }
+
+  .bg-surec__ayrac {
+    display: none;
+  }
+
+  .bg-karsilama {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.75rem;
+  }
+}

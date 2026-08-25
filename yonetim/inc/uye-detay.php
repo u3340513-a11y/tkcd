@@ -217,6 +217,10 @@ if (!empty($uye['uyelik_tarihi']) && $uye['uyelik_tarihi'] !== '0000-00-00') {
                             <td class="text-dark fw-bold text-primary"><?= htmlspecialchars($uye['ikamet_ili'] ?: '-'); ?></td>
                         </tr>
                         <tr>
+                            <td class="fw-bold text-secondary"><i class="fa-solid fa-map-location-dot me-2 text-muted"></i>İkamet İlçesi:</td>
+                            <td class="text-dark"><?= htmlspecialchars($uye['ikamet_ilcesi'] ?? '-'); ?></td>
+                        </tr>
+                        <tr>
                             <td class="fw-bold text-secondary"><i class="fa-solid fa-tree me-2 text-muted"></i>Trabzon İlçesi:</td>
                             <td class="text-dark"><?= htmlspecialchars($uye['trabzon_ilcesi'] ?: '-'); ?></td>
                         </tr>

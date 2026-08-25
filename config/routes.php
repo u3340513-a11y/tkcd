@@ -9,6 +9,7 @@ use App\Http\Controller\ContactController;
 use App\Http\Controller\EventController;
 use App\Http\Controller\HomeController;
 use App\Http\Controller\MembershipController;
+use App\Http\Controller\MemberUpdateController;
 use App\Http\Controller\SitemapController;
 
 /**
@@ -34,6 +35,10 @@ return [
     ['GET',  '/uye-ol', MembershipController::class, 'index', 'membership.index'],
     ['POST', '/uye-ol', MembershipController::class, 'store', 'membership.store'],
     ['GET',  '/uye-ol/telefon-kontrol', MembershipController::class, 'checkTelefon', 'membership.checkTelefon'],
+
+    ['GET',  '/guncelleme',         MemberUpdateController::class, 'index',  'member-update.index'],
+    ['POST', '/guncelleme/dogrula', MemberUpdateController::class, 'verify', 'member-update.verify'],
+    ['POST', '/guncelleme',         MemberUpdateController::class, 'store',  'member-update.store'],
 
     ['GET', '/sitemap.xml', SitemapController::class, 'index', 'sitemap'],
 ];

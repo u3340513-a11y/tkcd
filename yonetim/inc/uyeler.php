@@ -133,7 +133,8 @@ if ($is_il_baskani && !empty($_SESSION['sorumlu_il'])) {
     $rol_ek_where = " AND ikamet_ili = ?";
     $rol_ek_parametreler[] = $_SESSION['sorumlu_il'];
 } elseif ($is_ilce_baskani && !empty($_SESSION['sorumlu_ilce'])) {
-    $rol_ek_where = " AND trabzon_ilcesi = ?";
+    $rol_ek_where = " AND (trabzon_ilcesi = ? OR ikamet_ilcesi = ?)";
+    $rol_ek_parametreler[] = $_SESSION['sorumlu_ilce'];
     $rol_ek_parametreler[] = $_SESSION['sorumlu_ilce'];
 } elseif ($is_kurum_temsilcisi && !empty($_SESSION['sorumlu_kurum'])) {
     $rol_ek_where = " AND kurum = ?";
