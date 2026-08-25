@@ -333,6 +333,19 @@ switch ($sayfa) {
                 $il_grafik_sayilari[] = intval($v['adet']);
             }
 
+            // Bugün doğum günü olan onaylı üyeler
+            $bugun_ay_gun = date('m-d');
+            $dogum_gunu_sorgu = $db_baglanti->prepare(
+                "SELECT id, adi_soyadi, dogum_tarihi, ikamet_ili, kurum, temsilci_turu, ek_gorev
+                   FROM dernek_uyeler
+                  WHERE onay_durumu = 'onayli'
+                    AND dogum_tarihi IS NOT NULL
+                    AND dogum_tarihi != '0000-00-00'
+                    AND DATE_FORMAT(dogum_tarihi, '%m-%d') = ?
+                  ORDER BY adi_soyadi ASC"
+            );
+            $dogum_gunu_sorgu->execute([$bugun_ay_gun]);
+            $dogum_gunu_uyeleri = $dogum_gunu_sorgu->fetchAll(PDO::FETCH_ASSOC);
         } catch (\PDOException $e) {
             error_log('Yönetim dashboard hatası: ' . $e->getMessage());
             echo '<div class="container py-5"><div class="alert alert-danger">İstatistikler yüklenirken bir hata oluştu.</div></div>';
@@ -588,6 +601,101 @@ switch ($sayfa) {
                     </div>
                 </div>
 
+            </div>
+        </div>
+
+        <?php
+        // ── BUGÜN DOĞUM GÜNÜ OLAN ÜYELER ──────────────────────────────────
+        $bugun_goruntu = date('d F Y');
+        $ay_isimleri = [
+            'January'=>'Ocak','February'=>'Şubat','March'=>'Mart','April'=>'Nisan',
+            'May'=>'Mayıs','June'=>'Haziran','July'=>'Temmuz','August'=>'Ağustos',
+            'September'=>'Eylül','October'=>'Ekim','November'=>'Kasım','December'=>'Aralık'
+        ];
+        foreach ($ay_isimleri as $en => $tr) {
+            $bugun_goruntu = str_replace($en, $tr, $bugun_goruntu);
+        }
+        ?>
+        <div class="container-fluid px-md-4 pb-4">
+            <div class="rounded-4 shadow-sm overflow-hidden" style="background:#fff;border:1px solid rgba(0,0,0,0.08);">
+                <!-- Başlık -->
+                <div class="d-flex align-items-center justify-content-between px-4 pt-4 pb-3" style="border-bottom:1px solid rgba(0,0,0,0.07);">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-3 d-flex align-items-center justify-content-center" style="width:44px;height:44px;background:rgba(255,111,0,0.12);border:1px solid rgba(255,111,0,0.3);">
+                            <i class="fa-solid fa-cake-candles" style="color:#ff6f00;font-size:1.1rem;"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-0 text-dark">Bugün Doğum Günü Olan Üyeler</h5>
+                            <p class="mb-0 small text-muted"><?= $bugun_goruntu; ?> tarihinde doğan kayıtlı üyeler</p>
+                        </div>
+                    </div>
+                    <span class="badge rounded-pill px-3 py-2 fw-bold"
+                          style="background:rgba(255,111,0,0.12);color:#e65100;font-size:0.78rem;">
+                        <i class="fa-solid fa-gift me-1" style="font-size:0.7rem;"></i>
+                        <?= count($dogum_gunu_uyeleri); ?> Üye
+                    </span>
+                </div>
+
+                <!-- İçerik -->
+                <div class="p-4">
+                    <?php if (count($dogum_gunu_uyeleri) > 0): ?>
+                        <div class="row g-3">
+                            <?php foreach ($dogum_gunu_uyeleri as $dg): ?>
+                                <?php
+                                $yas = date('Y') - intval(substr($dg['dogum_tarihi'], 0, 4));
+                                $unvan = !empty($dg['temsilci_turu']) && $dg['temsilci_turu'] !== 'Normal Üye'
+                                    ? $dg['temsilci_turu']
+                                    : (!empty($dg['ek_gorev']) ? $dg['ek_gorev'] : 'Üye');
+                                ?>
+                                <div class="col-12 col-md-6 col-xl-4">
+                                    <a href="index.php?sayfa=uye-detay&id=<?= $dg['id']; ?>" class="text-decoration-none">
+                                        <div class="d-flex align-items-center gap-3 p-3 rounded-3 h-100"
+                                             style="background:linear-gradient(135deg,rgba(255,111,0,0.05),rgba(255,152,0,0.08));border:1px solid rgba(255,111,0,0.15);transition:transform 0.2s,box-shadow 0.2s;"
+                                             onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 20px rgba(255,111,0,0.15)'"
+                                             onmouseout="this.style.transform='';this.style.boxShadow=''">
+                                            <!-- Yaş balonu -->
+                                            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 fw-bold"
+                                                 style="width:52px;height:52px;background:linear-gradient(135deg,#ff6f00,#ffa000);color:#fff;font-size:1rem;box-shadow:0 4px 12px rgba(255,111,0,0.35);">
+                                                <?= $yas; ?>
+                                            </div>
+                                            <!-- Bilgiler -->
+                                            <div class="overflow-hidden">
+                                                <div class="fw-bold text-dark text-truncate" style="font-size:0.95rem;">
+                                                    <?= htmlspecialchars($dg['adi_soyadi']); ?>
+                                                </div>
+                                                <div class="small text-muted text-truncate">
+                                                    <i class="fa-solid fa-user-tag me-1" style="font-size:0.7rem;"></i><?= htmlspecialchars($unvan); ?>
+                                                </div>
+                                                <?php if (!empty($dg['ikamet_ili'])): ?>
+                                                <div class="small mt-1" style="color:#e65100;">
+                                                    <i class="fa-solid fa-location-dot me-1" style="font-size:0.7rem;"></i><?= htmlspecialchars($dg['ikamet_ili']); ?>
+                                                </div>
+                                                <?php endif; ?>
+                                            </div>
+                                            <!-- Konfeti ikonu -->
+                                            <div class="ms-auto flex-shrink-0">
+                                                <i class="fa-solid fa-party-horn" style="color:rgba(255,111,0,0.35);font-size:1.2rem;"></i>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php else: ?>
+                        <div class="text-center py-4">
+                            <i class="fa-solid fa-cake-candles fa-3x mb-3 d-block" style="color:rgba(0,0,0,0.1);"></i>
+                            <p class="text-muted mb-0">Bugün doğum günü olan kayıtlı üye bulunmuyor.</p>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Alt bilgi notu -->
+                <div class="px-4 pb-4">
+                    <div class="rounded-3 px-3 py-2 d-flex align-items-center gap-2" style="background:rgba(255,111,0,0.04);border:1px solid rgba(255,111,0,0.1);">
+                        <i class="fa-solid fa-circle-info small" style="color:rgba(255,111,0,0.5);"></i>
+                        <span class="small text-muted">Doğum günü listesi, sisteme kayıtlı ve doğum tarihi girilmiş onaylı üyelerden oluşmaktadır. Her gece 00:00'da otomatik güncellenir.</span>
+                    </div>
+                </div>
             </div>
         </div>
 
