@@ -62,62 +62,55 @@ final class MemberUpdateController
      */
     public function verify(): Response
     {
-        try {
-            if (!$this->verifyMathCaptcha($this->request->body)) {
-                return Response::redirect('/bilgi-guncelleme?durum=hata&step=captcha_fail');
-            }
-
-            $telefonRaw = trim((string) ($this->request->body['telefon'] ?? ''));
-            $telefon    = $this->normalizeTelefon($telefonRaw);
-
-            if ($telefon === '') {
-                return Response::redirect('/bilgi-guncelleme?durum=hata&step=telefon_bos&raw=' . urlencode($telefonRaw));
-            }
-
-            $pdo = $this->pdo();
-            $stmt = $pdo->prepare(
-                "SELECT id, adi_soyadi, telefon, dogum_tarihi, ikamet_ili, ikamet_ilcesi
-                   FROM dernek_uyeler
-                  WHERE REPLACE(REPLACE(telefon, ' ', ''), '-', '') = ?
-                    AND onay_durumu = 'onayli'
-                  LIMIT 1"
-            );
-            $stmt->execute([$telefon]);
-            $uye = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            if (!$uye) {
-                return Response::redirect('/bilgi-guncelleme?durum=bulunamadi');
-            }
-
-            $seo = $this->responder->seo(
-                title: 'Bilgi Güncelleme',
-                description: 'Bilgilerinizi güncelleyin.',
-                canonicalPath: '/bilgi-guncelleme',
-                indexable: false,
-            );
-
-            [$captchaA, $captchaB, $captchaToken] = $this->generateMathCaptcha();
-
-            // Mevcut doğum tarihini görüntüleme formatına çevir
-            $dogumGosterim = $this->formatDogumTarihi($uye['dogum_tarihi'] ?? '');
-
-            return $this->responder->page('pages/member-update', $seo, [
-                'adim'            => 'guncelleme',
-                'durum'           => null,
-                'uye'             => $uye,
-                'dogumGosterim'   => $dogumGosterim,
-                'captchaA'        => $captchaA,
-                'captchaB'        => $captchaB,
-                'captchaToken'    => $captchaToken,
-                'styles'          => ['member-update.css'],
-                'scripts'         => ['turkey-districts.js', 'member-update.js'],
-            ]);
-        } catch (\Throwable $e) {
-            $this->logger->exception($e);
-            $msg = urlencode(substr($e->getMessage(), 0, 200));
-            $file = urlencode(basename($e->getFile()) . ':' . $e->getLine());
-            return Response::redirect("/bilgi-guncelleme?durum=hata&debug_msg={$msg}&debug_file={$file}");
+        if (!$this->verifyMathCaptcha($this->request->body)) {
+            return Response::redirect('/bilgi-guncelleme?durum=hata&step=captcha_fail');
         }
+
+        $telefonRaw = trim((string) ($this->request->body['telefon'] ?? ''));
+        $telefon    = $this->normalizeTelefon($telefonRaw);
+
+        if ($telefon === '') {
+            return Response::redirect('/bilgi-guncelleme?durum=hata&step=telefon_bos&raw=' . urlencode($telefonRaw));
+        }
+
+        $pdo = $this->pdo();
+        $stmt = $pdo->prepare(
+            "SELECT id, adi_soyadi, telefon, dogum_tarihi, ikamet_ili, ikamet_ilcesi
+               FROM dernek_uyeler
+              WHERE REPLACE(REPLACE(telefon, ' ', ''), '-', '') = ?
+                AND onay_durumu = 'onayli'
+              LIMIT 1"
+        );
+        $stmt->execute([$telefon]);
+        $uye = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$uye) {
+            return Response::redirect('/bilgi-guncelleme?durum=bulunamadi');
+        }
+
+        $seo = $this->responder->seo(
+            title: 'Bilgi Güncelleme',
+            description: 'Bilgilerinizi güncelleyin.',
+            canonicalPath: '/bilgi-guncelleme',
+            indexable: false,
+        );
+
+        [$captchaA, $captchaB, $captchaToken] = $this->generateMathCaptcha();
+
+        // Mevcut doğum tarihini görüntüleme formatına çevir
+        $dogumGosterim = $this->formatDogumTarihi($uye['dogum_tarihi'] ?? '');
+
+        return $this->responder->page('pages/member-update', $seo, [
+            'adim'            => 'guncelleme',
+            'durum'           => null,
+            'uye'             => $uye,
+            'dogumGosterim'   => $dogumGosterim,
+            'captchaA'        => $captchaA,
+            'captchaB'        => $captchaB,
+            'captchaToken'    => $captchaToken,
+            'styles'          => ['member-update.css'],
+            'scripts'         => ['turkey-districts.js', 'member-update.js'],
+        ]);
     }
 
     /**
@@ -194,7 +187,7 @@ final class MemberUpdateController
             $stmt = $pdo->prepare($sql);
             $stmt->execute($updateValues);
 
-            $this->logger->info(sprintf(
+            $this->logger->error(sprintf(
                 'Üye bilgi güncelleme: #%d — dogum: %s, il: %s, ilce: %s',
                 $uyeId,
                 $dogumTarihi ?: '-',
