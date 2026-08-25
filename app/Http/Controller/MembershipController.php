@@ -54,7 +54,7 @@ final class MembershipController
             'captchaB'     => $captchaB,
             'captchaToken' => $captchaToken,
             'styles'       => ['membership.css'],
-            'scripts'      => ['membership.js'],
+            'scripts'      => ['turkey-districts.js', 'membership.js'],
         ]);
     }
 

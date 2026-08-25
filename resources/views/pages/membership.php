@@ -300,6 +300,22 @@ $calismaSekilleri = ['Tam Zamanlı', 'Yarı Zamanlı', 'Sözleşmeli', 'Emekli K
                     </select>
                 </div>
 
+                <!-- İkamet Edilen İlçe -->
+                <div class="ub-form__alan">
+                    <label class="ub-form__etiket" for="ub-ikamet-ilce">
+                        İkamet Edilen İlçe <span class="ub-form__zorunlu" aria-label="zorunlu">*</span>
+                    </label>
+                    <select
+                        class="ub-form__girdi ub-form__secim"
+                        id="ub-ikamet-ilce"
+                        name="ikamet_ilcesi"
+                        required
+                        aria-required="true"
+                    >
+                        <option value="">-- Önce İl Seçiniz --</option>
+                    </select>
+                </div>
+
                 <!-- Trabzon İlçesi (Nüfusa Kayıtlı) -->
                 <div class="ub-form__alan">
                     <label class="ub-form__etiket" for="ub-trabzon-ilce">

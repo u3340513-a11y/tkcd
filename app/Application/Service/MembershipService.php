@@ -43,6 +43,7 @@ final class MembershipService
         $kanGrubu  = trim((string) ($post['kan_grubu'] ?? ''));
         $dogumTarihi = trim((string) ($post['dogum_tarihi'] ?? ''));
         $ikametIl  = trim((string) ($post['ikamet_il'] ?? ''));
+        $ikametIlce = trim((string) ($post['ikamet_ilcesi'] ?? ''));
         $trabzonIlce = trim((string) ($post['trabzon_ilce'] ?? ''));
         $kurum       = trim((string) ($post['kurum'] ?? ''));
         $gorev       = trim((string) ($post['gorev'] ?? ''));
@@ -110,6 +111,7 @@ final class MembershipService
             kanGrubu:     $kanGrubu,
             dogumTarihi:  $dogumTarihiDb,
             ikametIli:    $ikametIl,
+            ikametIlcesi: $ikametIlce,
             trabzonIlcesi: $trabzonIlce,
             kurum:        $kurum,
             gorevUnvan:   $gorev,

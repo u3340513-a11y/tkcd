@@ -20,6 +20,7 @@ final readonly class MembershipApplication
         public string $kanGrubu,
         public string $dogumTarihi,
         public string $ikametIli,
+        public string $ikametIlcesi,
         public string $trabzonIlcesi,
         public string $kurum,
         public string $gorevUnvan,

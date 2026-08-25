@@ -50,6 +50,9 @@
     ikametIl: {
       bos: 'İkamet edilen ili seçiniz.',
     },
+    ikametIlce: {
+      bos: 'İkamet edilen ilçeyi seçiniz.',
+    },
     trabzonIlce: {
       bos: 'Trabzon ilçesini seçiniz.',
     },
@@ -73,6 +76,7 @@
   const elEposta      = document.getElementById('ub-eposta');
   const elDogum       = document.getElementById('ub-dogum-tarihi');
   const elIl          = document.getElementById('ub-ikamet-il');
+  const elIkametIlce  = document.getElementById('ub-ikamet-ilce');
   const elTrabzonIlce = document.getElementById('ub-trabzon-ilce');
   const elKvkk        = document.getElementById('ub-kvkk');
   const elCaptcha     = document.getElementById('ub-captcha-answer');
@@ -225,6 +229,17 @@
     return true;
   }
 
+  function dogrulaIkametIlce() {
+    if (!elIkametIlce) return true;
+    const seciliDeger = (elIkametIlce.value || '').trim();
+    if (seciliDeger === '') {
+      hataGoster(elIkametIlce, HATALAR.ikametIlce.bos);
+      return false;
+    }
+    hataSil(elIkametIlce);
+    return true;
+  }
+
   function dogrulaTrabzonIlce() {
     // Element DOM'da yoksa bu alan isteğe bağlıdır — doğrulamayı geç
     if (!elTrabzonIlce) return true;
@@ -362,7 +377,39 @@
    * İkamet İl — change'de doğrulama.
    */
   if (elIl) {
-    elIl.addEventListener('change', dogrulaIkametIl);
+    elIl.addEventListener('change', function () {
+      dogrulaIkametIl();
+      // İlçe cascading dropdown
+      if (elIkametIlce && typeof TURKIYE_ILCELER !== 'undefined') {
+        elIkametIlce.innerHTML = '';
+        var ilAdi = elIl.value;
+        if (!ilAdi || !TURKIYE_ILCELER[ilAdi]) {
+          var bos = document.createElement('option');
+          bos.value = '';
+          bos.textContent = '-- Önce İl Seçiniz --';
+          elIkametIlce.appendChild(bos);
+        } else {
+          var varsayilan = document.createElement('option');
+          varsayilan.value = '';
+          varsayilan.textContent = '-- İlçe Seçiniz --';
+          elIkametIlce.appendChild(varsayilan);
+          var ilceler = TURKIYE_ILCELER[ilAdi];
+          for (var i = 0; i < ilceler.length; i++) {
+            var opt = document.createElement('option');
+            opt.value = ilceler[i];
+            opt.textContent = ilceler[i];
+            elIkametIlce.appendChild(opt);
+          }
+        }
+      }
+    });
+  }
+
+  /**
+   * İkamet İlçesi — change'de doğrulama.
+   */
+  if (elIkametIlce) {
+    elIkametIlce.addEventListener('change', dogrulaIkametIlce);
   }
 
   /**
@@ -426,6 +473,7 @@
       dogrulaEposta(),
       dogrulaDogumTarihi(),
       dogrulaIkametIl(),
+      dogrulaIkametIlce(),
       dogrulaTrabzonIlce(),
       dogrulaKvkk(),
       dogrulaCaptcha(),
