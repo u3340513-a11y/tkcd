@@ -334,9 +334,8 @@ switch ($sayfa) {
             }
 
             // Bugün doğum günü olan onaylı üyeler
-            // DB'de tarih iki formatta olabilir: YYYY-MM-DD veya DD.MM.YYYY
-            $bugun_ay_gun   = date('m-d');   // MySQL DATE_FORMAT için: "08-25"
-            $bugun_gun_ay   = date('d.m');   // DD.MM.YYYY formatı için: "25.08"
+            // DB'de tarih üç formatta olabilir: YYYY-MM-DD, DD.MM.YYYY veya DD/MM/YYYY
+            $bugun_ay_gun = date('m-d');   // "08-25"
 
             $dogum_gunu_sorgu = $db_baglanti->prepare(
                 "SELECT id, adi_soyadi, dogum_tarihi, ikamet_ili, kurum, temsilci_turu, ek_gorev
@@ -345,13 +344,15 @@ switch ($sayfa) {
                     AND dogum_tarihi IS NOT NULL
                     AND dogum_tarihi != '0000-00-00'
                     AND dogum_tarihi != ''
+                    AND LENGTH(dogum_tarihi) >= 8
                     AND (
                         DATE_FORMAT(STR_TO_DATE(dogum_tarihi, '%Y-%m-%d'), '%m-%d') = ?
                         OR DATE_FORMAT(STR_TO_DATE(dogum_tarihi, '%d.%m.%Y'), '%m-%d') = ?
+                        OR DATE_FORMAT(STR_TO_DATE(dogum_tarihi, '%d/%m/%Y'), '%m-%d') = ?
                     )
                   ORDER BY adi_soyadi ASC"
             );
-            $dogum_gunu_sorgu->execute([$bugun_ay_gun, $bugun_ay_gun]);
+            $dogum_gunu_sorgu->execute([$bugun_ay_gun, $bugun_ay_gun, $bugun_ay_gun]);
             $dogum_gunu_uyeleri = $dogum_gunu_sorgu->fetchAll(PDO::FETCH_ASSOC);
         } catch (\PDOException $e) {
             error_log('Yönetim dashboard hatası: ' . $e->getMessage());
