@@ -1273,6 +1273,24 @@ p {
   font-size: var(--olcek-xs);
 }
 
+.site-alti__tesekkur {
+  font-size: var(--olcek-xs);
+  color: rgba(255, 255, 255, 0.45);
+  width: 100%;
+  text-align: center;
+  margin-top: var(--bosluk-2);
+}
+
+.site-alti__tesekkur a {
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.site-alti__tesekkur a:hover {
+  color: var(--renk-vurgu, #f59e0b);
+}
+
 /* Yukarı çık düğmesi */
 .yukari-cik {
   position: fixed;
