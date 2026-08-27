@@ -100,7 +100,7 @@ foreach ($navigation as $item) {
             <span>&copy; <?= (int) $currentYear ?> <?= $view->e($siteName) ?>. Tüm hakları saklıdır.</span>
             <span><?= $view->e((string) ($site['legal_note'] ?? '')) ?></span>
             <span class="site-alti__tesekkur">
-                Bu siteyi ilk yapana sonsuz teşekkürler:
+                Derneğimizin dış yüzü olan sitemize katkılarından dolayı sonsuz teşekkürler
                 <a href="https://kodwall.com/" target="_blank" rel="noopener noreferrer">kodwall.com</a>
             </span>
         </div>
