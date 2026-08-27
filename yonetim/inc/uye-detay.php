@@ -19,10 +19,10 @@ $is_ilce_baskani     = ($kullanici_rolu === 'ilce_baskani');
 $is_kurum_temsilcisi = ($kullanici_rolu === 'kurum_temsilcisi');
 $is_kisitli_rol      = ($is_il_baskani || $is_ilce_baskani || $is_kurum_temsilcisi);
 
-// --- GÜNCELLEME: SORUMLU BÖLGE / İLÇE EL İLE GÜNCELLEME MOTORU (SADECE GELİŞTİRİCİ) ---
+// --- GÜNCELLEME: SORUMLU BÖLGE / İLÇE EL İLE GÜNCELLEME MOTORU (ADMİN + GELİŞTİRİCİ) ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bolge_guncelle'])) {
-    if (!$is_gelistirici) {
-        die("Erişim Engellendi: Sorumlu bölge güncelleme yetkisi sadece Geliştirici rolüne aittir!");
+    if (!$is_admin && !$is_gelistirici) {
+        die("Erişim Engellendi: Sorumlu bölge güncelleme yetkisi sadece Admin ve Geliştirici rollerine aittir!");
     }
     $yeni_bolge = trim($_POST['sorumlu_bolge']);
     try {
@@ -321,7 +321,7 @@ if (!empty($uye['uyelik_tarihi']) && $uye['uyelik_tarihi'] !== '0000-00-00') {
                             <td class="fw-bold text-secondary"><i class="fa-solid fa-location-dot me-2 text-purple"></i>Sorumlu Bölge / İlçe:</td>
                             <td class="text-dark">
                                 <span class="fw-bold text-purple me-2" id="mevcutBolgeYazisi"><?= htmlspecialchars($uye['sorumlu_bolge'] ?: 'Atanmamış'); ?></span>
-                                <?php if ($is_gelistirici): ?>
+                                <?php if ($is_admin || $is_gelistirici): ?>
                                     <button type="button" class="btn btn-outline-dark btn-sm py-0 px-1.5 fw-bold ms-1" style="font-size:12px;" data-bs-toggle="modal" data-bs-target="#elIleBolgeModal">
                                         <i class="fa-solid fa-pen-to-square"></i> Düzenle
                                     </button>
@@ -385,7 +385,7 @@ if (!empty($uye['uyelik_tarihi']) && $uye['uyelik_tarihi'] !== '0000-00-00') {
     </div>
 </div>
 
-<?php if ($is_gelistirici): ?>
+<?php if ($is_admin || $is_gelistirici): ?>
 <div class="modal fade" id="elIleBolgeModal" tabindex="-1" aria-labelledby="elIleBolgeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content border-0 shadow-lg">
