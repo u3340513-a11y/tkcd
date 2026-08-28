@@ -31,6 +31,17 @@
     linear-gradient(180deg, var(--notr-0) 0%, var(--renk-zemin) 100%);
 }
 
+.kahraman__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.06;
+  z-index: 0;
+  pointer-events: none;
+}
+
 /* Logodaki dalga motifinden esinlenen dekoratif zemin deseni */
 .kahraman__desen {
   position: absolute;

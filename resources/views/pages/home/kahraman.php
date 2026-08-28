@@ -17,6 +17,9 @@ use App\Core\View\PhpViewRenderer;
  */
 ?>
 <section class="kahraman" aria-labelledby="kahraman-baslik">
+    <video class="kahraman__video" autoplay muted loop playsinline aria-hidden="true">
+        <source src="/images/hrbg.mp4" type="video/mp4">
+    </video>
     <span class="kahraman__isik kahraman__isik--bordo" aria-hidden="true"></span>
     <span class="kahraman__isik kahraman__isik--mavi" aria-hidden="true"></span>
 
