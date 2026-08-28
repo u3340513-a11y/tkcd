@@ -148,8 +148,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['not_ekle'])) {
             $not_sorgu = $db_baglanti->prepare("INSERT INTO dernek_notlar (uye_id, not_icerik) VALUES (?, ?)");
             $not_sorgu->execute([$uye_id, $not_icerik]);
 
-            $not_ozet = mb_strlen($not_icerik) > 100 ? mb_substr($not_icerik, 0, 100) . '…' : $not_icerik;
-            log_kaydet($db_baglanti, 'uye_duzenle', $not_uye_adi . ' — Not eklendi: "' . $not_ozet . '"', 'dernek_notlar', (int) $db_baglanti->lastInsertId());
+            log_kaydet($db_baglanti, 'uye_duzenle', $not_uye_adi . ' — Not eklendi: "' . $not_icerik . '"', 'dernek_notlar', (int) $db_baglanti->lastInsertId());
             echo "<script>window.location.href='index.php?sayfa=uye-detay&id=".$uye_id."';</script>";
             exit;
         } catch (\PDOException $e) {

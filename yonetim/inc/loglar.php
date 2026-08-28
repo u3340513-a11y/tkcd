@@ -406,15 +406,18 @@ function kisalt_ua(?string $ua): string
 
 <style>
 .log-tip .tooltip-inner {
-    max-width: 420px;
+    max-width: 600px;
     text-align: left;
-    padding: 10px 14px;
+    padding: 12px 16px;
     font-size: 0.82rem;
-    line-height: 1.5;
+    line-height: 1.6;
     background: #0f1528;
     border: 1px solid rgba(255,255,255,0.1);
     border-radius: 8px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
 }
 .log-tip .tooltip-arrow::before {
     border-top-color: #0f1528;
