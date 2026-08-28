@@ -197,8 +197,16 @@
 .sayac {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
+  text-align: center;
   gap: 2px;
+}
+
+@media (min-width: 560px) {
+  .sayac {
+    align-items: flex-start;
+    text-align: left;
+  }
 }
 
 .sayac__ikon {
