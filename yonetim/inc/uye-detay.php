@@ -175,7 +175,8 @@ try {
             exit;
         }
     } elseif ($is_ilce_baskani && !empty($_SESSION['sorumlu_ilce'])) {
-        if (trim($uye['trabzon_ilcesi']) !== trim($_SESSION['sorumlu_ilce'])) {
+        $uye_ilcesi = !empty($uye['ikamet_ilcesi']) ? trim($uye['ikamet_ilcesi']) : trim($uye['trabzon_ilcesi'] ?? '');
+        if ($uye_ilcesi !== trim($_SESSION['sorumlu_ilce'])) {
             echo '<div class="container py-5"><div class="alert alert-danger text-center fw-bold"><i class="fa-solid fa-lock me-2"></i>Erişim Engellendi: Bu üye sizin yetki alanınız dışındadır.</div></div>';
             exit;
         }
@@ -413,7 +414,8 @@ if (!empty($uye['uyelik_tarihi']) && $uye['uyelik_tarihi'] !== '0000-00-00') {
 
 <?php if ($is_gelistirici):
     // Geliştirici düzenleme formu için veri dizileri
-    $dev_iller = ["Adana","Adıyaman","Afyonkarahisar","Ağrı","Amasya","Ankara","Antalya","Artvin","Aydın","Balıkesir","Bilecik","Bingöl","Bitlis","Bolu","Burdur","Bursa","Çanakkale","Çankırı","Çorum","Denizli","Diyarbakır","Edirne","Elazığ","Erzincan","Erzurum","Eskişehir","Gaziantep","Giresun","Gümüşhane","Hakkari","Hatay","Isparta","Mersin","İstanbul","İzmir","Kars","Kastamonu","Kayseri","Kırklareli","Kırşehir","Kocaeli","Konya","Kütahya","Malatya","Manisa","Kahramanmaraş","Mardin","Muğla","Muş","Nevşehir","Niğde","Ordu","Rize","Sakarya","Samsun","Siirt","Sinop","Sivas","Tekirdağ","Tokat","Trabzon","Tunceli","Şanlıurfa","Uşak","Van","Yozgat","Zonguldak","Aksaray","Bayburt","Karaman","Kırıkkale","Batman","Şırnak","Bartın","Ardahan","Iğdır","Yalova","Karabük","Kilis","Osmaniye","Düzce"];
+    $dev_ilce_verileri = require __DIR__ . '/turkiye-ilce-verileri.php';
+    $dev_iller = array_keys($dev_ilce_verileri);
     $dev_trabzon = ["Akçaabat","Araklı","Arsin","Beşikdüzü","Çarşıbaşı","Çaykara","Dernekpazarı","Düzköy","Hayrat","Köprübaşı","Maçka","Of","Ortahisar","Sürmene","Şalpazarı","Tonya","Vakfıkebir","Yomra"];
     $dev_kan = ["A Rh+","A Rh-","B Rh+","B Rh-","AB Rh+","AB Rh-","0 Rh+","0 Rh-"];
     $dev_statu = ["Normal Üye","Yönetim Kurulu Üyesi","Yönetim Kurulu Üyesi Yedek","İl Başkanı","İlçe Başkanı","Kurum Temsilcisi","Bölge Koordinatörü"];
@@ -486,7 +488,7 @@ if (!empty($uye['uyelik_tarihi']) && $uye['uyelik_tarihi'] !== '0000-00-00') {
             <div class="row g-3 mb-4">
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">İkamet Ettiği İl</label>
-                    <select name="guncelle_ikamet_ili" class="form-select">
+                    <select name="guncelle_ikamet_ili" id="dev-ikamet-il" class="form-select">
                         <option value="">— İl Seçiniz —</option>
                         <?php foreach ($dev_iller as $il): ?>
                             <option value="<?= $il; ?>" <?= (trim($uye['ikamet_ili'] ?? '') === $il) ? 'selected' : ''; ?>><?= $il; ?></option>
@@ -495,7 +497,17 @@ if (!empty($uye['uyelik_tarihi']) && $uye['uyelik_tarihi'] !== '0000-00-00') {
                 </div>
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">İkamet İlçesi</label>
-                    <input type="text" name="guncelle_ikamet_ilcesi" class="form-control" placeholder="İlçe adını yazınız" value="<?= htmlspecialchars($uye['ikamet_ilcesi'] ?? ''); ?>">
+                    <select name="guncelle_ikamet_ilcesi" id="dev-ikamet-ilce" class="form-select">
+                        <option value="">— Önce İl Seçiniz —</option>
+                        <?php
+                        $mevcut_il = trim($uye['ikamet_ili'] ?? '');
+                        $mevcut_ilce = trim($uye['ikamet_ilcesi'] ?? '');
+                        if ($mevcut_il !== '' && isset($dev_ilce_verileri[$mevcut_il])):
+                            foreach ($dev_ilce_verileri[$mevcut_il] as $ilce): ?>
+                                <option value="<?= $ilce; ?>" <?= ($mevcut_ilce === $ilce) ? 'selected' : ''; ?>><?= $ilce; ?></option>
+                        <?php endforeach;
+                        endif; ?>
+                    </select>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Trabzon İlçesi (Nüfusa Kayıtlı)</label>
@@ -569,6 +581,59 @@ function devTarihFormatla(element) {
     }
     element.value = v;
 }
+
+/**
+ * İl → İlçe cascading dropdown mantığı.
+ *
+ * İl değiştiğinde, ilgili ilçeleri PHP'den JSON olarak alınan
+ * veri kaynağından dinamik olarak yükler.
+ */
+(function() {
+    var ilceVerileri = <?= json_encode($dev_ilce_verileri, JSON_UNESCAPED_UNICODE); ?>;
+    var ilSelect   = document.getElementById('dev-ikamet-il');
+    var ilceSelect = document.getElementById('dev-ikamet-ilce');
+
+    if (!ilSelect || !ilceSelect) return;
+
+    /**
+     * Seçilen ile ait ilçeleri dropdown'a yükler.
+     *
+     * @param {string} secilenIl         - Seçilen ilin adı
+     * @param {string} [mevcutIlce='']   - Önceden seçili olması gereken ilçe
+     */
+    function ilceleriYukle(secilenIl, mevcutIlce) {
+        mevcutIlce = mevcutIlce || '';
+        ilceSelect.innerHTML = '';
+
+        if (!secilenIl || !ilceVerileri[secilenIl]) {
+            var bos = document.createElement('option');
+            bos.value = '';
+            bos.textContent = '— Önce İl Seçiniz —';
+            ilceSelect.appendChild(bos);
+            return;
+        }
+
+        var varsayilan = document.createElement('option');
+        varsayilan.value = '';
+        varsayilan.textContent = '— İlçe Seçiniz —';
+        ilceSelect.appendChild(varsayilan);
+
+        var ilceler = ilceVerileri[secilenIl];
+        for (var i = 0; i < ilceler.length; i++) {
+            var opt = document.createElement('option');
+            opt.value = ilceler[i];
+            opt.textContent = ilceler[i];
+            if (ilceler[i] === mevcutIlce) {
+                opt.selected = true;
+            }
+            ilceSelect.appendChild(opt);
+        }
+    }
+
+    ilSelect.addEventListener('change', function() {
+        ilceleriYukle(this.value, '');
+    });
+})();
 </script>
 
 <script>

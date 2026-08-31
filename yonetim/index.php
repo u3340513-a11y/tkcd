@@ -225,7 +225,7 @@ switch ($sayfa) {
             $kisitli_ikon = 'fa-chart-pie';
             $kisitli_renk = 'primary';
             $kisitli_where = "onay_durumu = 'onayli'";
-            $kisitli_param = null;
+            $kisitli_parametreler = [];
 
             if ($is_il_baskani && !empty($_SESSION['sorumlu_il'])) {
                 $kisitli_baslik = htmlspecialchars($_SESSION['sorumlu_il']) . ' İli';
@@ -233,27 +233,28 @@ switch ($sayfa) {
                 $kisitli_ikon = 'fa-building-flag';
                 $kisitli_renk = 'success';
                 $kisitli_where .= " AND ikamet_ili = ?";
-                $kisitli_param = $_SESSION['sorumlu_il'];
+                $kisitli_parametreler[] = $_SESSION['sorumlu_il'];
             } elseif ($is_ilce_baskani && !empty($_SESSION['sorumlu_ilce'])) {
                 $kisitli_baslik = htmlspecialchars($_SESSION['sorumlu_ilce']) . ' İlçesi';
                 $kisitli_aciklama = htmlspecialchars($_SESSION['sorumlu_ilce']) . ' ilçesine ait kayıtlı üyeler.';
                 $kisitli_ikon = 'fa-map-location-dot';
                 $kisitli_renk = 'purple';
-                $kisitli_where .= " AND trabzon_ilcesi = ?";
-                $kisitli_param = $_SESSION['sorumlu_ilce'];
+                $kisitli_where .= " AND (ikamet_ilcesi = ? OR (ikamet_ilcesi IS NULL AND trabzon_ilcesi = ?))";
+                $kisitli_parametreler[] = $_SESSION['sorumlu_ilce'];
+                $kisitli_parametreler[] = $_SESSION['sorumlu_ilce'];
             } elseif ($is_kurum_temsilcisi && !empty($_SESSION['sorumlu_kurum'])) {
                 $kisitli_baslik = htmlspecialchars($_SESSION['sorumlu_kurum']);
                 $kisitli_aciklama = htmlspecialchars($_SESSION['sorumlu_kurum']) . ' kurumuna ait kayıtlı üyeler.';
                 $kisitli_ikon = 'fa-building-user';
                 $kisitli_renk = 'warning';
                 $kisitli_where .= " AND kurum = ?";
-                $kisitli_param = $_SESSION['sorumlu_kurum'];
+                $kisitli_parametreler[] = $_SESSION['sorumlu_kurum'];
             }
 
             try {
                 $k_sorgu = $db_baglanti->prepare("SELECT COUNT(*) FROM dernek_uyeler WHERE " . $kisitli_where);
-                if ($kisitli_param !== null) {
-                    $k_sorgu->execute([$kisitli_param]);
+                if (!empty($kisitli_parametreler)) {
+                    $k_sorgu->execute($kisitli_parametreler);
                 } else {
                     $k_sorgu->execute();
                 }
