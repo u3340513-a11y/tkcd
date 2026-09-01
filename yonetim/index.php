@@ -801,14 +801,22 @@ switch ($sayfa) {
             $dogum_gunu_sorgu->execute([$bugun_ay_gun, $bugun_ay_gun, $bugun_ay_gun]);
             $dogum_gunu_uyeleri = $dogum_gunu_sorgu->fetchAll(PDO::FETCH_ASSOC);
 
-            // Son eklenen 5 üye
+            // Son eklenen 10 üye
             $admin_son_sorgu = $db_baglanti->query(
                 "SELECT id, adi_soyadi, kurum, gorev_unvan, ikamet_ili, uyelik_tarihi
                    FROM dernek_uyeler
                   WHERE onay_durumu = 'onayli'
-                  ORDER BY id DESC LIMIT 5"
+                  ORDER BY id DESC LIMIT 10"
             );
             $admin_son_uyeler = $admin_son_sorgu->fetchAll(PDO::FETCH_ASSOC);
+
+            // Son 30 günde eklenen üye sayısı
+            $admin_son30_sayisi = $db_baglanti->query(
+                "SELECT COUNT(*) FROM dernek_uyeler
+                  WHERE onay_durumu = 'onayli'
+                    AND uyelik_tarihi IS NOT NULL
+                    AND uyelik_tarihi >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)"
+            )->fetchColumn();
 
             // Kan grubu dağılımı
             $admin_kan_sorgu = $db_baglanti->query(
@@ -836,15 +844,29 @@ switch ($sayfa) {
             );
             $admin_cs_verileri = $admin_cs_sorgu->fetchAll(PDO::FETCH_ASSOC);
 
-            // En çok üyeye sahip 5 kurum
+            // En çok üyeye sahip 10 kurum
             $admin_kurum_sorgu = $db_baglanti->query(
                 "SELECT kurum, COUNT(*) as adet
                    FROM dernek_uyeler
                   WHERE onay_durumu = 'onayli'
                     AND kurum IS NOT NULL AND kurum != ''
-                  GROUP BY kurum ORDER BY adet DESC LIMIT 5"
+                  GROUP BY kurum ORDER BY adet DESC LIMIT 10"
             );
             $admin_kurum_verileri = $admin_kurum_sorgu->fetchAll(PDO::FETCH_ASSOC);
+
+            // Toplam farklı kurum sayısı
+            $admin_toplam_kurum = $db_baglanti->query(
+                "SELECT COUNT(DISTINCT kurum) FROM dernek_uyeler
+                  WHERE onay_durumu = 'onayli'
+                    AND kurum IS NOT NULL AND kurum != ''"
+            )->fetchColumn();
+
+            // Kurumlarda çalışan toplam üye sayısı
+            $admin_kurumlu_uye = $db_baglanti->query(
+                "SELECT COUNT(*) FROM dernek_uyeler
+                  WHERE onay_durumu = 'onayli'
+                    AND kurum IS NOT NULL AND kurum != ''"
+            )->fetchColumn();
         } catch (\PDOException $e) {
             error_log('Yönetim dashboard hatası: ' . $e->getMessage());
             echo '<div class="container py-5"><div class="alert alert-danger">İstatistikler yüklenirken bir hata oluştu.</div></div>';
@@ -1202,12 +1224,15 @@ switch ($sayfa) {
                                 </div>
                                 <div>
                                     <h5 class="fw-bold mb-0" style="color:#fff;letter-spacing:-0.02em;">Son Eklenen Üyeler</h5>
-                                    <p class="mb-0 small" style="color:rgba(255,255,255,0.45);">Son kaydedilen 5 üye</p>
+                                    <p class="mb-0 small" style="color:rgba(255,255,255,0.45);">Son kaydedilen 10 üye</p>
                                 </div>
                             </div>
+                            <span class="badge rounded-pill px-3 py-2" style="background:rgba(74,144,217,0.18);color:#4a90d9;font-size:0.75rem;font-weight:600;">
+                                <i class="fa-solid fa-calendar-plus me-1" style="font-size:0.65rem;"></i>Son 30 gün: <?= $admin_son30_sayisi; ?>
+                            </span>
                         </div>
 
-                        <div class="p-4" style="max-height:380px;overflow-y:auto;">
+                        <div class="p-4" style="max-height:580px;overflow-y:auto;">
                             <?php if (count($admin_son_uyeler) > 0): ?>
                                 <div class="d-flex flex-column gap-2">
                                     <?php foreach ($admin_son_uyeler as $asu): ?>
@@ -1321,20 +1346,20 @@ switch ($sayfa) {
                                 </div>
                                 <div>
                                     <h5 class="fw-bold mb-0" style="color:#1a1a2e;letter-spacing:-0.02em;">En Çok Üyeli Kurumlar</h5>
-                                    <p class="mb-0 small" style="color:rgba(0,0,0,0.45);">Üye sayısına göre ilk 5 kurum</p>
+                                    <p class="mb-0 small" style="color:rgba(0,0,0,0.45);">Üye sayısına göre ilk 10 kurum</p>
                                 </div>
                             </div>
                             <span class="badge rounded-pill px-3 py-2" style="background:rgba(0,131,143,0.12);color:#00838f;font-size:0.75rem;font-weight:600;">
-                                <i class="fa-solid fa-ranking-star me-1" style="font-size:0.65rem;"></i>Top 5
+                                <i class="fa-solid fa-ranking-star me-1" style="font-size:0.65rem;"></i>Top 10
                             </span>
                         </div>
-                        <div class="p-4">
+                        <div class="p-4" style="max-height:480px;overflow-y:auto;">
                             <?php if (count($admin_kurum_verileri) > 0): ?>
                                 <?php foreach ($admin_kurum_verileri as $aki => $akv_item): ?>
                                     <?php
                                     $kurum_max = $admin_kurum_verileri[0]['adet'];
                                     $kurum_yuzde = $kurum_max > 0 ? round(($akv_item['adet'] / $kurum_max) * 100) : 0;
-                                    $sira_renkleri = ['#0d6efd', '#198754', '#6a1b9a', '#e65100', '#00838f'];
+                                    $sira_renkleri = ['#0d6efd', '#198754', '#6a1b9a', '#e65100', '#00838f', '#d32f2f', '#1565c0', '#f57f17', '#4a148c', '#004d40'];
                                     $sira_renk = $sira_renkleri[$aki] ?? '#6c757d';
                                     ?>
                                     <div class="d-flex align-items-center gap-3 <?= ($aki < count($admin_kurum_verileri) - 1) ? 'mb-3 pb-3 border-bottom' : ''; ?>">
@@ -1357,6 +1382,24 @@ switch ($sayfa) {
                                     <p class="text-muted small mb-0">Kurum verisi bulunamadı.</p>
                                 </div>
                             <?php endif; ?>
+                        </div>
+
+                        <!-- Kurum Özet İstatistikleri -->
+                        <div class="px-4 pb-4">
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <div class="rounded-3 p-3 text-center" style="background:rgba(0,131,143,0.06);border:1px solid rgba(0,131,143,0.12);">
+                                        <div class="fw-bold fs-5" style="color:#00838f;"><?= $admin_toplam_kurum; ?></div>
+                                        <div class="small" style="color:rgba(0,0,0,0.45);font-size:0.7rem;">Toplam Kurum</div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="rounded-3 p-3 text-center" style="background:rgba(13,110,253,0.06);border:1px solid rgba(13,110,253,0.12);">
+                                        <div class="fw-bold fs-5" style="color:#0d6efd;"><?= $admin_toplam_kurum > 0 ? round($admin_kurumlu_uye / $admin_toplam_kurum, 1) : 0; ?></div>
+                                        <div class="small" style="color:rgba(0,0,0,0.45);font-size:0.7rem;">Ort. Üye/Kurum</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
