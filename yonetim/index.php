@@ -800,6 +800,51 @@ switch ($sayfa) {
             );
             $dogum_gunu_sorgu->execute([$bugun_ay_gun, $bugun_ay_gun, $bugun_ay_gun]);
             $dogum_gunu_uyeleri = $dogum_gunu_sorgu->fetchAll(PDO::FETCH_ASSOC);
+
+            // Son eklenen 5 üye
+            $admin_son_sorgu = $db_baglanti->query(
+                "SELECT id, adi_soyadi, kurum, gorev_unvan, ikamet_ili, uyelik_tarihi
+                   FROM dernek_uyeler
+                  WHERE onay_durumu = 'onayli'
+                  ORDER BY id DESC LIMIT 5"
+            );
+            $admin_son_uyeler = $admin_son_sorgu->fetchAll(PDO::FETCH_ASSOC);
+
+            // Kan grubu dağılımı
+            $admin_kan_sorgu = $db_baglanti->query(
+                "SELECT kan_grubu, COUNT(*) as adet
+                   FROM dernek_uyeler
+                  WHERE onay_durumu = 'onayli'
+                    AND kan_grubu IS NOT NULL AND kan_grubu != ''
+                  GROUP BY kan_grubu ORDER BY adet DESC"
+            );
+            $admin_kan_verileri = $admin_kan_sorgu->fetchAll(PDO::FETCH_ASSOC);
+
+            $admin_kan_etiketler = [];
+            $admin_kan_sayilar   = [];
+            foreach ($admin_kan_verileri as $akv) {
+                $admin_kan_etiketler[] = $akv['kan_grubu'];
+                $admin_kan_sayilar[]   = (int) $akv['adet'];
+            }
+
+            // Çalışma şekli dağılımı
+            $admin_cs_sorgu = $db_baglanti->query(
+                "SELECT COALESCE(NULLIF(calisma_sekli, ''), 'Belirtilmemiş') as calisma_sekli, COUNT(*) as adet
+                   FROM dernek_uyeler
+                  WHERE onay_durumu = 'onayli'
+                  GROUP BY calisma_sekli ORDER BY adet DESC"
+            );
+            $admin_cs_verileri = $admin_cs_sorgu->fetchAll(PDO::FETCH_ASSOC);
+
+            // En çok üyeye sahip 5 kurum
+            $admin_kurum_sorgu = $db_baglanti->query(
+                "SELECT kurum, COUNT(*) as adet
+                   FROM dernek_uyeler
+                  WHERE onay_durumu = 'onayli'
+                    AND kurum IS NOT NULL AND kurum != ''
+                  GROUP BY kurum ORDER BY adet DESC LIMIT 5"
+            );
+            $admin_kurum_verileri = $admin_kurum_sorgu->fetchAll(PDO::FETCH_ASSOC);
         } catch (\PDOException $e) {
             error_log('Yönetim dashboard hatası: ' . $e->getMessage());
             echo '<div class="container py-5"><div class="alert alert-danger">İstatistikler yüklenirken bir hata oluştu.</div></div>';
@@ -1143,6 +1188,180 @@ switch ($sayfa) {
                 </div>
 
             </div>
+
+            <!-- ── 2. SATIR: Son Üyeler + Kan Grubu + Kurumlar ── -->
+            <div class="row g-4 mt-1">
+
+                <!-- SOL: Son Eklenen Üyeler -->
+                <div class="col-lg-4">
+                    <div class="rounded-4 shadow-sm overflow-hidden h-100" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); border: 1px solid rgba(255,255,255,0.08);">
+                        <div class="d-flex align-items-center justify-content-between px-4 pt-4 pb-3" style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="rounded-3 d-flex align-items-center justify-content-center" style="width:44px;height:44px;background:rgba(74,144,217,0.2);border:1px solid rgba(74,144,217,0.35);">
+                                    <i class="fa-solid fa-user-plus" style="color:#4a90d9;font-size:1.1rem;"></i>
+                                </div>
+                                <div>
+                                    <h5 class="fw-bold mb-0" style="color:#fff;letter-spacing:-0.02em;">Son Eklenen Üyeler</h5>
+                                    <p class="mb-0 small" style="color:rgba(255,255,255,0.45);">Son kaydedilen 5 üye</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-4" style="max-height:380px;overflow-y:auto;">
+                            <?php if (count($admin_son_uyeler) > 0): ?>
+                                <div class="d-flex flex-column gap-2">
+                                    <?php foreach ($admin_son_uyeler as $asu): ?>
+                                        <a href="index.php?sayfa=uye-detay&id=<?= $asu['id']; ?>" class="text-decoration-none">
+                                            <div class="d-flex align-items-center gap-3 p-3 rounded-3"
+                                                 style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);transition:transform 0.15s,box-shadow 0.15s;"
+                                                 onmouseover="this.style.transform='translateX(3px)';this.style.boxShadow='0 4px 16px rgba(74,144,217,0.2)';this.style.background='rgba(255,255,255,0.08)'"
+                                                 onmouseout="this.style.transform='';this.style.boxShadow='';this.style.background='rgba(255,255,255,0.04)'">
+                                                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                                                     style="width:40px;height:40px;background:linear-gradient(135deg,#0d6efd,rgba(74,144,217,0.8));box-shadow:0 3px 10px rgba(74,144,217,0.25);">
+                                                    <i class="fa-solid fa-user" style="color:#fff;font-size:0.85rem;"></i>
+                                                </div>
+                                                <div class="overflow-hidden flex-grow-1">
+                                                    <div class="fw-bold text-truncate" style="color:#fff;font-size:0.88rem;"><?= htmlspecialchars($asu['adi_soyadi']); ?></div>
+                                                    <div class="small text-truncate" style="color:rgba(255,255,255,0.45);">
+                                                        <?= htmlspecialchars($asu['kurum'] ?: ($asu['gorev_unvan'] ?: 'Üye')); ?>
+                                                        <?php if (!empty($asu['ikamet_ili'])): ?>
+                                                            &bull; <?= htmlspecialchars($asu['ikamet_ili']); ?>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                </div>
+                                                <?php if (!empty($asu['uyelik_tarihi']) && $asu['uyelik_tarihi'] !== '0000-00-00'): ?>
+                                                    <span class="badge rounded-pill px-2 py-1 flex-shrink-0" style="background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.5);font-size:0.65rem;">
+                                                        <?= date('d.m.Y', strtotime($asu['uyelik_tarihi'])); ?>
+                                                    </span>
+                                                <?php endif; ?>
+                                            </div>
+                                        </a>
+                                    <?php endforeach; ?>
+                                </div>
+                            <?php else: ?>
+                                <div class="text-center py-5" style="color:rgba(255,255,255,0.3);">
+                                    <i class="fa-solid fa-user-plus fa-3x d-block mb-3" style="opacity:0.25;"></i>
+                                    <p class="mb-0 small">Henüz kayıtlı üye bulunmuyor.</p>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="px-4 pb-4">
+                            <a href="index.php?sayfa=uyeler" class="btn btn-sm w-100 fw-bold py-2 rounded-3" style="background:rgba(74,144,217,0.15);color:#4a90d9;border:1px solid rgba(74,144,217,0.25);transition:all 0.2s;" onmouseover="this.style.background='rgba(74,144,217,0.25)'" onmouseout="this.style.background='rgba(74,144,217,0.15)'">
+                                <i class="fa-solid fa-list me-2"></i>Tüm Üyeleri Görüntüle
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ORTA: Kan Grubu Dağılımı + Çalışma Şekli -->
+                <div class="col-lg-4">
+                    <div class="rounded-4 shadow-sm overflow-hidden h-100" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); border: 1px solid rgba(255,255,255,0.08);">
+                        <div class="d-flex align-items-center justify-content-between px-4 pt-4 pb-3" style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="rounded-3 d-flex align-items-center justify-content-center" style="width:44px;height:44px;background:rgba(179,0,0,0.2);border:1px solid rgba(179,0,0,0.35);">
+                                    <i class="fa-solid fa-droplet" style="color:#e05555;font-size:1.1rem;"></i>
+                                </div>
+                                <div>
+                                    <h5 class="fw-bold mb-0" style="color:#fff;letter-spacing:-0.02em;">Kan Grubu Dağılımı</h5>
+                                    <p class="mb-0 small" style="color:rgba(255,255,255,0.45);">Tüm üyelerin kan grubu bilgisi</p>
+                                </div>
+                            </div>
+                            <span class="badge rounded-pill px-3 py-2" style="background:rgba(179,0,0,0.18);color:#e05555;font-size:0.75rem;font-weight:600;">
+                                <?= count($admin_kan_verileri); ?> Grup
+                            </span>
+                        </div>
+
+                        <div class="p-4">
+                            <?php if (count($admin_kan_verileri) > 0): ?>
+                                <div class="d-flex justify-content-center align-items-center" style="position:relative;height:280px;width:100%;">
+                                    <canvas id="adminKanGrupGrafik"></canvas>
+                                </div>
+                            <?php else: ?>
+                                <div class="text-center py-5" style="color:rgba(255,255,255,0.3);">
+                                    <i class="fa-solid fa-droplet fa-3x d-block mb-3" style="opacity:0.25;"></i>
+                                    <p class="mb-0 small">Henüz kan grubu bilgisi girilmiş üye bulunmuyor.</p>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+
+                        <!-- Çalışma Şekli Tablosu -->
+                        <div class="px-4 pb-4">
+                            <div class="rounded-3 p-3" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);">
+                                <h6 class="fw-bold mb-2" style="color:rgba(255,255,255,0.6);font-size:0.8rem;"><i class="fa-solid fa-briefcase me-1"></i>Çalışma Şekli Dağılımı</h6>
+                                <?php if (count($admin_cs_verileri) > 0): ?>
+                                    <?php foreach ($admin_cs_verileri as $acsv): ?>
+                                        <?php
+                                        $acs_toplam = $toplam_uye > 0 ? $toplam_uye : 1;
+                                        $acs_yuzde = round(($acsv['adet'] / $acs_toplam) * 100);
+                                        ?>
+                                        <div class="d-flex align-items-center justify-content-between mb-1">
+                                            <span class="small" style="color:rgba(255,255,255,0.55);"><?= htmlspecialchars($acsv['calisma_sekli']); ?></span>
+                                            <span class="small fw-bold" style="color:rgba(255,255,255,0.7);"><?= $acsv['adet']; ?></span>
+                                        </div>
+                                        <div class="progress mb-2" style="height:5px;background:rgba(255,255,255,0.06);border-radius:3px;">
+                                            <div class="progress-bar" style="width:<?= $acs_yuzde; ?>%;background:#0d6efd;border-radius:3px;"></div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <p class="mb-0 small" style="color:rgba(255,255,255,0.3);">Veri yok.</p>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SAĞ: En Çok Üyeli Kurumlar -->
+                <div class="col-lg-4">
+                    <div class="rounded-4 shadow-sm overflow-hidden h-100" style="background:#fff;border:1px solid rgba(0,0,0,0.08);">
+                        <div class="d-flex align-items-center justify-content-between px-4 pt-4 pb-3" style="border-bottom:1px solid rgba(0,0,0,0.07);">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="rounded-3 d-flex align-items-center justify-content-center" style="width:44px;height:44px;background:rgba(0,131,143,0.12);border:1px solid rgba(0,131,143,0.3);">
+                                    <i class="fa-solid fa-building" style="color:#00838f;font-size:1.1rem;"></i>
+                                </div>
+                                <div>
+                                    <h5 class="fw-bold mb-0" style="color:#1a1a2e;letter-spacing:-0.02em;">En Çok Üyeli Kurumlar</h5>
+                                    <p class="mb-0 small" style="color:rgba(0,0,0,0.45);">Üye sayısına göre ilk 5 kurum</p>
+                                </div>
+                            </div>
+                            <span class="badge rounded-pill px-3 py-2" style="background:rgba(0,131,143,0.12);color:#00838f;font-size:0.75rem;font-weight:600;">
+                                <i class="fa-solid fa-ranking-star me-1" style="font-size:0.65rem;"></i>Top 5
+                            </span>
+                        </div>
+                        <div class="p-4">
+                            <?php if (count($admin_kurum_verileri) > 0): ?>
+                                <?php foreach ($admin_kurum_verileri as $aki => $akv_item): ?>
+                                    <?php
+                                    $kurum_max = $admin_kurum_verileri[0]['adet'];
+                                    $kurum_yuzde = $kurum_max > 0 ? round(($akv_item['adet'] / $kurum_max) * 100) : 0;
+                                    $sira_renkleri = ['#0d6efd', '#198754', '#6a1b9a', '#e65100', '#00838f'];
+                                    $sira_renk = $sira_renkleri[$aki] ?? '#6c757d';
+                                    ?>
+                                    <div class="d-flex align-items-center gap-3 <?= ($aki < count($admin_kurum_verileri) - 1) ? 'mb-3 pb-3 border-bottom' : ''; ?>">
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 fw-bold"
+                                             style="width:38px;height:38px;background:<?= $sira_renk; ?>15;color:<?= $sira_renk; ?>;font-size:0.85rem;border:1px solid <?= $sira_renk; ?>30;">
+                                            <?= $aki + 1; ?>
+                                        </div>
+                                        <div class="overflow-hidden flex-grow-1">
+                                            <div class="fw-semibold text-dark text-truncate" style="font-size:0.88rem;"><?= htmlspecialchars($akv_item['kurum']); ?></div>
+                                            <div class="progress mt-1" style="height:4px;background:rgba(0,0,0,0.05);border-radius:3px;">
+                                                <div class="progress-bar" style="width:<?= $kurum_yuzde; ?>%;background:<?= $sira_renk; ?>;border-radius:3px;"></div>
+                                            </div>
+                                        </div>
+                                        <span class="badge rounded-pill px-2 py-1 fw-bold flex-shrink-0" style="background:<?= $sira_renk; ?>15;color:<?= $sira_renk; ?>;font-size:0.8rem;"><?= $akv_item['adet']; ?></span>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <div class="text-center py-4">
+                                    <i class="fa-solid fa-building fa-2x mb-2 d-block" style="color:rgba(0,0,0,0.08);"></i>
+                                    <p class="text-muted small mb-0">Kurum verisi bulunamadı.</p>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
         </div>
 
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -1275,6 +1494,67 @@ switch ($sayfa) {
 
         });
         </script>
+
+        <?php if (count($admin_kan_verileri) > 0): ?>
+        <script>
+        window.addEventListener("load", function() {
+            var adminKanCanvas = document.getElementById('adminKanGrupGrafik');
+            if (!adminKanCanvas) return;
+
+            var adminKanEtiketler = <?= json_encode($admin_kan_etiketler, JSON_UNESCAPED_UNICODE); ?>;
+            var adminKanVeriler   = <?= json_encode($admin_kan_sayilar); ?>;
+            var adminKanRenkler   = ['#e05555','#4a90d9','#50c878','#f5a623','#b388ff','#80cbc4','#ef9a9a','#ffe082'];
+
+            new Chart(adminKanCanvas, {
+                type: 'doughnut',
+                data: {
+                    labels: adminKanEtiketler,
+                    datasets: [{
+                        data: adminKanVeriler,
+                        backgroundColor: adminKanRenkler.slice(0, adminKanEtiketler.length),
+                        borderWidth: 3,
+                        borderColor: '#16213e',
+                        hoverBorderWidth: 0,
+                        hoverOffset: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '55%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: 'rgba(255,255,255,0.65)',
+                                padding: 12,
+                                usePointStyle: true,
+                                pointStyleWidth: 10,
+                                font: { size: 11, weight: '600' }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(22,33,62,0.95)',
+                            titleColor: '#fff',
+                            bodyColor: 'rgba(255,255,255,0.85)',
+                            borderColor: 'rgba(255,255,255,0.1)',
+                            borderWidth: 1,
+                            padding: 12,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function(ctx) {
+                                    var toplam = ctx.dataset.data.reduce(function(a, b) { return a + b; }, 0);
+                                    var yuzde = ((ctx.raw / toplam) * 100).toFixed(1);
+                                    return ' ' + ctx.label + ': ' + ctx.raw + ' kişi (%' + yuzde + ')';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+        </script>
+        <?php endif; ?>
         <?php
         break;
 }
