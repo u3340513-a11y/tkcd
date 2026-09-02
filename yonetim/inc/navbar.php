@@ -46,6 +46,11 @@
             <i class="fa-solid fa-terminal me-1"></i> Sistem Logları
           </a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" href="index.php?sayfa=kurum-birlestir" style="color:#00c9a7 !important;">
+            <i class="fa-solid fa-code-merge me-1"></i> Kurum Birleştir
+          </a>
+        </li>
         <?php endif; ?>
       </ul>
       

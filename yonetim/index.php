@@ -215,6 +215,10 @@ switch ($sayfa) {
             include 'inc/loglar.php';
         }
         break;
+
+    case 'kurum-birlestir':
+        include 'inc/kurum-birlestir.php';
+        break;
         
     case 'dashboard':
     default:
