@@ -299,35 +299,7 @@ try {
                             <p class="mb-0 small" style="color:rgba(0,0,0,0.45);">Birden fazla kurum seçip tek isme dönüştürün</p>
                         </div>
                     </div>
-                    <script>
-                    /* Türkçe küçük harf dönüşümü */
-                    function trKucukHarf(s) {
-                        return s.replace(/İ/g,'i').replace(/I/g,'ı').replace(/Ş/g,'ş').replace(/Ğ/g,'ğ').replace(/Ü/g,'ü').replace(/Ö/g,'ö').replace(/Ç/g,'ç').toLowerCase();
-                    }
-
-                    /* Anlık kurum filtreleme */
-                    function kurumFiltrele(deger) {
-                        var aranan = trKucukHarf(deger.trim());
-                        var satirlar = document.querySelectorAll('#kurumCheckboxListesi .kurum-satir-item');
-                        for (var i = 0; i < satirlar.length; i++) {
-                            var ad = satirlar[i].getAttribute('data-ad') || '';
-                            satirlar[i].style.display = (aranan === '' || ad.indexOf(aranan) !== -1) ? '' : 'none';
-                        }
-                    }
-
-                    /* Seçim sayacı */
-                    function kurumSecimGuncelle() {
-                        var checkler = document.querySelectorAll('#kurumCheckboxListesi input[type=checkbox]');
-                        var secili = 0;
-                        for (var i = 0; i < checkler.length; i++) {
-                            if (checkler[i].checked) secili++;
-                            var satir = checkler[i].closest('.kurum-satir-item');
-                            if (satir) satir.style.background = checkler[i].checked ? 'rgba(0,131,143,0.08)' : '';
-                        }
-                        var sayac = document.getElementById('secimSayaci');
-                        if (sayac) sayac.textContent = secili + ' seçili';
-                    }
-                    </script>
+                    <script src="assets/kurum-birlestir.js?v=<?= time(); ?>"></script>
                     <div class="p-4">
                         <form method="POST" id="manuelBirlestirForm">
                             <input type="hidden" name="csrf_token" value="<?= $csrf_token; ?>">
