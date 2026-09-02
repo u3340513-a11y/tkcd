@@ -339,36 +339,52 @@ try {
                 </div>
 
                 <script>
-                (function() {
+                document.addEventListener('DOMContentLoaded', function() {
+                    var konteyner = document.getElementById('kurumCheckboxListesi');
+                    if (!konteyner) return;
+
                     var filtre   = document.getElementById('kurumAraFiltre');
-                    var satirlar = document.querySelectorAll('.kurum-satir');
+                    var satirlar = konteyner.querySelectorAll('.kurum-satir');
                     var sayac    = document.getElementById('secimSayaci');
-                    var checkler = document.querySelectorAll('.kurum-checkbox');
+                    var checkler = konteyner.querySelectorAll('.kurum-checkbox');
+
+                    /** Türkçe karakter uyumlu küçük harf dönüşümü */
+                    function trLower(str) {
+                        return str
+                            .replace(/İ/g, 'i')
+                            .replace(/I/g, 'ı')
+                            .replace(/Ş/g, 'ş')
+                            .replace(/Ğ/g, 'ğ')
+                            .replace(/Ü/g, 'ü')
+                            .replace(/Ö/g, 'ö')
+                            .replace(/Ç/g, 'ç')
+                            .toLowerCase();
+                    }
 
                     /** Arama filtresi */
                     if (filtre) {
                         filtre.addEventListener('input', function() {
-                            var aranan = this.value.toLowerCase();
+                            var aranan = trLower(this.value.trim());
                             for (var i = 0; i < satirlar.length; i++) {
                                 var ad = satirlar[i].getAttribute('data-ad') || '';
-                                satirlar[i].style.display = ad.indexOf(aranan) !== -1 ? '' : 'none';
+                                satirlar[i].style.display = (aranan === '' || ad.indexOf(aranan) !== -1) ? '' : 'none';
                             }
                         });
                     }
 
-                    /** Seçim sayacı */
+                    /** Seçim sayacı + satır vurgusu */
                     function sayaciGuncelle() {
                         var secili = 0;
                         for (var i = 0; i < checkler.length; i++) {
                             if (checkler[i].checked) secili++;
-                            checkler[i].closest('.kurum-satir').style.background = checkler[i].checked ? 'rgba(0,131,143,0.06)' : '';
+                            checkler[i].closest('.kurum-satir').style.background = checkler[i].checked ? 'rgba(0,131,143,0.08)' : '';
                         }
                         if (sayac) sayac.textContent = secili + ' seçili';
                     }
                     for (var i = 0; i < checkler.length; i++) {
                         checkler[i].addEventListener('change', sayaciGuncelle);
                     }
-                })();
+                });
                 </script>
 
                 <!-- Tüm Kurumlar Listesi -->
