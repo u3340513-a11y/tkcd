@@ -37,34 +37,60 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['kurum_birlestir'])) {
         $islem_mesaji = 'Güvenlik doğrulaması başarısız. Sayfayı yenileyin.';
         $islem_tipi   = 'danger';
     } else {
-        $eski_isim = trim($_POST['eski_kurum'] ?? '');
         $yeni_isim = trim($_POST['yeni_kurum'] ?? '');
 
-        if (empty($eski_isim) || empty($yeni_isim)) {
-            $islem_mesaji = 'Hem eski hem yeni kurum adı gereklidir.';
+        // Tekli veya çoklu seçim desteği
+        $eski_isimler = [];
+        if (!empty($_POST['eski_kurumlar']) && is_array($_POST['eski_kurumlar'])) {
+            foreach ($_POST['eski_kurumlar'] as $ek) {
+                $temiz = trim($ek);
+                if ($temiz !== '' && $temiz !== $yeni_isim) {
+                    $eski_isimler[] = $temiz;
+                }
+            }
+        } elseif (!empty($_POST['eski_kurum'])) {
+            $tek = trim($_POST['eski_kurum']);
+            if ($tek !== '' && $tek !== $yeni_isim) {
+                $eski_isimler[] = $tek;
+            }
+        }
+
+        if (empty($eski_isimler) || empty($yeni_isim)) {
+            $islem_mesaji = 'En az bir eski kurum adı seçin ve yeni kurum adını girin.';
             $islem_tipi   = 'danger';
-        } elseif ($eski_isim === $yeni_isim) {
-            $islem_mesaji = 'Eski ve yeni kurum adı aynı olamaz.';
-            $islem_tipi   = 'warning';
         } else {
             try {
+                $db_baglanti->beginTransaction();
+
+                $toplam_etkilenen = 0;
+                $guncellenen_isimler = [];
                 $guncelle = $db_baglanti->prepare(
                     "UPDATE dernek_uyeler SET kurum = ? WHERE kurum = ?"
                 );
-                $guncelle->execute([$yeni_isim, $eski_isim]);
-                $etkilenen = $guncelle->rowCount();
 
-                if ($etkilenen > 0) {
+                foreach ($eski_isimler as $eski) {
+                    $guncelle->execute([$yeni_isim, $eski]);
+                    $satir = $guncelle->rowCount();
+                    if ($satir > 0) {
+                        $toplam_etkilenen += $satir;
+                        $guncellenen_isimler[] = '"' . $eski . '" (' . $satir . ')';
+                    }
+                }
+
+                $db_baglanti->commit();
+
+                if ($toplam_etkilenen > 0) {
+                    $log_detay = implode(', ', $guncellenen_isimler) . ' → "' . $yeni_isim . '"';
                     log_kaydet(
                         $db_baglanti,
                         'kurum_birlestir',
-                        '"' . $eski_isim . '" → "' . $yeni_isim . '" (' . $etkilenen . ' üye güncellendi)',
+                        $log_detay . ' (Toplam ' . $toplam_etkilenen . ' üye güncellendi)',
                         'dernek_uyeler'
                     );
-                    $islem_mesaji = '<strong>' . $etkilenen . '</strong> üyenin kurum adı "<strong>' . htmlspecialchars($eski_isim) . '</strong>" → "<strong>' . htmlspecialchars($yeni_isim) . '</strong>" olarak güncellendi.';
+                    $islem_mesaji = '<strong>' . $toplam_etkilenen . '</strong> üyenin kurum adı "<strong>' . htmlspecialchars($yeni_isim) . '</strong>" olarak güncellendi.<br><small class="text-muted">Değişen: ' . htmlspecialchars(implode(', ', $guncellenen_isimler)) . '</small>';
                     $islem_tipi   = 'success';
                 } else {
-                    $islem_mesaji = '"' . htmlspecialchars($eski_isim) . '" kurum adıyla kayıtlı üye bulunamadı.';
+                    $islem_mesaji = 'Seçilen kurum adlarıyla kayıtlı üye bulunamadı.';
                     $islem_tipi   = 'warning';
                 }
 
@@ -72,6 +98,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['kurum_birlestir'])) {
                 $_SESSION['csrf_kurum_birlestir'] = bin2hex(random_bytes(32));
                 $csrf_token = $_SESSION['csrf_kurum_birlestir'];
             } catch (\PDOException $e) {
+                if ($db_baglanti->inTransaction()) {
+                    $db_baglanti->rollBack();
+                }
                 error_log('Kurum birleştirme hatası: ' . $e->getMessage());
                 $islem_mesaji = 'Veritabanı hatası oluştu. Lütfen tekrar deneyin.';
                 $islem_tipi   = 'danger';
@@ -267,36 +296,80 @@ try {
                         </div>
                         <div>
                             <h5 class="fw-bold mb-0" style="color:#1a1a2e;">Manuel Birleştirme</h5>
-                            <p class="mb-0 small" style="color:rgba(0,0,0,0.45);">Listede göremediğiniz bir eşleşmeyi elle birleştirin</p>
+                            <p class="mb-0 small" style="color:rgba(0,0,0,0.45);">Birden fazla kurum seçip tek isme dönüştürün</p>
                         </div>
                     </div>
                     <div class="p-4">
-                        <form method="POST">
+                        <form method="POST" id="manuelBirlestirForm">
                             <input type="hidden" name="csrf_token" value="<?= $csrf_token; ?>">
 
                             <div class="mb-3">
-                                <label class="form-label fw-semibold small">Eski Kurum Adı <span class="text-danger">*</span></label>
-                                <select name="eski_kurum" class="form-select" required>
-                                    <option value="">— Değiştirilecek kurum adını seçin —</option>
+                                <label class="form-label fw-semibold small">Eski Kurum Adları <span class="text-danger">*</span></label>
+                                <div class="mb-2">
+                                    <input type="text" id="kurumAraFiltre" class="form-control form-control-sm" placeholder="🔍 Kurum ara..." autocomplete="off">
+                                </div>
+                                <div id="kurumCheckboxListesi" style="max-height:280px;overflow-y:auto;border:1px solid rgba(0,0,0,0.1);border-radius:8px;padding:8px;">
                                     <?php foreach ($tum_kurumlar as $tk): ?>
-                                        <option value="<?= htmlspecialchars($tk['kurum']); ?>"><?= htmlspecialchars($tk['kurum']); ?> (<?= $tk['adet']; ?> üye)</option>
+                                        <div class="form-check py-1 px-2 rounded kurum-satir" data-ad="<?= htmlspecialchars(mb_strtolower($tk['kurum'], 'UTF-8')); ?>" style="transition:background 0.15s;">
+                                            <input class="form-check-input kurum-checkbox" type="checkbox" name="eski_kurumlar[]" value="<?= htmlspecialchars($tk['kurum']); ?>" id="kurum_<?= md5($tk['kurum']); ?>">
+                                            <label class="form-check-label w-100 d-flex justify-content-between align-items-center" for="kurum_<?= md5($tk['kurum']); ?>" style="cursor:pointer;font-size:0.85rem;">
+                                                <span><?= htmlspecialchars($tk['kurum']); ?></span>
+                                                <span class="badge rounded-pill bg-primary bg-opacity-10 text-primary" style="font-size:0.7rem;"><?= $tk['adet']; ?></span>
+                                            </label>
+                                        </div>
                                     <?php endforeach; ?>
-                                </select>
-                                <div class="form-text">Bu isim veritabanından kaldırılacak.</div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mt-2">
+                                    <div class="form-text mb-0">Seçilen kurum adları kaldırılacak.</div>
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary" id="secimSayaci" style="font-size:0.75rem;">0 seçili</span>
+                                </div>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label fw-semibold small">Yeni Kurum Adı <span class="text-danger">*</span></label>
                                 <input type="text" name="yeni_kurum" class="form-control" placeholder="Doğru kurum adını yazın" required>
-                                <div class="form-text">Tüm eşleşen kayıtlar bu isme güncellenecek.</div>
+                                <div class="form-text">Tüm seçilen kurumların üyeleri bu isme güncellenecek.</div>
                             </div>
 
                             <button type="submit" name="kurum_birlestir" class="btn btn-sm w-100 fw-bold py-2" style="background:#00838f;color:#fff;border:none;">
-                                <i class="fa-solid fa-code-merge me-1"></i>Birleştir ve Güncelle
+                                <i class="fa-solid fa-code-merge me-1"></i>Seçilenleri Birleştir ve Güncelle
                             </button>
                         </form>
                     </div>
                 </div>
+
+                <script>
+                (function() {
+                    var filtre   = document.getElementById('kurumAraFiltre');
+                    var satirlar = document.querySelectorAll('.kurum-satir');
+                    var sayac    = document.getElementById('secimSayaci');
+                    var checkler = document.querySelectorAll('.kurum-checkbox');
+
+                    /** Arama filtresi */
+                    if (filtre) {
+                        filtre.addEventListener('input', function() {
+                            var aranan = this.value.toLowerCase();
+                            for (var i = 0; i < satirlar.length; i++) {
+                                var ad = satirlar[i].getAttribute('data-ad') || '';
+                                satirlar[i].style.display = ad.indexOf(aranan) !== -1 ? '' : 'none';
+                            }
+                        });
+                    }
+
+                    /** Seçim sayacı */
+                    function sayaciGuncelle() {
+                        var secili = 0;
+                        for (var i = 0; i < checkler.length; i++) {
+                            if (checkler[i].checked) secili++;
+                            checkler[i].closest('.kurum-satir').style.background = checkler[i].checked ? 'rgba(0,131,143,0.06)' : '';
+                        }
+                        if (sayac) sayac.textContent = secili + ' seçili';
+                    }
+                    for (var i = 0; i < checkler.length; i++) {
+                        checkler[i].addEventListener('change', sayaciGuncelle);
+                    }
+                })();
+                </script>
 
                 <!-- Tüm Kurumlar Listesi -->
                 <div class="rounded-4 shadow-sm overflow-hidden" style="background:#fff;border:1px solid rgba(0,0,0,0.08);">
