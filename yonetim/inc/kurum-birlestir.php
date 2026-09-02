@@ -339,38 +339,37 @@ try {
                 </div>
 
                 <script>
-                document.addEventListener('DOMContentLoaded', function() {
+                (function kurumFiltreBaglat() {
                     var konteyner = document.getElementById('kurumCheckboxListesi');
-                    if (!konteyner) return;
+                    var filtre    = document.getElementById('kurumAraFiltre');
+                    var sayac     = document.getElementById('secimSayaci');
 
-                    var filtre   = document.getElementById('kurumAraFiltre');
-                    var satirlar = konteyner.querySelectorAll('.kurum-satir');
-                    var sayac    = document.getElementById('secimSayaci');
-                    var checkler = konteyner.querySelectorAll('.kurum-checkbox');
+                    if (!konteyner || !filtre) {
+                        /* DOM henüz hazır değilse kısa bekle ve tekrar dene */
+                        setTimeout(kurumFiltreBaglat, 50);
+                        return;
+                    }
+
+                    var satirlar = konteyner.getElementsByClassName('kurum-satir');
+                    var checkler = konteyner.getElementsByClassName('kurum-checkbox');
 
                     /** Türkçe karakter uyumlu küçük harf dönüşümü */
                     function trLower(str) {
                         return str
-                            .replace(/İ/g, 'i')
-                            .replace(/I/g, 'ı')
-                            .replace(/Ş/g, 'ş')
-                            .replace(/Ğ/g, 'ğ')
-                            .replace(/Ü/g, 'ü')
-                            .replace(/Ö/g, 'ö')
-                            .replace(/Ç/g, 'ç')
-                            .toLowerCase();
+                            .replace(/İ/g, 'i').replace(/I/g, 'ı')
+                            .replace(/Ş/g, 'ş').replace(/Ğ/g, 'ğ')
+                            .replace(/Ü/g, 'ü').replace(/Ö/g, 'ö')
+                            .replace(/Ç/g, 'ç').toLowerCase();
                     }
 
                     /** Arama filtresi */
-                    if (filtre) {
-                        filtre.addEventListener('input', function() {
-                            var aranan = trLower(this.value.trim());
-                            for (var i = 0; i < satirlar.length; i++) {
-                                var ad = satirlar[i].getAttribute('data-ad') || '';
-                                satirlar[i].style.display = (aranan === '' || ad.indexOf(aranan) !== -1) ? '' : 'none';
-                            }
-                        });
-                    }
+                    filtre.addEventListener('input', function() {
+                        var aranan = trLower(this.value.trim());
+                        for (var i = 0; i < satirlar.length; i++) {
+                            var ad = satirlar[i].getAttribute('data-ad') || '';
+                            satirlar[i].style.display = (aranan === '' || ad.indexOf(aranan) !== -1) ? '' : 'none';
+                        }
+                    });
 
                     /** Seçim sayacı + satır vurgusu */
                     function sayaciGuncelle() {
@@ -384,7 +383,7 @@ try {
                     for (var i = 0; i < checkler.length; i++) {
                         checkler[i].addEventListener('change', sayaciGuncelle);
                     }
-                });
+                })();
                 </script>
 
                 <!-- Tüm Kurumlar Listesi -->
