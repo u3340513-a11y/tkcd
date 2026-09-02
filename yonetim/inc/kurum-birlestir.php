@@ -306,12 +306,14 @@ try {
                             <div class="mb-3">
                                 <label class="form-label fw-semibold small">Eski Kurum Adları <span class="text-danger">*</span></label>
                                 <div class="mb-2">
-                                    <input type="text" id="kurumAraFiltre" class="form-control form-control-sm" placeholder="🔍 Kurum ara..." autocomplete="off">
+                                    <input type="text" id="kurumAraFiltre" class="form-control form-control-sm" placeholder="🔍 Kurum ara..." autocomplete="off"
+                                           oninput="kurumFiltrele(this.value)">
                                 </div>
                                 <div id="kurumCheckboxListesi" style="max-height:300px;overflow-y:auto;border:1px solid rgba(0,0,0,0.12);border-radius:8px;">
                                     <?php foreach ($tum_kurumlar as $tki => $tk): ?>
-                                        <div class="d-flex align-items-center gap-2 px-3 py-2 kurum-satir" data-ad="<?= htmlspecialchars(mb_strtolower($tk['kurum'], 'UTF-8')); ?>" style="transition:background 0.15s;<?= ($tki < count($tum_kurumlar) - 1) ? 'border-bottom:1px solid rgba(0,0,0,0.06);' : ''; ?>">
-                                            <input class="form-check-input mt-0 flex-shrink-0 kurum-checkbox" type="checkbox" name="eski_kurumlar[]" value="<?= htmlspecialchars($tk['kurum']); ?>" id="kurum_<?= md5($tk['kurum']); ?>" style="width:18px;height:18px;min-width:18px;cursor:pointer;">
+                                        <div class="d-flex align-items-center gap-2 px-3 py-2 kurum-satir-item" data-ad="<?= htmlspecialchars(mb_strtolower($tk['kurum'], 'UTF-8')); ?>" style="transition:background 0.15s;<?= ($tki < count($tum_kurumlar) - 1) ? 'border-bottom:1px solid rgba(0,0,0,0.06);' : ''; ?>">
+                                            <input class="form-check-input mt-0 flex-shrink-0" type="checkbox" name="eski_kurumlar[]" value="<?= htmlspecialchars($tk['kurum']); ?>" id="kurum_<?= md5($tk['kurum']); ?>" style="width:18px;height:18px;min-width:18px;cursor:pointer;"
+                                                   onchange="kurumSecimGuncelle()">
                                             <label class="d-flex justify-content-between align-items-center w-100" for="kurum_<?= md5($tk['kurum']); ?>" style="cursor:pointer;font-size:0.85rem;margin:0;">
                                                 <span class="text-truncate me-2"><?= htmlspecialchars($tk['kurum']); ?></span>
                                                 <span class="badge rounded-pill flex-shrink-0" style="background:rgba(13,110,253,0.1);color:#0d6efd;font-size:0.75rem;min-width:28px;"><?= $tk['adet']; ?></span>
@@ -339,51 +341,33 @@ try {
                 </div>
 
                 <script>
-                (function kurumFiltreBaglat() {
-                    var konteyner = document.getElementById('kurumCheckboxListesi');
-                    var filtre    = document.getElementById('kurumAraFiltre');
-                    var sayac     = document.getElementById('secimSayaci');
+                /* Türkçe küçük harf dönüşümü */
+                function trKucukHarf(s) {
+                    return s.replace(/İ/g,'i').replace(/I/g,'ı').replace(/Ş/g,'ş').replace(/Ğ/g,'ğ').replace(/Ü/g,'ü').replace(/Ö/g,'ö').replace(/Ç/g,'ç').toLowerCase();
+                }
 
-                    if (!konteyner || !filtre) {
-                        /* DOM henüz hazır değilse kısa bekle ve tekrar dene */
-                        setTimeout(kurumFiltreBaglat, 50);
-                        return;
+                /* Anlık kurum filtreleme */
+                function kurumFiltrele(deger) {
+                    var aranan = trKucukHarf(deger.trim());
+                    var satirlar = document.querySelectorAll('#kurumCheckboxListesi .kurum-satir-item');
+                    for (var i = 0; i < satirlar.length; i++) {
+                        var ad = satirlar[i].getAttribute('data-ad') || '';
+                        satirlar[i].style.display = (aranan === '' || ad.indexOf(aranan) !== -1) ? '' : 'none';
                     }
+                }
 
-                    var satirlar = konteyner.getElementsByClassName('kurum-satir');
-                    var checkler = konteyner.getElementsByClassName('kurum-checkbox');
-
-                    /** Türkçe karakter uyumlu küçük harf dönüşümü */
-                    function trLower(str) {
-                        return str
-                            .replace(/İ/g, 'i').replace(/I/g, 'ı')
-                            .replace(/Ş/g, 'ş').replace(/Ğ/g, 'ğ')
-                            .replace(/Ü/g, 'ü').replace(/Ö/g, 'ö')
-                            .replace(/Ç/g, 'ç').toLowerCase();
-                    }
-
-                    /** Arama filtresi */
-                    filtre.addEventListener('input', function() {
-                        var aranan = trLower(this.value.trim());
-                        for (var i = 0; i < satirlar.length; i++) {
-                            var ad = satirlar[i].getAttribute('data-ad') || '';
-                            satirlar[i].style.display = (aranan === '' || ad.indexOf(aranan) !== -1) ? '' : 'none';
-                        }
-                    });
-
-                    /** Seçim sayacı + satır vurgusu */
-                    function sayaciGuncelle() {
-                        var secili = 0;
-                        for (var i = 0; i < checkler.length; i++) {
-                            if (checkler[i].checked) secili++;
-                            checkler[i].closest('.kurum-satir').style.background = checkler[i].checked ? 'rgba(0,131,143,0.08)' : '';
-                        }
-                        if (sayac) sayac.textContent = secili + ' seçili';
-                    }
+                /* Seçim sayacı */
+                function kurumSecimGuncelle() {
+                    var checkler = document.querySelectorAll('#kurumCheckboxListesi input[type=checkbox]');
+                    var secili = 0;
                     for (var i = 0; i < checkler.length; i++) {
-                        checkler[i].addEventListener('change', sayaciGuncelle);
+                        if (checkler[i].checked) secili++;
+                        var satir = checkler[i].closest('.kurum-satir-item');
+                        if (satir) satir.style.background = checkler[i].checked ? 'rgba(0,131,143,0.08)' : '';
                     }
-                })();
+                    var sayac = document.getElementById('secimSayaci');
+                    if (sayac) sayac.textContent = secili + ' seçili';
+                }
                 </script>
 
                 <!-- Tüm Kurumlar Listesi -->
