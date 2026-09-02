@@ -388,4 +388,44 @@ try {
 
     </div>
 </div>
-<script src="assets/kurum-birlestir.js?v=<?= time(); ?>"></script>
+<script>
+(function() {
+    'use strict';
+    function trKucukHarf(s) {
+        return s.replace(/İ/g,'i').replace(/I/g,'ı').replace(/Ş/g,'ş').replace(/Ğ/g,'ğ').replace(/Ü/g,'ü').replace(/Ö/g,'ö').replace(/Ç/g,'ç').toLowerCase();
+    }
+    function kurumFiltrele() {
+        var filtre = document.getElementById('kurumAraFiltre');
+        if (!filtre) return;
+        var aranan = trKucukHarf(filtre.value.trim());
+        var satirlar = document.querySelectorAll('#kurumCheckboxListesi .kurum-satir-item');
+        for (var i = 0; i < satirlar.length; i++) {
+            var ad = satirlar[i].getAttribute('data-ad') || '';
+            satirlar[i].style.display = (aranan === '' || ad.indexOf(aranan) !== -1) ? '' : 'none';
+        }
+    }
+    function kurumSecimGuncelle() {
+        var checkler = document.querySelectorAll('#kurumCheckboxListesi input[type=checkbox]');
+        var secili = 0;
+        for (var i = 0; i < checkler.length; i++) {
+            if (checkler[i].checked) secili++;
+            var satir = checkler[i].closest('.kurum-satir-item');
+            if (satir) satir.style.background = checkler[i].checked ? 'rgba(0,131,143,0.08)' : '';
+        }
+        var sayac = document.getElementById('secimSayaci');
+        if (sayac) sayac.textContent = secili + ' seçili';
+    }
+    var filtre = document.getElementById('kurumAraFiltre');
+    var konteyner = document.getElementById('kurumCheckboxListesi');
+    if (filtre) {
+        filtre.addEventListener('input', kurumFiltrele);
+        filtre.addEventListener('keyup', kurumFiltrele);
+    }
+    if (konteyner) {
+        var checkler = konteyner.querySelectorAll('input[type=checkbox]');
+        for (var i = 0; i < checkler.length; i++) {
+            checkler[i].addEventListener('change', kurumSecimGuncelle);
+        }
+    }
+})();
+</script>
