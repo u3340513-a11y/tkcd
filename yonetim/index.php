@@ -985,16 +985,22 @@ switch ($sayfa) {
                   WHERE onay_durumu = 'onayli'
                     AND kurum IS NOT NULL AND kurum != ''"
             )->fetchColumn();
+        } catch (\PDOException $e) {
+            error_log('Yönetim dashboard hatası: ' . $e->getMessage());
+            echo '<div class="container py-5"><div class="alert alert-danger">İstatistikler yüklenirken bir hata oluştu.</div></div>';
+            include 'inc/footer.php';
+            exit;
+        }
 
-            // ─── SON GİRİŞ TAKİBİ (Yönetim rolüne özel) ───────────────────
-            // yonetim_log tablosundan her panel kullanıcısının en son giriş
-            // tarihini çeker. Hiç giriş yapmamışları da dahil eder (LEFT JOIN).
-            // Sıralama: en uzun süredir giriş yapmamış en üstte (ASC).
+        // ─── SON GİRİŞ TAKİBİ (Yönetim rolüne özel, izole try-catch) ───
+        // Ana dashboard verisini etkilemez; hata olursa kartlar boş kalır.
+        $son_giris_verileri = [];
+
+        if ($is_yonetim || $is_gelistirici) {
             $son_giris_rolleri = ['yonetim', 'il_baskani', 'ilce_baskani'];
-            $son_giris_verileri = [];
 
-            if ($is_yonetim || $is_gelistirici) {
-                foreach ($son_giris_rolleri as $sg_rol) {
+            foreach ($son_giris_rolleri as $sg_rol) {
+                try {
                     $sg_sorgu = $db_baglanti->prepare(
                         "SELECT
                             y.id,
@@ -1010,17 +1016,22 @@ switch ($sayfa) {
                             ) AS son_giris_tarihi
                            FROM dernek_yoneticiler y
                           WHERE y.rol = ?
-                          ORDER BY son_giris_tarihi ASC"
+                          ORDER BY
+                            CASE WHEN (
+                                SELECT MAX(l2.tarih)
+                                  FROM yonetim_log l2
+                                 WHERE l2.kullanici_adi = y.kullanici_adi
+                                   AND l2.islem_turu = 'giris'
+                            ) IS NULL THEN 0 ELSE 1 END ASC,
+                            son_giris_tarihi ASC"
                     );
                     $sg_sorgu->execute([$sg_rol]);
                     $son_giris_verileri[$sg_rol] = $sg_sorgu->fetchAll(PDO::FETCH_ASSOC);
+                } catch (\PDOException $e) {
+                    error_log('Son giriş takibi hatası (' . $sg_rol . '): ' . $e->getMessage());
+                    $son_giris_verileri[$sg_rol] = [];
                 }
             }
-        } catch (\PDOException $e) {
-            error_log('Yönetim dashboard hatası: ' . $e->getMessage());
-            echo '<div class="container py-5"><div class="alert alert-danger">İstatistikler yüklenirken bir hata oluştu.</div></div>';
-            include 'inc/footer.php';
-            exit;
         }
         ?>
         <div class="container-fluid py-4 px-md-4">
