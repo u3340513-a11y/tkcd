@@ -994,6 +994,7 @@ switch ($sayfa) {
 
         // ─── SON GİRİŞ TAKİBİ (Yönetim rolüne özel, izole try-catch) ───
         // Ana dashboard verisini etkilemez; hata olursa kartlar boş kalır.
+        // İki ayrı sorgu: 1) Hesap listesi 2) Son giriş tarihleri → PHP'de birleştirilir.
         $son_giris_verileri = [];
 
         if ($is_yonetim || $is_gelistirici) {
@@ -1001,25 +1002,36 @@ switch ($sayfa) {
 
             foreach ($son_giris_rolleri as $sg_rol) {
                 try {
-                    $sg_sorgu = $db_baglanti->prepare(
-                        "SELECT
-                            y.id,
-                            y.kullanici_adi,
-                            y.rol,
-                            y.sorumlu_il,
-                            y.sorumlu_ilce,
-                            MAX(l.tarih) AS son_giris_tarihi
-                           FROM dernek_yoneticiler y
-                           LEFT JOIN yonetim_log l
-                             ON l.kullanici_adi = y.kullanici_adi
-                            AND l.islem_turu = 'giris'
-                          WHERE y.rol = ?
-                          GROUP BY y.id, y.kullanici_adi, y.rol, y.sorumlu_il, y.sorumlu_ilce
-                          ORDER BY son_giris_tarihi IS NULL DESC,
-                                   son_giris_tarihi ASC"
+                    // 1) Bu roldeki hesapları çek
+                    $hesap_sorgu = $db_baglanti->prepare(
+                        "SELECT id, kullanici_adi, rol, sorumlu_il, sorumlu_ilce
+                           FROM dernek_yoneticiler
+                          WHERE rol = ?
+                          ORDER BY kullanici_adi ASC"
                     );
-                    $sg_sorgu->execute([$sg_rol]);
-                    $son_giris_verileri[$sg_rol] = $sg_sorgu->fetchAll(PDO::FETCH_ASSOC);
+                    $hesap_sorgu->execute([$sg_rol]);
+                    $hesaplar = $hesap_sorgu->fetchAll(PDO::FETCH_ASSOC);
+
+                    // 2) Her hesabın son giriş tarihini çek
+                    foreach ($hesaplar as &$hesap) {
+                        $giris_sorgu = $db_baglanti->prepare(
+                            "SELECT MAX(tarih) FROM yonetim_log
+                              WHERE kullanici_adi = ? AND islem_turu = 'giris'"
+                        );
+                        $giris_sorgu->execute([$hesap['kullanici_adi']]);
+                        $hesap['son_giris_tarihi'] = $giris_sorgu->fetchColumn() ?: null;
+                    }
+                    unset($hesap);
+
+                    // 3) En uzun süredir giriş yapmayan en üstte sırala
+                    usort($hesaplar, function ($a, $b) {
+                        if ($a['son_giris_tarihi'] === null && $b['son_giris_tarihi'] === null) return 0;
+                        if ($a['son_giris_tarihi'] === null) return -1;
+                        if ($b['son_giris_tarihi'] === null) return 1;
+                        return strcmp($a['son_giris_tarihi'], $b['son_giris_tarihi']);
+                    });
+
+                    $son_giris_verileri[$sg_rol] = $hesaplar;
                 } catch (\PDOException $e) {
                     error_log('Son giriş takibi hatası (' . $sg_rol . '): ' . $e->getMessage());
                     $son_giris_verileri[$sg_rol] = [];
