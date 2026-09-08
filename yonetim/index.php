@@ -985,6 +985,37 @@ switch ($sayfa) {
                   WHERE onay_durumu = 'onayli'
                     AND kurum IS NOT NULL AND kurum != ''"
             )->fetchColumn();
+
+            // ─── SON GİRİŞ TAKİBİ (Yönetim rolüne özel) ───────────────────
+            // yonetim_log tablosundan her panel kullanıcısının en son giriş
+            // tarihini çeker. Hiç giriş yapmamışları da dahil eder (LEFT JOIN).
+            // Sıralama: en uzun süredir giriş yapmamış en üstte (ASC).
+            $son_giris_rolleri = ['yonetim', 'il_baskani', 'ilce_baskani'];
+            $son_giris_verileri = [];
+
+            if ($is_yonetim || $is_gelistirici) {
+                foreach ($son_giris_rolleri as $sg_rol) {
+                    $sg_sorgu = $db_baglanti->prepare(
+                        "SELECT
+                            y.id,
+                            y.kullanici_adi,
+                            y.rol,
+                            y.sorumlu_il,
+                            y.sorumlu_ilce,
+                            (
+                                SELECT MAX(l.tarih)
+                                  FROM yonetim_log l
+                                 WHERE l.kullanici_adi = y.kullanici_adi
+                                   AND l.islem_turu = 'giris'
+                            ) AS son_giris_tarihi
+                           FROM dernek_yoneticiler y
+                          WHERE y.rol = ?
+                          ORDER BY son_giris_tarihi ASC"
+                    );
+                    $sg_sorgu->execute([$sg_rol]);
+                    $son_giris_verileri[$sg_rol] = $sg_sorgu->fetchAll(PDO::FETCH_ASSOC);
+                }
+            }
         } catch (\PDOException $e) {
             error_log('Yönetim dashboard hatası: ' . $e->getMessage());
             echo '<div class="container py-5"><div class="alert alert-danger">İstatistikler yüklenirken bir hata oluştu.</div></div>';
@@ -1521,6 +1552,130 @@ switch ($sayfa) {
                         </div>
                     </div>
                 </div>
+
+            <?php if (($is_yonetim || $is_gelistirici) && !empty($son_giris_verileri)): ?>
+            <!-- ─── SON GİRİŞ TAKİP KARTLARI ─────────────────────────────── -->
+            <div class="row g-4 mt-2 mb-4">
+                <div class="col-12">
+                    <h4 class="fw-bold text-dark mb-0">
+                        <i class="fa-solid fa-user-clock me-2 text-primary"></i>Panel Kullanıcıları — Son Giriş Takibi
+                    </h4>
+                    <p class="text-muted small mb-0">Her kullanıcının sisteme en son ne zaman giriş yaptığı. En uzun süredir giriş yapmayan en üstte listelenir.</p>
+                </div>
+            </div>
+            <div class="row g-4 mb-4">
+                <?php
+                $kart_ayarlari = [
+                    'yonetim' => [
+                        'baslik'  => 'Yönetim Kurulu',
+                        'ikon'    => 'fa-users-gear',
+                        'renk'    => '#0d6efd',
+                        'renk_bg' => 'rgba(13,110,253,0.1)',
+                        'border'  => 'rgba(13,110,253,0.25)',
+                    ],
+                    'il_baskani' => [
+                        'baslik'  => 'İl Başkanları',
+                        'ikon'    => 'fa-building-flag',
+                        'renk'    => '#198754',
+                        'renk_bg' => 'rgba(25,135,84,0.1)',
+                        'border'  => 'rgba(25,135,84,0.25)',
+                    ],
+                    'ilce_baskani' => [
+                        'baslik'  => 'İlçe Başkanları',
+                        'ikon'    => 'fa-map-location-dot',
+                        'renk'    => '#6a1b9a',
+                        'renk_bg' => 'rgba(106,27,154,0.1)',
+                        'border'  => 'rgba(106,27,154,0.25)',
+                    ],
+                ];
+
+                foreach ($kart_ayarlari as $kart_rol => $kart):
+                    $kullanicilar = $son_giris_verileri[$kart_rol] ?? [];
+                ?>
+                <div class="col-lg-4 col-md-6">
+                    <div class="rounded-4 shadow-sm overflow-hidden h-100" style="background:#fff;border:1px solid <?= $kart['border']; ?>;">
+                        <!-- Kart Başlığı -->
+                        <div class="d-flex align-items-center justify-content-between px-4 pt-4 pb-3" style="border-bottom:1px solid rgba(0,0,0,0.07);">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="rounded-3 d-flex align-items-center justify-content-center" style="width:42px;height:42px;background:<?= $kart['renk_bg']; ?>;border:1px solid <?= $kart['border']; ?>;">
+                                    <i class="fa-solid <?= $kart['ikon']; ?>" style="color:<?= $kart['renk']; ?>;font-size:1rem;"></i>
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold mb-0" style="color:#1a1a2e;"><?= $kart['baslik']; ?></h6>
+                                    <span class="small text-muted"><?= count($kullanicilar); ?> hesap</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Kart İçeriği -->
+                        <div class="p-3" style="max-height:320px;overflow-y:auto;">
+                            <?php if (count($kullanicilar) > 0): ?>
+                                <div class="d-flex flex-column gap-2">
+                                    <?php foreach ($kullanicilar as $sg_kullanici):
+                                        $sg_tarih_ham = $sg_kullanici['son_giris_tarihi'];
+                                        $sg_sorumluluk = '';
+                                        if (!empty($sg_kullanici['sorumlu_il'])) {
+                                            $sg_sorumluluk = $sg_kullanici['sorumlu_il'];
+                                        } elseif (!empty($sg_kullanici['sorumlu_ilce'])) {
+                                            $sg_sorumluluk = $sg_kullanici['sorumlu_ilce'];
+                                        }
+
+                                        if ($sg_tarih_ham === null) {
+                                            $sg_tarih_goster = 'Hiç giriş yapmadı';
+                                            $sg_tarih_renk = '#dc3545';
+                                            $sg_gun_fark = 99999;
+                                        } else {
+                                            $sg_ts = strtotime($sg_tarih_ham);
+                                            $sg_tarih_goster = date('d.m.Y H:i', $sg_ts);
+                                            $sg_gun_fark = (int) floor((time() - $sg_ts) / 86400);
+
+                                            if ($sg_gun_fark <= 7) {
+                                                $sg_tarih_renk = '#198754';
+                                            } elseif ($sg_gun_fark <= 30) {
+                                                $sg_tarih_renk = '#e65100';
+                                            } else {
+                                                $sg_tarih_renk = '#dc3545';
+                                            }
+                                        }
+                                    ?>
+                                    <div class="d-flex align-items-center gap-3 p-3 rounded-3" style="background:<?= $kart['renk_bg']; ?>;border:1px solid <?= $kart['border']; ?>;transition:transform 0.15s;" onmouseover="this.style.transform='translateX(3px)'" onmouseout="this.style.transform=''">
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width:36px;height:36px;background:<?= $kart['renk']; ?>;">
+                                            <i class="fa-solid fa-user" style="color:#fff;font-size:0.75rem;"></i>
+                                        </div>
+                                        <div class="overflow-hidden flex-grow-1">
+                                            <div class="fw-bold text-dark text-truncate" style="font-size:0.85rem;">
+                                                <?= htmlspecialchars($sg_kullanici['kullanici_adi']); ?>
+                                            </div>
+                                            <?php if ($sg_sorumluluk !== ''): ?>
+                                            <div class="small text-truncate" style="color:#888;font-size:0.75rem;">
+                                                <?= htmlspecialchars($sg_sorumluluk); ?>
+                                            </div>
+                                            <?php endif; ?>
+                                        </div>
+                                        <div class="text-end flex-shrink-0">
+                                            <div class="fw-bold" style="font-size:0.72rem;color:<?= $sg_tarih_renk; ?>;">
+                                                <?= $sg_tarih_goster; ?>
+                                            </div>
+                                            <?php if ($sg_gun_fark < 99999): ?>
+                                            <div class="small" style="font-size:0.65rem;color:#aaa;">
+                                                <?= $sg_gun_fark === 0 ? 'Bugün' : $sg_gun_fark . ' gün önce'; ?>
+                                            </div>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            <?php else: ?>
+                                <div class="text-center py-4">
+                                    <i class="fa-solid fa-user-slash fa-2x mb-2 d-block" style="color:rgba(0,0,0,0.08);"></i>
+                                    <p class="text-muted small mb-0">Bu rolde kayıtlı hesap bulunmuyor.</p>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+            <?php endif; ?>
 
             </div>
         </div>
