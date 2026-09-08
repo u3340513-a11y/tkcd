@@ -11,6 +11,10 @@ $uye_id = intval($_GET['id']);
 $kullanici_rolu      = isset($_SESSION['rol']) ? $_SESSION['rol'] : 'admin';
 $is_admin            = ($kullanici_rolu === 'admin');
 
+// yonetim_hk kullanıcı adına özel künyeyi düzenleme yetkisi
+$oturum_kullanici_adi = isset($_SESSION['kullanici_adi']) ? $_SESSION['kullanici_adi'] : '';
+$is_yonetim_hk       = ($oturum_kullanici_adi === 'yonetim_hk');
+
 // Roller
 $is_yonetim          = ($kullanici_rolu === 'yonetim');
 $is_gelistirici      = ($kullanici_rolu === 'gelistirici');
@@ -39,8 +43,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bolge_guncelle'])) {
 
 // --- ÜYE BİLGİLERİNİ GÜNCELLEME MOTORU (SADECE GELİŞTİRİCİ) ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['uye_bilgi_guncelle'])) {
-    if (!$is_gelistirici) {
-        die("Erişim Engellendi: Üye bilgisi düzenleme yetkisi sadece Geliştirici rolüne aittir!");
+    if (!$is_gelistirici && !$is_yonetim_hk) {
+        die("Erişim Engellendi: Üye bilgisi düzenleme yetkiniz bulunmamaktadır!");
     }
 
     $guncelle_adi_soyadi    = trim($_POST['guncelle_adi_soyadi'] ?? '');
@@ -98,7 +102,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['uye_bilgi_guncelle'])
                 $guncelle_uyelik_tarihi, $uye_id
             ]);
 
-            log_kaydet($db_baglanti, 'uye_duzenle', $eski_ad . ' — Tüm bilgiler güncellendi (Geliştirici).', 'dernek_uyeler', $uye_id);
+            $guncelleme_kaynak = $is_yonetim_hk ? 'yonetim_hk' : 'Geliştirici';
+            log_kaydet($db_baglanti, 'uye_duzenle', $eski_ad . ' — Tüm bilgiler güncellendi (' . $guncelleme_kaynak . ').', 'dernek_uyeler', $uye_id);
             echo "<script>window.location.href='index.php?sayfa=uye-detay&id=".$uye_id."';</script>";
             exit;
         } catch (\PDOException $e) {
@@ -256,7 +261,7 @@ if (!empty($uye['uyelik_tarihi']) && $uye['uyelik_tarihi'] !== '0000-00-00') {
             <div class="card border-0 shadow-sm rounded-3 h-100">
                 <div class="card-header bg-dark text-white py-3 d-flex justify-content-between align-items-center">
                     <h5 class="fw-bold mb-0"><i class="fa-solid fa-id-card-clip me-2 text-warning"></i>Üye Detay Künyesi</h5>
-                    <?php if ($is_gelistirici): ?>
+                    <?php if ($is_gelistirici || $is_yonetim_hk): ?>
                         <button type="button" class="btn btn-warning btn-sm fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#uyeBilgiDuzenleModal">
                             <i class="fa-solid fa-pen-to-square me-1"></i>Bilgileri Düzenle
                         </button>
@@ -412,8 +417,8 @@ if (!empty($uye['uyelik_tarihi']) && $uye['uyelik_tarihi'] !== '0000-00-00') {
 </div>
 <?php endif; ?>
 
-<?php if ($is_gelistirici):
-    // Geliştirici düzenleme formu için veri dizileri
+<?php if ($is_gelistirici || $is_yonetim_hk):
+    // Geliştirici / yonetim_hk düzenleme formu için veri dizileri
     $dev_ilce_verileri = require __DIR__ . '/turkiye-ilce-verileri.php';
     $dev_iller = array_keys($dev_ilce_verileri);
     $dev_trabzon = ["Akçaabat","Araklı","Arsin","Beşikdüzü","Çarşıbaşı","Çaykara","Dernekpazarı","Düzköy","Hayrat","Köprübaşı","Maçka","Of","Ortahisar","Sürmene","Şalpazarı","Tonya","Vakfıkebir","Yomra"];
@@ -452,7 +457,7 @@ if (!empty($uye['uyelik_tarihi']) && $uye['uyelik_tarihi'] !== '0000-00-00') {
           <div class="modal-body p-4">
             <div class="alert alert-info small mb-4">
                 <i class="fa-solid fa-shield-halved me-2"></i>
-                <strong>Geliştirici Yetkisi:</strong> Bu form ile üyenin tüm bilgilerini düzenleyebilirsiniz. Değişiklikler sistem loglarına kaydedilir.
+                <strong>Yetkili Düzenleme:</strong> Bu form ile üyenin tüm bilgilerini düzenleyebilirsiniz. Değişiklikler sistem loglarına kaydedilir.
             </div>
 
             <h6 class="fw-bold text-primary border-bottom pb-2 mb-3"><i class="fa-solid fa-id-card me-2"></i>Kişisel Bilgiler</h6>
