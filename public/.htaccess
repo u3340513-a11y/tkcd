@@ -11,11 +11,11 @@ Options -Indexes -MultiViews
     # HTTPS zorunluluğu — cPanel'de hem doğrudan SSL hem de proxy arkasını kapsar.
     RewriteCond %{HTTPS} off [OR]
     RewriteCond %{HTTP:X-Forwarded-Proto} =http
-    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L,QSA]
 
     # www → apex yönlendirmesi (tek kanonik host).
     RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
-    RewriteRule ^(.*)$ https://%1%{REQUEST_URI} [R=301,L]
+    RewriteRule ^(.*)$ https://%1%{REQUEST_URI} [R=301,L,QSA]
 
     # Var olan dosya/dizinler doğrudan sunulur, gerisi front controller'a gider.
     RewriteCond %{REQUEST_FILENAME} !-f

@@ -49,7 +49,7 @@ final class MembershipController
         [$captchaA, $captchaB, $captchaToken] = $this->generateMathCaptcha();
 
         return $this->responder->page('pages/membership', $seo, [
-            'durum'        => in_array($durum, ['basarili', 'hata', 'telefon_kayitli'], true) ? $durum : null,
+            'durum'        => in_array($durum, ['basarili', 'hata', 'telefon_kayitli', 'kisi_kayitli', 'eposta_kayitli'], true) ? $durum : null,
             'captchaA'     => $captchaA,
             'captchaB'     => $captchaB,
             'captchaToken' => $captchaToken,

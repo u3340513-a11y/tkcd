@@ -111,8 +111,9 @@ $calismaSekilleri = ['Tam Zamanlı', 'Yarı Zamanlı', 'Sözleşmeli', 'Emekli K
             <div class="ub-bildiri ub-bildiri--basarili" role="alert">
                 <?= $view->icon('check-circle') ?>
                 <div>
-                    <strong>Başvurunuz Alındı</strong>
-                    <p>Yönetim kurulumuz değerlendirmesinin ardından sizinle iletişime geçecektir.</p>
+                    <strong>Teşekkürler! Başvurunuz Başarıyla Alındı 🎉</strong>
+                    <p>Üyelik başvurunuz sistemimize kaydedildi. Yönetim kurulumuz başvurunuzu inceleyecek ve en kısa sürede sizinle iletişime geçecektir.</p>
+                    <p style="margin-top:0.4rem;font-size:0.9rem">Başvurunuz ile ilgili sorularınız için <a href="/iletisim">iletişim sayfamızdan</a> bize ulaşabilirsiniz.</p>
                 </div>
             </div>
             <?php elseif ($durum === 'telefon_kayitli'): ?>
@@ -147,7 +148,7 @@ $calismaSekilleri = ['Tam Zamanlı', 'Yarı Zamanlı', 'Sözleşmeli', 'Emekli K
                 <?= $view->icon('alert-circle') ?>
                 <div>
                     <strong>Gönderim Başarısız</strong>
-                    <p>Lütfen tüm zorunlu alanları doğru doldurup tekrar deneyin.</p>
+                    <p>Başvurunuz gönderilemedi. Lütfen tüm zorunlu alanları doğru doldurup tekrar deneyin.</p>
                     <?php
                     $hataMesaji = trim((string) ($_GET['hata_mesaji'] ?? ''));
                     if ($hataMesaji !== ''):
@@ -158,6 +159,7 @@ $calismaSekilleri = ['Tam Zamanlı', 'Yarı Zamanlı', 'Sözleşmeli', 'Emekli K
             </div>
             <?php endif; ?>
 
+            <?php if ($durum !== 'basarili'): ?>
             <form
                 class="ub-form"
                 id="uyelik-basvuru-formu"
@@ -444,6 +446,23 @@ $calismaSekilleri = ['Tam Zamanlı', 'Yarı Zamanlı', 'Sözleşmeli', 'Emekli K
                 </p>
 
             </form>
+            <?php endif; /* durum !== basarili */ ?>
         </div>
     </div>
 </section>
+
+<?php if ($durum !== null): ?>
+<script>
+/**
+ * Durum bildiri mesajına otomatik scroll.
+ * PRG sonrası sayfa yüklenince bildiri kutusunu görünür alana taşır.
+ */
+(function () {
+    'use strict';
+    var bildiri = document.querySelector('.ub-bildiri');
+    if (bildiri) {
+        bildiri.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+})();
+</script>
+<?php endif; ?>
