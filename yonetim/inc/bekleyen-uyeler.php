@@ -6,6 +6,10 @@ $mesaj_turu = "";
 
 $kullanici_rolu      = isset($_SESSION['rol']) ? $_SESSION['rol'] : 'admin';
 
+// yonetim_mh kullanıcı adına özel: onaylama/reddetme yetkisi yok
+$oturum_kullanici_adi = isset($_SESSION['kullanici_adi']) ? $_SESSION['kullanici_adi'] : '';
+$is_yonetim_mh       = ($oturum_kullanici_adi === 'yonetim_mh');
+
 // Roller
 $is_il_baskani       = ($kullanici_rolu === 'il_baskani');
 $is_ilce_baskani     = ($kullanici_rolu === 'ilce_baskani');
@@ -14,6 +18,9 @@ $is_kisitli_rol      = ($is_il_baskani || $is_ilce_baskani || $is_kurum_temsilci
 
 // --- BAŞVURU ONAYLAMA MOTORU ---
 if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'basvuru_onayla' && isset($_GET['id'])) {
+    if ($is_yonetim_mh) {
+        die("Erişim Engellendi: Bu hesap ile başvuru onaylama işlemi yapılamaz!");
+    }
     $uye_id = intval($_GET['id']);
     try {
         // 1. ADIM: Onaylanacak üyenin telefon numarasını bekleyen kayıttan çekiyoruz
@@ -60,6 +67,9 @@ if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'basvuru_onayla' && isset($_
 
 // --- BAŞVURU REDDETME / SİLME MOTORU ---
 if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'basvuru_reddet' && isset($_GET['id'])) {
+    if ($is_yonetim_mh) {
+        die("Erişim Engellendi: Bu hesap ile başvuru reddetme işlemi yapılamaz!");
+    }
     $uye_id = intval($_GET['id']);
     try {
         // Silme öncesi üye adını çek
@@ -185,6 +195,9 @@ try {
                                     </td>
                                     <td><small><?= htmlspecialchars($b['calisma_sekli'] ?: '-'); ?></small></td>
                                     <td class="text-center pe-4">
+                                        <?php if ($is_yonetim_mh): ?>
+                                            <span class="badge bg-secondary text-white px-3 py-2"><i class="fa-solid fa-lock me-1"></i>İşlem Yetkiniz Yok</span>
+                                        <?php else: ?>
                                         <div class="d-flex gap-2 justify-content-center">
                                             <a href="index.php?sayfa=bekleyen-uyeler&aksiyon=basvuru_onayla&id=<?= $b['id']; ?>" class="btn btn-success btn-sm fw-bold px-2.5 shadow-sm" onclick="return confirm('<?= htmlspecialchars($b['adi_soyadi']); ?> isimli adayı derneğe üye olarak onaylıyor musunuz?');">
                                                 <i class="fa-solid fa-user-check me-1"></i> Onayla
@@ -195,6 +208,7 @@ try {
                                                 </a>
                                             <?php endif; ?>
                                         </div>
+                                        <?php endif; ?>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
