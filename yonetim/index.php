@@ -1008,22 +1008,15 @@ switch ($sayfa) {
                             y.rol,
                             y.sorumlu_il,
                             y.sorumlu_ilce,
-                            (
-                                SELECT MAX(l.tarih)
-                                  FROM yonetim_log l
-                                 WHERE l.kullanici_adi = y.kullanici_adi
-                                   AND l.islem_turu = 'giris'
-                            ) AS son_giris_tarihi
+                            MAX(l.tarih) AS son_giris_tarihi
                            FROM dernek_yoneticiler y
+                           LEFT JOIN yonetim_log l
+                             ON l.kullanici_adi = y.kullanici_adi
+                            AND l.islem_turu = 'giris'
                           WHERE y.rol = ?
-                          ORDER BY
-                            CASE WHEN (
-                                SELECT MAX(l2.tarih)
-                                  FROM yonetim_log l2
-                                 WHERE l2.kullanici_adi = y.kullanici_adi
-                                   AND l2.islem_turu = 'giris'
-                            ) IS NULL THEN 0 ELSE 1 END ASC,
-                            son_giris_tarihi ASC"
+                          GROUP BY y.id, y.kullanici_adi, y.rol, y.sorumlu_il, y.sorumlu_ilce
+                          ORDER BY son_giris_tarihi IS NULL DESC,
+                                   son_giris_tarihi ASC"
                     );
                     $sg_sorgu->execute([$sg_rol]);
                     $son_giris_verileri[$sg_rol] = $sg_sorgu->fetchAll(PDO::FETCH_ASSOC);
