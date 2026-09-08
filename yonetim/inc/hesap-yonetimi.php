@@ -252,6 +252,14 @@ $rol_etiketleri = [
                                     <td class="text-center"><small class="text-muted"><?= $tarih; ?></small></td>
                                     <td class="text-center pe-4">
                                         <div class="d-flex gap-2 justify-content-center">
+                                            <?php if ($kullanici_rolu === 'gelistirici' && !in_array($hesap['rol'], ['admin', 'gelistirici'], true)): ?>
+                                                <a href="index.php?islem=hesap_gecis&id=<?= $hesap['id']; ?>" 
+                                                   class="btn btn-outline-warning btn-sm fw-bold px-2"
+                                                   onclick="return confirm('<?= htmlspecialchars($hesap['kullanici_adi']); ?> hesabına geçiş yapmak istediğinize emin misiniz?\n\nPaneli bu kullanıcının gözünden göreceksiniz.');"
+                                                   title="Bu hesabın gözünden paneli görüntüle">
+                                                    <i class="fa-solid fa-eye me-1"></i>Geçiş
+                                                </a>
+                                            <?php endif; ?>
                                             <button type="button" class="btn btn-outline-primary btn-sm fw-bold px-2" 
                                                     onclick="sifreSifirlaModal(<?= $hesap['id']; ?>, '<?= htmlspecialchars($hesap['kullanici_adi']); ?>')">
                                                 <i class="fa-solid fa-key me-1"></i>Şifre

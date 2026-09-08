@@ -1,3 +1,25 @@
+<?php
+/**
+ * Hesap geçişi (impersonate) aktif mi kontrolü.
+ * Geliştirici başka bir hesabı görüntülüyorsa session'da gercek_id bulunur.
+ */
+$is_gecis_aktif = isset($_SESSION['gercek_id']);
+$gecis_gercek_kullanici = $is_gecis_aktif ? ($_SESSION['gercek_kullanici_adi'] ?? '') : '';
+?>
+
+<?php if ($is_gecis_aktif): ?>
+<div style="background: linear-gradient(90deg, #ff6d00, #ff9100); color: #fff; padding: 8px 20px; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 12px; box-shadow: 0 2px 8px rgba(255,109,0,0.3); z-index: 1060; position: relative;">
+    <i class="fa-solid fa-eye" style="font-size: 16px;"></i>
+    <span>
+        <strong><?= htmlspecialchars($_SESSION['kullanici_adi']); ?></strong> hesabını görüntülüyorsunuz
+        <span style="opacity:0.8;">(Gerçek hesap: <?= htmlspecialchars($gecis_gercek_kullanici); ?>)</span>
+    </span>
+    <a href="/yonetim/?islem=hesap_donus" class="btn btn-sm fw-bold px-3 py-1" style="background:#fff; color:#ff6d00; border:none; border-radius:20px; font-size:12px; text-decoration:none; box-shadow:0 1px 4px rgba(0,0,0,0.15);">
+        <i class="fa-solid fa-arrow-rotate-left me-1"></i>Asıl Hesabıma Dön
+    </a>
+</div>
+<?php endif; ?>
+
 <nav class="navbar navbar-expand-lg navbar-trabzon mb-4 shadow-sm">
   <div class="container-fluid px-4">
     <a class="navbar-brand d-flex align-items-center fw-bold" href="/yonetim/">
@@ -79,9 +101,15 @@
           ?>
           <span class="badge bg-<?= $etiket[1]; ?> ms-1" <?= $etiket[1] === 'purple' ? 'style="background-color: #6a1b9a !important;"' : ''; ?>><?= $etiket[0] . $sorumluluk; ?></span>
         </span>
-        <a href="/yonetim/?islem=cikis" class="btn btn-outline-light btn-sm fw-bold px-3">
-          <i class="fa-solid fa-right-from-bracket me-1"></i> Çıkış
-        </a>
+        <?php if ($is_gecis_aktif): ?>
+            <a href="/yonetim/?islem=hesap_donus" class="btn btn-warning btn-sm fw-bold px-3">
+              <i class="fa-solid fa-arrow-rotate-left me-1"></i> Hesabıma Dön
+            </a>
+        <?php else: ?>
+            <a href="/yonetim/?islem=cikis" class="btn btn-outline-light btn-sm fw-bold px-3">
+              <i class="fa-solid fa-right-from-bracket me-1"></i> Çıkış
+            </a>
+        <?php endif; ?>
       </div>
     </div>
   </div>

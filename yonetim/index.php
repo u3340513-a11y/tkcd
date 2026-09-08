@@ -157,6 +157,120 @@ if (!isset($_SESSION['oturum']) || $_SESSION['oturum'] !== true) {
     exit;
 }
 
+// ─── HESAP GEÇİŞ (IMPERSONATE) MOTORU ──────────────────────────────────
+/**
+ * Geliştirici rolü, paneli başka bir kullanıcının gözünden görebilir.
+ *
+ * Güvenlik katmanları:
+ *   1. Sadece gelistirici rolü geçiş yapabilir
+ *   2. Geçiş sırasında orijinal rol $_SESSION['gercek_rol'] ile doğrulanır
+ *   3. admin ve gelistirici hesaplarına geçiş yapılamaz
+ *   4. Hedef kullanıcı veritabanından doğrulanır
+ *   5. Tüm geçiş/dönüş işlemleri loglanır
+ */
+if (isset($_GET['islem']) && $_GET['islem'] === 'hesap_gecis' && isset($_GET['id'])) {
+    $gercek_rol = $_SESSION['gercek_rol'] ?? $_SESSION['rol'] ?? '';
+
+    if ($gercek_rol !== 'gelistirici') {
+        die("Erişim Engellendi: Hesap geçişi sadece Geliştirici rolüne açıktır!");
+    }
+
+    $hedef_id = intval($_GET['id']);
+    try {
+        $hedef_sorgu = $db_baglanti->prepare(
+            "SELECT id, kullanici_adi, rol, sorumlu_il, sorumlu_ilce, sorumlu_kurum FROM dernek_yoneticiler WHERE id = ?"
+        );
+        $hedef_sorgu->execute([$hedef_id]);
+        $hedef = $hedef_sorgu->fetch();
+
+        if (!$hedef) {
+            die("Hedef hesap bulunamadı!");
+        }
+
+        // admin ve gelistirici hesaplarına geçiş engeli
+        if (in_array($hedef['rol'], ['admin', 'gelistirici'], true)) {
+            die("Erişim Engellendi: Admin veya Geliştirici hesabına geçiş yapılamaz!");
+        }
+
+        // Eğer zaten geçiş yapılmamışsa orijinal bilgileri yedekle
+        if (!isset($_SESSION['gercek_id'])) {
+            $_SESSION['gercek_id']            = $_SESSION['id'];
+            $_SESSION['gercek_kullanici_adi'] = $_SESSION['kullanici_adi'];
+            $_SESSION['gercek_rol']           = $_SESSION['rol'];
+        }
+
+        // Aktif oturumu hedef kullanıcıya geçir
+        $_SESSION['id']            = $hedef['id'];
+        $_SESSION['kullanici_adi'] = $hedef['kullanici_adi'];
+        $_SESSION['rol']           = $hedef['rol'];
+        $_SESSION['sorumlu_il']    = $hedef['sorumlu_il'] ?? null;
+        $_SESSION['sorumlu_ilce']  = $hedef['sorumlu_ilce'] ?? null;
+        $_SESSION['sorumlu_kurum'] = $hedef['sorumlu_kurum'] ?? null;
+
+        log_kaydet(
+            $db_baglanti,
+            'hesap_gecis',
+            'Geliştirici (' . $_SESSION['gercek_kullanici_adi'] . ') → '
+                . $hedef['kullanici_adi'] . ' hesabına geçiş yaptı.',
+            'dernek_yoneticiler',
+            $hedef_id
+        );
+
+        header("Location: /yonetim/");
+        exit;
+    } catch (\PDOException $e) {
+        error_log('Hesap geçiş hatası: ' . $e->getMessage());
+        die("Hesap geçişi sırasında bir hata oluştu.");
+    }
+}
+
+// ─── HESAP GERİ DÖNÜŞ MOTORU ───────────────────────────────────────────
+if (isset($_GET['islem']) && $_GET['islem'] === 'hesap_donus') {
+    if (!isset($_SESSION['gercek_id'])) {
+        header("Location: /yonetim/");
+        exit;
+    }
+
+    // Güvenlik: Orijinal rolün gerçekten gelistirici olduğunu doğrula
+    if ($_SESSION['gercek_rol'] !== 'gelistirici') {
+        die("Erişim Engellendi: Geri dönüş yetkisi bulunamadı!");
+    }
+
+    $donus_kullanici = $_SESSION['kullanici_adi'];
+
+    // Orijinal geliştirici oturumunu geri yükle
+    $geri_sorgu = $db_baglanti->prepare(
+        "SELECT id, kullanici_adi, rol, sorumlu_il, sorumlu_ilce, sorumlu_kurum FROM dernek_yoneticiler WHERE id = ?"
+    );
+    $geri_sorgu->execute([$_SESSION['gercek_id']]);
+    $gercek_hesap = $geri_sorgu->fetch();
+
+    if ($gercek_hesap) {
+        $_SESSION['id']            = $gercek_hesap['id'];
+        $_SESSION['kullanici_adi'] = $gercek_hesap['kullanici_adi'];
+        $_SESSION['rol']           = $gercek_hesap['rol'];
+        $_SESSION['sorumlu_il']    = $gercek_hesap['sorumlu_il'] ?? null;
+        $_SESSION['sorumlu_ilce']  = $gercek_hesap['sorumlu_ilce'] ?? null;
+        $_SESSION['sorumlu_kurum'] = $gercek_hesap['sorumlu_kurum'] ?? null;
+    }
+
+    // Geçiş verilerini temizle
+    unset(
+        $_SESSION['gercek_id'],
+        $_SESSION['gercek_kullanici_adi'],
+        $_SESSION['gercek_rol']
+    );
+
+    log_kaydet(
+        $db_baglanti,
+        'hesap_donus',
+        'Geliştirici hesabına geri dönüldü (önceki: ' . $donus_kullanici . ').'
+    );
+
+    header("Location: /yonetim/");
+    exit;
+}
+
 // ─── ROL KONTROLLERİ ───────────────────────────────────────────────────
 $kullanici_rolu      = $_SESSION['rol'] ?? 'admin';
 $is_admin            = ($kullanici_rolu === 'admin');
