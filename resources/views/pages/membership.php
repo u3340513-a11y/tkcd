@@ -60,7 +60,7 @@ $trabzonIlceleri = [
 $kanGruplari = ['A Rh+', 'A Rh-', 'B Rh+', 'B Rh-', 'AB Rh+', 'AB Rh-', '0 Rh+', '0 Rh-'];
 
 /** @var list<string> $calismaSekilleri */
-$calismaSekilleri = ['Tam Zamanlı', 'Yarı Zamanlı', 'Sözleşmeli', 'Emekli Kamu Çalışanı'];
+$calismaSekilleri = ['Kadrolu', 'Yarı Zamanlı', 'Sözleşmeli', 'Emekli Kamu Çalışanı'];
 
 ?>
 
