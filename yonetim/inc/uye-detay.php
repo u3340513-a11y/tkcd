@@ -447,14 +447,14 @@ if (!empty($uye['uyelik_tarihi']) && $uye['uyelik_tarihi'] !== '0000-00-00') {
 <div class="modal fade" id="uyeBilgiDuzenleModal" tabindex="-1" aria-labelledby="uyeBilgiDuzenleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable modal-fullscreen-md-down">
     <div class="modal-content border-0 shadow-lg">
-      <form action="index.php?sayfa=uye-detay&id=<?= $uye_id; ?>" method="POST">
+      <form action="index.php?sayfa=uye-detay&id=<?= $uye_id; ?>" method="POST" style="display:contents;">
           <div class="modal-header bg-warning text-dark">
             <h5 class="modal-title fw-bold" id="uyeBilgiDuzenleModalLabel">
                 <i class="fa-solid fa-user-pen me-2"></i>Üye Bilgilerini Düzenle
             </h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
           </div>
-          <div class="modal-body p-4">
+          <div class="modal-body p-4" style="overflow-y:auto;-webkit-overflow-scrolling:touch;">
             <div class="alert alert-info small mb-4">
                 <i class="fa-solid fa-shield-halved me-2"></i>
                 <strong>Yetkili Düzenleme:</strong> Bu form ile üyenin tüm bilgilerini düzenleyebilirsiniz. Değişiklikler sistem loglarına kaydedilir.
