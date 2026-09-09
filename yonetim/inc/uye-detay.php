@@ -445,7 +445,7 @@ if (!empty($uye['uyelik_tarihi']) && $uye['uyelik_tarihi'] !== '0000-00-00') {
     }
 ?>
 <div class="modal fade" id="uyeBilgiDuzenleModal" tabindex="-1" aria-labelledby="uyeBilgiDuzenleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable modal-fullscreen-md-down">
     <div class="modal-content border-0 shadow-lg">
       <form action="index.php?sayfa=uye-detay&id=<?= $uye_id; ?>" method="POST">
           <div class="modal-header bg-warning text-dark">
