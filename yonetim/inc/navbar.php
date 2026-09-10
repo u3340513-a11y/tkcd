@@ -78,6 +78,11 @@ $gecis_gercek_kullanici = $is_gecis_aktif ? ($_SESSION['gercek_kullanici_adi'] ?
             <i class="fa-solid fa-filter me-1"></i> Yaş Filtresi
           </a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" href="index.php?sayfa=cinsiyet-ata" style="color:#00c9a7 !important;">
+            <i class="fa-solid fa-venus-mars me-1"></i> Cinsiyet Ata
+          </a>
+        </li>
         <?php endif; ?>
       </ul>
       

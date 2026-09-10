@@ -339,6 +339,15 @@ switch ($sayfa) {
         }
         break;
 
+    case 'cinsiyet-ata':
+        if (!$is_gelistirici) {
+            echo '<div class="container py-5"><div class="alert alert-danger text-center fw-bold"><i class="fa-solid fa-lock me-2"></i>Erişim Engellendi.</div></div>';
+        } else {
+            log_kaydet($db_baglanti, 'sayfa_goruntulem', 'Cinsiyet atama sayfası açıldı.');
+            include 'inc/cinsiyet-ata.php';
+        }
+        break;
+
     case 'kurum-birlestir':
         include 'inc/kurum-birlestir.php';
         break;
