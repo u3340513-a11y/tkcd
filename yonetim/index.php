@@ -330,6 +330,15 @@ switch ($sayfa) {
         }
         break;
 
+    case 'yas-filtresi':
+        if (!$is_gelistirici) {
+            echo '<div class="container py-5"><div class="alert alert-danger text-center fw-bold"><i class="fa-solid fa-lock me-2"></i>Erişim Engellendi: Yaş filtresi sadece geliştirici hesabına açıktır.</div></div>';
+        } else {
+            log_kaydet($db_baglanti, 'sayfa_goruntulem', 'Yaş filtresi sayfası açıldı.');
+            include 'inc/yas-filtresi.php';
+        }
+        break;
+
     case 'kurum-birlestir':
         include 'inc/kurum-birlestir.php';
         break;
