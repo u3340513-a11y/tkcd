@@ -48,6 +48,12 @@ final class MembershipService
         $kurum       = trim((string) ($post['kurum'] ?? ''));
         $gorev       = trim((string) ($post['gorev'] ?? ''));
         $calismaSekli = trim((string) ($post['calisma_sekli'] ?? ''));
+        $cinsiyet     = trim((string) ($post['cinsiyet'] ?? ''));
+
+        // cinsiyet sadece belirli değerlere izin ver
+        if ($cinsiyet !== '' && !in_array($cinsiyet, ['Erkek', 'Kadın'], true)) {
+            $cinsiyet = '';
+        }
 
         // Zorunlu alan kontrolleri
         if (mb_strlen($adiSoyadi) < 3 || mb_strlen($adiSoyadi) > 120) {
@@ -116,6 +122,7 @@ final class MembershipService
             kurum:        $kurum,
             gorevUnvan:   $gorev,
             calismaSekli: $calismaSekli,
+            cinsiyet:     $cinsiyet,
         );
 
         return $this->repository->save($application);

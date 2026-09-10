@@ -22,6 +22,10 @@ $f_yas2 = max(1, min(100, $f_yas2));
 $f_il      = trim($_GET['il'] ?? '');
 $f_statu   = trim($_GET['statu'] ?? '');
 $f_calisma = trim($_GET['calisma'] ?? '');
+$f_cinsiyet = trim($_GET['cinsiyet'] ?? '');
+if (!in_array($f_cinsiyet, ['Erkek', 'Kadın', ''], true)) {
+    $f_cinsiyet = '';
+}
 $filtre_gonderildi = isset($_GET['filtrele']);
 
 $uyeler   = [];
@@ -76,6 +80,10 @@ if ($filtre_gonderildi) {
             $where[]  = "calisma_sekli = ?";
             $params[] = $f_calisma;
         }
+        if ($f_cinsiyet !== '') {
+            $where[]  = "cinsiyet = ?";
+            $params[] = $f_cinsiyet;
+        }
 
         $sql = "SELECT id, adi_soyadi, telefon, eposta, dogum_tarihi, kan_grubu,
                        ikamet_ili, trabzon_ilcesi, kurum, gorev_unvan, calisma_sekli,
@@ -122,6 +130,7 @@ $pdf_params = http_build_query([
     'il'        => $f_il,
     'statu'     => $f_statu,
     'calisma'   => $f_calisma,
+    'cinsiyet'  => $f_cinsiyet,
 ]);
 $pdf_url = '/yonetim/inc/yas-filtresi-pdf.php?' . $pdf_params;
 ?>
@@ -203,6 +212,15 @@ $pdf_url = '/yonetim/inc/yas-filtresi-pdf.php?' . $pdf_params;
                                     <?= htmlspecialchars($s); ?>
                                 </option>
                             <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <div class="col-12 col-md-2">
+                        <label class="form-label fw-semibold small text-muted mb-1">Cinsiyet</label>
+                        <select name="cinsiyet" class="form-select">
+                            <option value="">Tümü</option>
+                            <option value="Erkek" <?= $f_cinsiyet==='Erkek' ? 'selected' : ''; ?>>Erkek</option>
+                            <option value="Kadın" <?= $f_cinsiyet==='Kadın' ? 'selected' : ''; ?>>Kadın</option>
                         </select>
                     </div>
 

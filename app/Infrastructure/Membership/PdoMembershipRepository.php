@@ -42,9 +42,9 @@ final class PdoMembershipRepository implements MembershipRepositoryInterface
             INSERT INTO dernek_uyeler
                 (adi_soyadi, telefon, eposta, kan_grubu, dogum_tarihi,
                  ikamet_ili, ikamet_ilcesi, trabzon_ilcesi, kurum, gorev_unvan,
-                 calisma_sekli, onay_durumu)
+                 calisma_sekli, cinsiyet, onay_durumu)
             VALUES
-                (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'bekleyen')
+                (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'bekleyen')
         SQL;
 
         $pdo = $this->connection();
@@ -62,6 +62,7 @@ final class PdoMembershipRepository implements MembershipRepositoryInterface
             $application->kurum,
             $application->gorevUnvan,
             $application->calismaSekli,
+            $application->cinsiyet ?: null,
         ]);
 
         return (int) $pdo->lastInsertId();

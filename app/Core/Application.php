@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Core;
 
 use App\Application\Service\LayoutDataComposer;
+use App\Application\Service\VisitorLogger;
 use App\Core\Exception\HttpNotFoundException;
 use App\Core\Http\Request;
 use App\Core\Http\Response;
@@ -59,6 +60,9 @@ final class Application
         $this->container->instance(Request::class, $request);
 
         (new SecurityHeaders())->apply();
+
+        // Ziyaretçiyi kaydet (bot değilse, yönetim dışı sayfalarda)
+        $this->logVisitor($request);
 
         $this->handle($request)->send();
     }
@@ -202,5 +206,34 @@ final class Application
         $logger = $this->container->get(LoggerInterface::class);
 
         return $logger;
+    }
+
+    /**
+     * Ziyaretçiyi loglar; hata fırlatmaz, sayfa yüklenmesini etkilemez.
+     */
+    private function logVisitor(Request $request): void
+    {
+        try {
+            $pdoFactory = function (): \PDO {
+                $host    = Support\Env::string('DB_HOST',     '127.0.0.1');
+                $port    = Support\Env::string('DB_PORT',     '3306');
+                $dbname  = Support\Env::string('DB_DATABASE', '');
+                $user    = Support\Env::string('DB_USERNAME', '');
+                $pass    = Support\Env::string('DB_PASSWORD', '');
+                $charset = Support\Env::string('DB_CHARSET',  'utf8mb4');
+
+                $dsn = "mysql:host={$host};port={$port};dbname={$dbname};charset={$charset}";
+
+                return new \PDO($dsn, $user, $pass, [
+                    \PDO::ATTR_ERRMODE            => \PDO::ERRMODE_EXCEPTION,
+                    \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
+                    \PDO::ATTR_EMULATE_PREPARES   => false,
+                ]);
+            };
+
+            (new VisitorLogger($pdoFactory))->log($request);
+        } catch (\Throwable) {
+            // Ziyaretçi kaydı başarısız olsa da site çalışmaya devam eder
+        }
     }
 }

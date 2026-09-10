@@ -32,6 +32,10 @@ $f_yas2 = max(1, min(100, $f_yas2));
 $f_il      = trim($_GET['il'] ?? '');
 $f_statu   = trim($_GET['statu'] ?? '');
 $f_calisma = trim($_GET['calisma'] ?? '');
+$f_cinsiyet = trim($_GET['cinsiyet'] ?? '');
+if (!in_array($f_cinsiyet, ['Erkek', 'Kadın', ''], true)) {
+    $f_cinsiyet = '';
+}
 
 // ─── YAŞ HESAPLAMA EXPR ──────────────────────────────────────────────────
 $yas_expr = "TIMESTAMPDIFF(YEAR,
@@ -79,6 +83,10 @@ try {
     if ($f_calisma !== '') {
         $where[]  = "calisma_sekli = ?";
         $params[] = $f_calisma;
+    }
+    if ($f_cinsiyet !== '') {
+        $where[]  = "cinsiyet = ?";
+        $params[] = $f_cinsiyet;
     }
 
     $sql = "SELECT id, adi_soyadi, telefon, eposta, dogum_tarihi, kan_grubu,

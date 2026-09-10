@@ -57,6 +57,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['uye_bilgi_guncelle'])
     $guncelle_kurum         = trim($_POST['guncelle_kurum'] ?? '');
     $guncelle_gorev_unvan   = trim($_POST['guncelle_gorev_unvan'] ?? '');
     $guncelle_calisma_sekli = trim($_POST['guncelle_calisma_sekli'] ?? '');
+    $guncelle_cinsiyet      = trim($_POST['guncelle_cinsiyet'] ?? '');
+    if (!in_array($guncelle_cinsiyet, ['Erkek', 'Kadın', ''], true)) {
+        $guncelle_cinsiyet = '';
+    }
     $guncelle_temsilci_turu = trim($_POST['guncelle_temsilci_turu'] ?? '');
     $guncelle_sorumlu_bolge = trim($_POST['guncelle_sorumlu_bolge'] ?? '');
 
@@ -88,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['uye_bilgi_guncelle'])
                 adi_soyadi = ?, telefon = ?, eposta = ?, kan_grubu = ?,
                 dogum_tarihi = ?, ikamet_ili = ?, ikamet_ilcesi = ?,
                 trabzon_ilcesi = ?, kurum = ?, gorev_unvan = ?,
-                calisma_sekli = ?, temsilci_turu = ?, sorumlu_bolge = ?,
+                calisma_sekli = ?, cinsiyet = ?, temsilci_turu = ?, sorumlu_bolge = ?,
                 uyelik_tarihi = ?
                 WHERE id = ?";
 
@@ -98,6 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['uye_bilgi_guncelle'])
                 $guncelle_kan_grubu, $guncelle_dogum, $guncelle_ikamet_ili,
                 $guncelle_ikamet_ilcesi ?: null, $guncelle_trabzon_ilcesi,
                 $guncelle_kurum, $guncelle_gorev_unvan, $guncelle_calisma_sekli,
+                $guncelle_cinsiyet ?: null,
                 $guncelle_temsilci_turu, $guncelle_sorumlu_bolge ?: null,
                 $guncelle_uyelik_tarihi, $uye_id
             ]);
@@ -323,6 +328,21 @@ if (!empty($uye['uyelik_tarihi']) && $uye['uyelik_tarihi'] !== '0000-00-00') {
                             <td class="text-dark"><span class="badge bg-light text-dark border"><?= htmlspecialchars($uye['calisma_sekli'] ?: '-'); ?></span></td>
                         </tr>
                         <tr>
+                            <td class="fw-bold text-secondary"><i class="fa-solid fa-venus-mars me-2 text-muted"></i>Cinsiyet:</td>
+                            <td class="text-dark">
+                                <?php
+                                $c = $uye['cinsiyet'] ?? '';
+                                if ($c === 'Erkek') {
+                                    echo '<span class="badge" style="background:rgba(13,110,253,0.12);color:#0d6efd;"><i class="fa-solid fa-mars me-1"></i>Erkek</span>';
+                                } elseif ($c === 'Kadın') {
+                                    echo '<span class="badge" style="background:rgba(214,51,132,0.12);color:#d63384;"><i class="fa-solid fa-venus me-1"></i>Kadın</span>';
+                                } else {
+                                    echo '<span class="text-muted">—</span>';
+                                }
+                                ?>
+                            </td>
+                        </tr>
+                        <tr>
                             <td class="fw-bold text-secondary"><i class="fa-solid fa-location-dot me-2 text-purple"></i>Sorumlu Bölge / İlçe:</td>
                             <td class="text-dark">
                                 <span class="fw-bold text-purple me-2" id="mevcutBolgeYazisi"><?= htmlspecialchars($uye['sorumlu_bolge'] ?: 'Atanmamış'); ?></span>
@@ -538,6 +558,14 @@ if (!empty($uye['uyelik_tarihi']) && $uye['uyelik_tarihi'] !== '0000-00-00') {
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Çalışma Şekli</label>
                     <input type="text" name="guncelle_calisma_sekli" class="form-control" placeholder="Kadrolu, Sözleşmeli, vb." value="<?= htmlspecialchars($uye['calisma_sekli'] ?? ''); ?>">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Cinsiyet</label>
+                    <select name="guncelle_cinsiyet" class="form-select">
+                        <option value="">— Belirtilmemiş —</option>
+                        <option value="Erkek"  <?= ($uye['cinsiyet'] ?? '') === 'Erkek'  ? 'selected' : ''; ?>>Erkek</option>
+                        <option value="Kadın"  <?= ($uye['cinsiyet'] ?? '') === 'Kadın'  ? 'selected' : ''; ?>>Kadın</option>
+                    </select>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Üyelik Tarihi</label>

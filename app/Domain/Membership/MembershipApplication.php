@@ -25,6 +25,7 @@ final readonly class MembershipApplication
         public string $kurum,
         public string $gorevUnvan,
         public string $calismaSekli,
+        public string $cinsiyet,
     ) {
     }
 }

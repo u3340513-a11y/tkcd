@@ -369,6 +369,22 @@ $calismaSekilleri = ['Kadrolu', 'Yarı Zamanlı', 'Sözleşmeli', 'Emekli Kamu �
                     >
                 </div>
 
+                <!-- Cinsiyet -->
+                <div class="ub-form__alan">
+                    <label class="ub-form__etiket" for="ub-cinsiyet">
+                        Cinsiyet
+                    </label>
+                    <select
+                        class="ub-form__girdi ub-form__secim"
+                        id="ub-cinsiyet"
+                        name="cinsiyet"
+                    >
+                        <option value="">-- Seçiniz --</option>
+                        <option value="Erkek">Erkek</option>
+                        <option value="Kadın">Kadın</option>
+                    </select>
+                </div>
+
                 <!-- Çalışma Şekli -->
                 <div class="ub-form__alan">
                     <label class="ub-form__etiket" for="ub-calisma-sekli">

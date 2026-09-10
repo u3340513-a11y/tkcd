@@ -175,3 +175,35 @@ function csrf_hidden_alan(): string
 {
     return '<input type="hidden" name="csrf_token" value="' . htmlspecialchars(csrf_token_al()) . '">';
 }
+
+// ─── 5. OTOMATİK MIGRATION ────────────────────────────────────────────────
+/**
+ * Yeni kolon eklemelerini idempotent biçimde uygular.
+ *
+ * Neden: SQL dump'ı güncellemek yerine ALTER TABLE IF NOT EXISTS ile
+ * mevcut DB'yi günceller. Her sayfa yüklemesinde değil, sadece
+ * kolon yoksa çalışır (INFORMATION_SCHEMA sorgusu O(1)).
+ */
+(static function () use ($db_baglanti): void {
+    $kolonlar = [
+        ['cinsiyet', "VARCHAR(10) NULL DEFAULT NULL COMMENT 'Erkek veya Kadın'"],
+    ];
+
+    $db_adi_sorgu = $db_baglanti->query("SELECT DATABASE()");
+    $db_adi = $db_adi_sorgu ? $db_adi_sorgu->fetchColumn() : '';
+
+    foreach ($kolonlar as [$kolon, $tanim]) {
+        try {
+            $kontrol = $db_baglanti->prepare(
+                "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS
+                  WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'dernek_uyeler' AND COLUMN_NAME = ?"
+            );
+            $kontrol->execute([$db_adi, $kolon]);
+            if ((int) $kontrol->fetchColumn() === 0) {
+                $db_baglanti->exec("ALTER TABLE `dernek_uyeler` ADD COLUMN `{$kolon}` {$tanim}");
+            }
+        } catch (\PDOException $e) {
+            error_log("Migration hatası ({$kolon}): " . $e->getMessage());
+        }
+    }
+})();
