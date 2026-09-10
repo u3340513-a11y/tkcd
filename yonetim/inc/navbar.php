@@ -70,25 +70,38 @@ $gecis_gercek_kullanici = $is_gecis_aktif ? ($_SESSION['gercek_kullanici_adi'] ?
         </li>
         <?php endif; ?>
         <?php if ($is_gelistirici): ?>
-        <li class="nav-item">
-          <a class="nav-link" href="index.php?sayfa=loglar" style="color:#00c9a7 !important;">
-            <i class="fa-solid fa-terminal me-1"></i> Sistem Logları
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle fw-semibold"
+             href="#" id="gelistiriciMenu" role="button"
+             data-bs-toggle="dropdown" aria-expanded="false"
+             style="color:#00c9a7 !important;">
+            <i class="fa-solid fa-screwdriver-wrench me-1"></i> Araçlar
           </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="index.php?sayfa=kurum-birlestir" style="color:#00c9a7 !important;">
-            <i class="fa-solid fa-code-merge me-1"></i> Kurum Birleştir
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="index.php?sayfa=yas-filtresi" style="color:#00c9a7 !important;">
-            <i class="fa-solid fa-filter me-1"></i> Yaş Filtresi
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="index.php?sayfa=cinsiyet-ata" style="color:#00c9a7 !important;">
-            <i class="fa-solid fa-venus-mars me-1"></i> Cinsiyet Ata
-          </a>
+          <ul class="dropdown-menu dropdown-menu-dark shadow-lg border-0 rounded-3 mt-1"
+              style="background:#1a2035;min-width:200px;"
+              aria-labelledby="gelistiriciMenu">
+            <li>
+              <a class="dropdown-item py-2" href="index.php?sayfa=loglar">
+                <i class="fa-solid fa-terminal me-2" style="color:#00c9a7;width:16px;"></i>Sistem Logları
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item py-2" href="index.php?sayfa=kurum-birlestir">
+                <i class="fa-solid fa-code-merge me-2" style="color:#00c9a7;width:16px;"></i>Kurum Birleştir
+              </a>
+            </li>
+            <li><hr class="dropdown-divider" style="border-color:rgba(255,255,255,0.1);"></li>
+            <li>
+              <a class="dropdown-item py-2" href="index.php?sayfa=yas-filtresi">
+                <i class="fa-solid fa-filter me-2" style="color:#00c9a7;width:16px;"></i>Yaş Filtresi
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item py-2" href="index.php?sayfa=cinsiyet-ata">
+                <i class="fa-solid fa-venus-mars me-2" style="color:#00c9a7;width:16px;"></i>Cinsiyet Ata
+              </a>
+            </li>
+          </ul>
         </li>
         <?php endif; ?>
       </ul>
