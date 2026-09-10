@@ -62,6 +62,13 @@ $gecis_gercek_kullanici = $is_gecis_aktif ? ($_SESSION['gercek_kullanici_adi'] ?
           </a>
         </li>
         <?php endif; ?>
+        <?php if (!$is_kisitli_rol): ?>
+        <li class="nav-item">
+          <a class="nav-link" href="index.php?sayfa=son-onaylananlar">
+            <i class="fa-solid fa-user-check me-1"></i> Son Onaylananlar
+          </a>
+        </li>
+        <?php endif; ?>
         <?php if ($is_gelistirici): ?>
         <li class="nav-item">
           <a class="nav-link" href="index.php?sayfa=loglar" style="color:#00c9a7 !important;">

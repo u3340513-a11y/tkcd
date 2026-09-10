@@ -11,11 +11,12 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # canli-ara, excel-indir, pdf-indir, yas-filtresi-pdf hariç tüm PHP dosyalarını engelle
+    # canli-ara, excel-indir, pdf-indir, yas-filtresi-pdf, son-onaylananlar-pdf hariç tüm PHP dosyalarını engelle
     RewriteCond %{REQUEST_FILENAME} -f
     RewriteCond %{REQUEST_URI} !canli-ara\.php$ [NC]
     RewriteCond %{REQUEST_URI} !excel-indir\.php$ [NC]
     RewriteCond %{REQUEST_URI} !pdf-indir\.php$ [NC]
     RewriteCond %{REQUEST_URI} !yas-filtresi-pdf\.php$ [NC]
+    RewriteCond %{REQUEST_URI} !son-onaylananlar-pdf\.php$ [NC]
     RewriteRule \.php$ - [F,L]
 </IfModule>

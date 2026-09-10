@@ -348,6 +348,15 @@ switch ($sayfa) {
         }
         break;
 
+    case 'son-onaylananlar':
+        if (!$is_yetki_var) {
+            echo '<div class="container py-5"><div class="alert alert-danger text-center fw-bold"><i class="fa-solid fa-lock me-2"></i>Erişim Engellendi: Yetkiniz bulunmuyor.</div></div>';
+        } else {
+            log_kaydet($db_baglanti, 'sayfa_goruntulem', 'Son onaylananlar sayfası açıldı.');
+            include 'inc/son-onaylananlar.php';
+        }
+        break;
+
     case 'kurum-birlestir':
         include 'inc/kurum-birlestir.php';
         break;
