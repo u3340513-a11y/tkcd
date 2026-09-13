@@ -14,7 +14,8 @@ $is_yonetim          = ($kullanici_rolu === 'yonetim');
 $is_il_baskani       = ($kullanici_rolu === 'il_baskani');
 $is_ilce_baskani     = ($kullanici_rolu === 'ilce_baskani');
 $is_kurum_temsilcisi = ($kullanici_rolu === 'kurum_temsilcisi');
-$is_kisitli_rol      = ($is_il_baskani || $is_ilce_baskani || $is_kurum_temsilcisi);
+$is_kadin_kollari    = ($kullanici_rolu === 'kadin_kollari_baskani');
+$is_kisitli_rol      = ($is_il_baskani || $is_ilce_baskani || $is_kurum_temsilcisi || $is_kadin_kollari);
 
 $arama_kelimesi = isset($_GET['kelime']) ? trim($_GET['kelime']) : '';
 $aktif_filtre   = isset($_GET['filtre']) ? trim($_GET['filtre']) : '';
@@ -34,6 +35,8 @@ try {
     } elseif ($is_kurum_temsilcisi && !empty($_SESSION['sorumlu_kurum'])) {
         $where_sartlari[] = "kurum = ?";
         $parametreler[] = $_SESSION['sorumlu_kurum'];
+    } elseif ($is_kadin_kollari) {
+        $where_sartlari[] = "cinsiyet = 'Kadın'";
     }
 
     // 1. Dashboard kart filtreleri (Hem ana statüye hem ek göreve bakar)

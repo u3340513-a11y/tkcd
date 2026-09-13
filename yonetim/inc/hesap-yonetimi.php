@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['hesap_olustur'])) {
     $yeni_ilce      = trim($_POST['sorumlu_ilce'] ?? '') ?: null;
     $yeni_kurum     = trim($_POST['sorumlu_kurum'] ?? '') ?: null;
 
-    $gecerli_roller = ['yonetim', 'il_baskani', 'ilce_baskani', 'kurum_temsilcisi'];
+    $gecerli_roller = ['yonetim', 'il_baskani', 'ilce_baskani', 'kurum_temsilcisi', 'kadin_kollari_baskani'];
 
     if (empty($yeni_kullanici) || empty($yeni_sifre) || empty($yeni_rol)) {
         $mesaj = "Kullanıcı adı, şifre ve rol alanları zorunludur!";
@@ -181,8 +181,9 @@ $rol_etiketleri = [
     'yonetim'            => ['Yönetim', 'bg-primary text-white'],
     'gelistirici'        => ['Geliştirici', 'bg-info text-white'],
     'il_baskani'         => ['İl Başkanı', 'bg-success text-white'],
-    'ilce_baskani'       => ['İlçe Başkanı', 'text-white'],
+    'ilce_baskani'       => ["İlçe Başkanı", 'text-white'],
     'kurum_temsilcisi'   => ['Kurum Temsilcisi', 'bg-warning text-dark'],
+    'kadin_kollari_baskani' => ['Kadın Kolları Başkanı', 'text-white'],
 ];
 ?>
 
@@ -243,8 +244,12 @@ $rol_etiketleri = [
                                             <span class="badge bg-danger ms-1">Korumalı</span>
                                         <?php endif; ?>
                                     </td>
-                                    <td class="text-center">
-                                        <span class="badge <?= $etiket[1]; ?> px-2 py-1 fw-semibold" <?= $hesap['rol'] === 'ilce_baskani' ? 'style="background-color: #6a1b9a !important;"' : ''; ?>>
+                                        <?php
+                                        $badge_stil = '';
+                                        if ($hesap['rol'] === 'ilce_baskani') $badge_stil = 'background-color: #6a1b9a !important;';
+                                        elseif ($hesap['rol'] === 'kadin_kollari_baskani') $badge_stil = 'background-color: #d63384 !important;';
+                                        ?>
+                                        <span class="badge <?= $etiket[1]; ?> px-2 py-1 fw-semibold" <?= $badge_stil ? 'style="'.$badge_stil.'"' : ''; ?>>
                                             <?= $etiket[0]; ?>
                                         </span>
                                     </td>
@@ -324,6 +329,7 @@ $rol_etiketleri = [
                                 <option value="il_baskani">İl Başkanı (Sadece kendi ili)</option>
                                 <option value="ilce_baskani">İlçe Başkanı (Sadece kendi ilçesi)</option>
                                 <option value="kurum_temsilcisi">Kurum Temsilcisi (Sadece kendi kurumu)</option>
+                                <option value="kadin_kollari_baskani">Kadın Kolları Başkanı (Sadece kadın üyeler)</option>
                             </select>
                         </div>
                         

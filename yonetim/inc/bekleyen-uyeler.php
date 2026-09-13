@@ -12,7 +12,8 @@ $oturum_kullanici_adi = isset($_SESSION['kullanici_adi']) ? $_SESSION['kullanici
 $is_il_baskani       = ($kullanici_rolu === 'il_baskani');
 $is_ilce_baskani     = ($kullanici_rolu === 'ilce_baskani');
 $is_kurum_temsilcisi = ($kullanici_rolu === 'kurum_temsilcisi');
-$is_kisitli_rol      = ($is_il_baskani || $is_ilce_baskani || $is_kurum_temsilcisi);
+$is_kadin_kollari    = ($kullanici_rolu === 'kadin_kollari_baskani');
+$is_kisitli_rol      = ($is_il_baskani || $is_ilce_baskani || $is_kurum_temsilcisi || $is_kadin_kollari);
 
 // --- BAŞVURU ONAYLAMA MOTORU ---
 if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'basvuru_onayla' && isset($_GET['id'])) {

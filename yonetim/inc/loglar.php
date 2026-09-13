@@ -305,6 +305,7 @@ function kisalt_ua(?string $ua): string
                                     'il_baskani'       => ['İl Başkanı', 'bg-success'],
                                     'ilce_baskani'     => ['İlçe Başkanı', ''],
                                     'kurum_temsilcisi'  => ['Kurum Temsilcisi', 'bg-warning text-dark'],
+                                    'kadin_kollari_baskani' => ['Kadın Kolları', ''],
                                 ];
                                 $rol_stil = $rol_etiketleri_log[$log['rol'] ?? ''] ?? ['Bilinmeyen', 'bg-secondary'];
                                 ?>
@@ -316,7 +317,12 @@ function kisalt_ua(?string $ua): string
                                         <?= htmlspecialchars($log['kullanici_adi']); ?>
                                     </td>
                                     <td class="text-center">
-                                        <span class="badge <?= $rol_stil[1]; ?> px-2 py-1" style="font-size:0.7rem;<?= ($log['rol'] ?? '') === 'ilce_baskani' ? 'background-color:#6a1b9a!important;' : ''; ?>">
+                                        <?php
+                                        $log_badge_stil = 'font-size:0.7rem;';
+                                        if (($log['rol'] ?? '') === 'ilce_baskani') $log_badge_stil .= 'background-color:#6a1b9a!important;';
+                                        elseif (($log['rol'] ?? '') === 'kadin_kollari_baskani') $log_badge_stil .= 'background-color:#d63384!important;';
+                                        ?>
+                                        <span class="badge <?= $rol_stil[1]; ?> px-2 py-1" style="<?= $log_badge_stil; ?>">
                                             <?= $rol_stil[0]; ?>
                                         </span>
                                     </td>

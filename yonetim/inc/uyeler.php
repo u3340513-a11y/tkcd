@@ -10,7 +10,8 @@ $is_yonetim          = ($kullanici_rolu === 'yonetim');
 $is_il_baskani       = ($kullanici_rolu === 'il_baskani');
 $is_ilce_baskani     = ($kullanici_rolu === 'ilce_baskani');
 $is_kurum_temsilcisi = ($kullanici_rolu === 'kurum_temsilcisi');
-$is_kisitli_rol      = ($is_il_baskani || $is_ilce_baskani || $is_kurum_temsilcisi);
+$is_kadin_kollari    = ($kullanici_rolu === 'kadin_kollari_baskani');
+$is_kisitli_rol      = ($is_il_baskani || $is_ilce_baskani || $is_kurum_temsilcisi || $is_kadin_kollari);
 
 // İşlem sonrası aynı sayfaya geri yönlendirme linki
 $geri_link = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : 'index.php?sayfa=uyeler';
@@ -139,6 +140,8 @@ if ($is_il_baskani && !empty($_SESSION['sorumlu_il'])) {
 } elseif ($is_kurum_temsilcisi && !empty($_SESSION['sorumlu_kurum'])) {
     $rol_ek_where = " AND kurum = ?";
     $rol_ek_parametreler[] = $_SESSION['sorumlu_kurum'];
+} elseif ($is_kadin_kollari) {
+    $rol_ek_where = " AND cinsiyet = 'Kadın'";
 }
 
 try {

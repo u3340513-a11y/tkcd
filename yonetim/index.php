@@ -279,7 +279,8 @@ $is_gelistirici      = ($kullanici_rolu === 'gelistirici');
 $is_il_baskani       = ($kullanici_rolu === 'il_baskani');
 $is_ilce_baskani     = ($kullanici_rolu === 'ilce_baskani');
 $is_kurum_temsilcisi = ($kullanici_rolu === 'kurum_temsilcisi');
-$is_kisitli_rol      = ($is_il_baskani || $is_ilce_baskani || $is_kurum_temsilcisi);
+$is_kadin_kollari    = ($kullanici_rolu === 'kadin_kollari_baskani');
+$is_kisitli_rol      = ($is_il_baskani || $is_ilce_baskani || $is_kurum_temsilcisi || $is_kadin_kollari);
 $is_yetki_var        = ($is_admin || $is_yonetim || $is_gelistirici);
 
 $sayfa = isset($_GET['sayfa']) ? trim($_GET['sayfa']) : 'dashboard';
@@ -400,6 +401,13 @@ switch ($sayfa) {
                 $kisitli_renk_bg_10 = 'rgba(230, 81, 0, 0.1)';
                 $kisitli_where .= " AND kurum = ?";
                 $kisitli_parametreler[] = $_SESSION['sorumlu_kurum'];
+            } elseif ($is_kadin_kollari) {
+                $kisitli_baslik = 'Kadın Kolları';
+                $kisitli_aciklama = 'Kadın üyelere ait kayıtlar.';
+                $kisitli_ikon = 'fa-venus';
+                $kisitli_renk_bg    = '#d63384';
+                $kisitli_renk_bg_10 = 'rgba(214, 51, 132, 0.1)';
+                $kisitli_where .= " AND cinsiyet = 'Kadın'";
             }
 
             try {

@@ -21,7 +21,8 @@ $is_gelistirici      = ($kullanici_rolu === 'gelistirici');
 $is_il_baskani       = ($kullanici_rolu === 'il_baskani');
 $is_ilce_baskani     = ($kullanici_rolu === 'ilce_baskani');
 $is_kurum_temsilcisi = ($kullanici_rolu === 'kurum_temsilcisi');
-$is_kisitli_rol      = ($is_il_baskani || $is_ilce_baskani || $is_kurum_temsilcisi);
+$is_kadin_kollari    = ($kullanici_rolu === 'kadin_kollari_baskani');
+$is_kisitli_rol      = ($is_il_baskani || $is_ilce_baskani || $is_kurum_temsilcisi || $is_kadin_kollari);
 
 // --- GÜNCELLEME: SORUMLU BÖLGE / İLÇE EL İLE GÜNCELLEME MOTORU (ADMİN + GELİŞTİRİCİ) ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bolge_guncelle'])) {
@@ -192,6 +193,11 @@ try {
         }
     } elseif ($is_kurum_temsilcisi && !empty($_SESSION['sorumlu_kurum'])) {
         if (trim($uye['kurum']) !== trim($_SESSION['sorumlu_kurum'])) {
+            echo '<div class="container py-5"><div class="alert alert-danger text-center fw-bold"><i class="fa-solid fa-lock me-2"></i>Erişim Engellendi: Bu üye sizin yetki alanınız dışındadır.</div></div>';
+            exit;
+        }
+    } elseif ($is_kadin_kollari) {
+        if (($uye['cinsiyet'] ?? '') !== 'Kadın') {
             echo '<div class="container py-5"><div class="alert alert-danger text-center fw-bold"><i class="fa-solid fa-lock me-2"></i>Erişim Engellendi: Bu üye sizin yetki alanınız dışındadır.</div></div>';
             exit;
         }

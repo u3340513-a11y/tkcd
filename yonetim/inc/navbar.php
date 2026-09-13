@@ -118,6 +118,7 @@ $gecis_gercek_kullanici = $is_gecis_aktif ? ($_SESSION['gercek_kullanici_adi'] ?
               'il_baskani'      => ['İl Başkanı', 'success'],
               'ilce_baskani'    => ['İlçe Başkanı', 'purple'],
               'kurum_temsilcisi' => ['Kurum Temsilcisi', 'warning'],
+              'kadin_kollari_baskani' => ['Kadın Kolları', 'danger'],
           ];
           $etiket = $rol_etiketleri[$kullanici_rolu] ?? ['Bilinmeyen', 'secondary'];
           $sorumluluk = '';
@@ -129,7 +130,12 @@ $gecis_gercek_kullanici = $is_gecis_aktif ? ($_SESSION['gercek_kullanici_adi'] ?
               $sorumluluk = ' — ' . htmlspecialchars($_SESSION['sorumlu_kurum']);
           }
           ?>
-          <span class="badge bg-<?= $etiket[1]; ?> ms-1" <?= $etiket[1] === 'purple' ? 'style="background-color: #6a1b9a !important;"' : ''; ?>><?= $etiket[0] . $sorumluluk; ?></span>
+          <?php
+          $badge_nav_stil = '';
+          if ($etiket[1] === 'purple') $badge_nav_stil = 'background-color: #6a1b9a !important;';
+          elseif ($kullanici_rolu === 'kadin_kollari_baskani') $badge_nav_stil = 'background-color: #d63384 !important;';
+          ?>
+          <span class="badge bg-<?= $etiket[1]; ?> ms-1" <?= $badge_nav_stil ? 'style="'.$badge_nav_stil.'"' : ''; ?>><?= $etiket[0] . $sorumluluk; ?></span>
         </span>
         <?php if ($is_gecis_aktif): ?>
             <a href="/yonetim/?islem=hesap_donus" class="btn btn-warning btn-sm fw-bold px-3">
