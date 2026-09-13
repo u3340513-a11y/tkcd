@@ -244,6 +244,7 @@ $rol_etiketleri = [
                                             <span class="badge bg-danger ms-1">Korumalı</span>
                                         <?php endif; ?>
                                     </td>
+                                    <td class="text-center">
                                         <?php
                                         $badge_stil = '';
                                         if ($hesap['rol'] === 'ilce_baskani') $badge_stil = 'background-color: #6a1b9a !important;';
