@@ -165,6 +165,9 @@ try {
                         if($temsilci_turu_kontrol !== 'Kurum Temsilcisi') {
                             $islem_icerik .= '<li><a class="dropdown-item text-warning py-1" href="index.php?sayfa=uyeler&aksiyon=stat%C3%BC_degistir&id='.$uye['id'].'&tur=Kurum+Temsilcisi"><i class="fa-solid fa-building-user me-1.5"></i>Kurum Temsilcisi Yap</a></li>';
                         }
+                        if($temsilci_turu_kontrol !== 'Kadın Kolları Başkanı') {
+                            $islem_icerik .= '<li><a class="dropdown-item py-1" style="color: #d63384;" href="index.php?sayfa=uyeler&aksiyon=stat%C3%BC_degistir&id='.$uye['id'].'&tur=Kadın+Kolları+Başkanı"><i class="fa-solid fa-venus me-1.5"></i>Kadın Kolları Başkanı Yap</a></li>';
+                        }
                         if($temsilci_turu_kontrol !== 'Normal Üye') {
                             $islem_icerik .= '<li><a class="dropdown-item text-secondary py-1" href="index.php?sayfa=uyeler&aksiyon=stat%C3%BC_degistir&id='.$uye['id'].'&tur=Normal+Üye"><i class="fa-solid fa-user-minus me-1.5"></i>Normal Üyeliğe Çek</a></li>';
                         }

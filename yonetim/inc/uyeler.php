@@ -50,7 +50,7 @@ if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'statü_degistir' && isset($
     $yeni_tur = trim($_GET['tur']);
     $bolge = isset($_GET['bolge']) ? trim($_GET['bolge']) : null;
     
-    $gecerli_türler = ['Normal Üye', 'Yönetim Kurulu Üyesi', 'Yönetim Kurulu Üyesi Yedek', 'İl Başkanı', 'İlçe Başkanı', 'Kurum Temsilcisi', 'Bölge Koordinatörü'];
+    $gecerli_türler = ['Normal Üye', 'Yönetim Kurulu Üyesi', 'Yönetim Kurulu Üyesi Yedek', 'İl Başkanı', 'İlçe Başkanı', 'Kurum Temsilcisi', 'Bölge Koordinatörü', 'Kadın Kolları Başkanı'];
     
     if (in_array($yeni_tur, $gecerli_türler)) {
         try {
@@ -376,6 +376,10 @@ try {
                                     $satir_klasi = 'class="bolge-koordinator-satir"'; 
                                     $rozet_klasi = "text-white";
                                     $sol_ikon = '<i class="fa-solid fa-earth-americas me-2" style="color:#00838f !important;"></i>';
+                                } elseif ($temsilci_turu_kontrol === 'Kadın Kolları Başkanı') {
+                                    $satir_klasi = 'style="background-color:rgba(214,51,132,0.08);"'; 
+                                    $rozet_klasi = "text-white";
+                                    $sol_ikon = '<i class="fa-solid fa-venus me-2" style="color:#d63384 !important;"></i>';
                                 } else {
                                     $sol_ikon = '<i class="fa-solid '.$ikon_sekil.' me-2" style="'.$ikon_renk.'"></i>';
                                 }
@@ -431,6 +435,7 @@ try {
                                                 <?php 
                                                 if($temsilci_turu_kontrol === 'İlçe Başkanı') echo 'style="background-color: #6a1b9a !important;"';
                                                 if($temsilci_turu_kontrol === 'Bölge Koordinatörü') echo 'style="background-color: #00838f !important;"';
+                                                if($temsilci_turu_kontrol === 'Kadın Kolları Başkanı') echo 'style="background-color: #d63384 !important;"';
                                                 ?>>
                                                 <?= $rozet_yazisi; ?>
                                             </span>
@@ -474,6 +479,10 @@ try {
                                                     
                                                     <?php if($temsilci_turu_kontrol !== 'Kurum Temsilcisi'): ?>
                                                         <li><a class="dropdown-item text-warning py-1" href="index.php?sayfa=uyeler&aksiyon=stat%C3%BC_degistir&id=<?= $uye['id']; ?>&tur=Kurum+Temsilcisi"><i class="fa-solid fa-building-user me-1.5"></i>Kurum Temsilcisi Yap</a></li>
+                                                    <?php endif; ?>
+                                                    
+                                                    <?php if($temsilci_turu_kontrol !== 'Kadın Kolları Başkanı'): ?>
+                                                        <li><a class="dropdown-item py-1" style="color: #d63384;" href="index.php?sayfa=uyeler&aksiyon=stat%C3%BC_degistir&id=<?= $uye['id']; ?>&tur=Kadın+Kolları+Başkanı"><i class="fa-solid fa-venus me-1.5"></i>Kadın Kolları Başkanı Yap</a></li>
                                                     <?php endif; ?>
                                                     
                                                     <?php if($temsilci_turu_kontrol !== 'Normal Üye'): ?>
