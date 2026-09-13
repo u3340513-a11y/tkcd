@@ -895,6 +895,7 @@ switch ($sayfa) {
             $ilce_baskanlari = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'İlçe Başkanı' OR temsilci_turu = 'İlçe Temsilcisi' OR ek_gorev = 'İlçe Başkanı' OR ek_gorev = 'İlçe Temsilcisi')")->fetchColumn();
             $kurum_temsilcileri = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Kurum Temsilcisi' OR ek_gorev = 'Kurum Temsilcisi')")->fetchColumn();
             $teskilatlanma_sorumlusu = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Teşkilatlanma Sorumlu Başkan' OR ek_gorev = 'Teşkilatlanma Sorumlu Başkan')")->fetchColumn();
+            $kadin_kollari_baskanlari = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND temsilci_turu = 'Kadın Kolları Başkanı'")->fetchColumn();
 
             $bekleyen_uye_sayisi = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'bekleyen'")->fetchColumn();
 
@@ -1199,6 +1200,21 @@ switch ($sayfa) {
                                     <h2 class="fw-bold mb-0 text-dark"><?= $kurum_temsilcileri; ?></h2>
                                 </div>
                                 <div class="bg-warning bg-opacity-10 p-3 rounded text-warning"><i class="fa-solid fa-building-user fa-xl"></i></div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Kadın Kolları Başkanları -->
+                <div class="col">
+                    <a href="index.php?sayfa=uyeler&filtre=kadin_kollari" class="text-decoration-none text-dark d-block" style="transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <div class="card card-stat bg-white h-100 p-3 border-0 border-start border-5 shadow-sm" style="border-left-color: #d63384 !important; cursor: pointer;">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <h6 class="text-uppercase small fw-bold mb-1" style="font-size: 0.75rem; color: #d63384;">Kadın Kolları Bşk.</h6>
+                                    <h2 class="fw-bold mb-0 text-dark"><?= $kadin_kollari_baskanlari; ?></h2>
+                                </div>
+                                <div class="p-3 rounded" style="background-color: rgba(214, 51, 132, 0.1); color: #d63384;"><i class="fa-solid fa-venus fa-xl"></i></div>
                             </div>
                         </div>
                     </a>

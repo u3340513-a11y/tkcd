@@ -187,6 +187,13 @@ try {
         $toplam_onayli = $say_sorgu->fetchColumn();
         $toplam_sayfa = ceil($toplam_onayli / $limit);
         $sorgu = $db_baglanti->prepare("SELECT * FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Teşkilatlanma Sorumlu Başkan' OR ek_gorev = 'Teşkilatlanma Sorumlu Başkan')" . $rol_ek_where . " ORDER BY adi_soyadi ASC LIMIT ? OFFSET ?");
+    } elseif ($aktif_filtre === 'kadin_kollari') {
+        $say_sql = "SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND temsilci_turu = 'Kadın Kolları Başkanı'" . $rol_ek_where;
+        $say_sorgu = $db_baglanti->prepare($say_sql);
+        $say_sorgu->execute($rol_ek_parametreler);
+        $toplam_onayli = $say_sorgu->fetchColumn();
+        $toplam_sayfa = ceil($toplam_onayli / $limit);
+        $sorgu = $db_baglanti->prepare("SELECT * FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND temsilci_turu = 'Kadın Kolları Başkanı'" . $rol_ek_where . " ORDER BY adi_soyadi ASC LIMIT ? OFFSET ?");
     } elseif ($aktif_filtre === 'aktif_iller') {
         $iller_modu = true;
         $toplam_onayli = $db_baglanti->query("SELECT COUNT(DISTINCT ikamet_ili) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND ikamet_ili IS NOT NULL AND ikamet_ili != ''")->fetchColumn();
@@ -230,6 +237,7 @@ try {
                 elseif($aktif_filtre === 'il_baskani') echo 'Filtrelenen: İl Başkanları Listesi';
                 elseif($aktif_filtre === 'ilce_baskani') echo 'Filtrelenen: İlçe Başkanları Listesi';
                 elseif($aktif_filtre === 'teskilatlanma_sorumlusu') echo 'Filtrelenen: Teşkilatlanma, Komiteler ve Temsilcilerden Sorumlu Başkan Listesi';
+                elseif($aktif_filtre === 'kadin_kollari') echo 'Filtrelenen: Kadın Kolları Başkanları Listesi';
                 elseif($aktif_filtre === 'aktif_iller') echo 'Filtrelenen: Aktif İl Listesi (Toplam ' . $toplam_onayli . ' İl)';
                 else echo 'Derneğe kayıtlı aktif üyeler listesi.';
                 ?>
