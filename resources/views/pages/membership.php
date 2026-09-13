@@ -340,7 +340,7 @@ $calismaSekilleri = ['Kadrolu', 'Yarı Zamanlı', 'Sözleşmeli', 'Emekli Kamu �
                 <!-- Çalıştığı Kurum -->
                 <div class="ub-form__alan">
                     <label class="ub-form__etiket" for="ub-kurum">
-                        Çalıştığı Kurum
+                        Çalıştığı Kurum <span style="color:var(--bordo-500)">*</span>
                     </label>
                     <input
                         class="ub-form__girdi"
@@ -350,13 +350,15 @@ $calismaSekilleri = ['Kadrolu', 'Yarı Zamanlı', 'Sözleşmeli', 'Emekli Kamu �
                         placeholder="Örn: Maliye Bakanlığı"
                         maxlength="200"
                         autocomplete="organization"
+                        required
+                        aria-required="true"
                     >
                 </div>
 
                 <!-- Görev / Ünvan -->
                 <div class="ub-form__alan">
                     <label class="ub-form__etiket" for="ub-gorev">
-                        Görev / Ünvan
+                        Görev / Ünvan <span style="color:var(--bordo-500)">*</span>
                     </label>
                     <input
                         class="ub-form__girdi"
@@ -366,18 +368,22 @@ $calismaSekilleri = ['Kadrolu', 'Yarı Zamanlı', 'Sözleşmeli', 'Emekli Kamu �
                         placeholder="Örn: Mühendis"
                         maxlength="120"
                         autocomplete="organization-title"
+                        required
+                        aria-required="true"
                     >
                 </div>
 
                 <!-- Cinsiyet -->
                 <div class="ub-form__alan">
                     <label class="ub-form__etiket" for="ub-cinsiyet">
-                        Cinsiyet
+                        Cinsiyet <span style="color:var(--bordo-500)">*</span>
                     </label>
                     <select
                         class="ub-form__girdi ub-form__secim"
                         id="ub-cinsiyet"
                         name="cinsiyet"
+                        required
+                        aria-required="true"
                     >
                         <option value="">-- Seçiniz --</option>
                         <option value="Erkek">Erkek</option>
@@ -388,12 +394,14 @@ $calismaSekilleri = ['Kadrolu', 'Yarı Zamanlı', 'Sözleşmeli', 'Emekli Kamu �
                 <!-- Çalışma Şekli -->
                 <div class="ub-form__alan">
                     <label class="ub-form__etiket" for="ub-calisma-sekli">
-                        Çalışma Şekli
+                        Çalışma Şekli <span style="color:var(--bordo-500)">*</span>
                     </label>
                     <select
                         class="ub-form__girdi ub-form__secim"
                         id="ub-calisma-sekli"
                         name="calisma_sekli"
+                        required
+                        aria-required="true"
                     >
                         <option value="">-- Seçiniz --</option>
                         <?php foreach ($calismaSekilleri as $sekil): ?>

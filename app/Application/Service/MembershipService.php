@@ -80,6 +80,22 @@ final class MembershipService
             throw new \InvalidArgumentException('Trabzon ilçesi zorunludur.');
         }
 
+        if ($kurum === '') {
+            throw new \InvalidArgumentException('Çalıştığı kurum alanı zorunludur.');
+        }
+
+        if ($gorev === '') {
+            throw new \InvalidArgumentException('Görev / Ünvan alanı zorunludur.');
+        }
+
+        if ($cinsiyet === '') {
+            throw new \InvalidArgumentException('Cinsiyet seçimi zorunludur.');
+        }
+
+        if ($calismaSekli === '') {
+            throw new \InvalidArgumentException('Çalışma şekli seçimi zorunludur.');
+        }
+
         // Telefonu tam, boşluksuz forma çevir: "05" + 9 rakam
         $telefonTam = '05' . $telefonSuffix;
 
