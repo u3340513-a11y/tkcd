@@ -90,44 +90,62 @@ final class MembershipController
      * İşlem sırası:
      *  1. Matematik doğrulaması (HMAC imzalı, replay-safe).
      *  2. Form verilerini MembershipService aracılığıyla doğrula ve kaydet.
-     *  3. PRG desenine göre yönlendir.
+     *  3. AJAX isteklerinde JSON yanıt, klasik POST'larda PRG yönlendirme.
      */
     public function store(): Response
     {
+        $isAjax = ($this->request->header('X-Requested-With') === 'XMLHttpRequest');
+
         try {
             // 1. Matematik doğrulaması
             if (!$this->verifyMathCaptcha($this->request->body)) {
                 $this->logger->error('Matematik doğrulaması başarısız.');
-                return Response::redirect('/uye-ol?durum=hata&hata_mesaji=' . urlencode('Matematik dogrulamasi basarisiz'));
+                return $isAjax
+                    ? Response::json(['durum' => 'hata', 'mesaj' => 'Güvenlik sorusu yanlış. Lütfen tekrar deneyin.'], 422)
+                    : Response::redirect('/uye-ol?durum=hata&hata_mesaji=' . urlencode('Matematik dogrulamasi basarisiz'));
             }
 
             // 2. Form verisi doğrulama + kayıt
             $this->membershipService->apply($this->request->body);
 
-            return Response::redirect('/uye-ol?durum=basarili');
+            return $isAjax
+                ? Response::json(['durum' => 'basarili', 'mesaj' => 'Başvurunuz başarıyla alındı.'])
+                : Response::redirect('/uye-ol?durum=basarili');
         } catch (\InvalidArgumentException $e) {
-            // Telefon numarası zaten kayıtlı — özel uyarı sayfası
-            if ($e->getMessage() === '__TELEFON_KAYITLI__') {
-                return Response::redirect('/uye-ol?durum=telefon_kayitli');
+            $msg = $e->getMessage();
+
+            // Telefon numarası zaten kayıtlı
+            if ($msg === '__TELEFON_KAYITLI__') {
+                return $isAjax
+                    ? Response::json(['durum' => 'telefon_kayitli', 'mesaj' => 'Bu telefon numarası sistemde zaten kayıtlıdır.'], 409)
+                    : Response::redirect('/uye-ol?durum=telefon_kayitli');
             }
 
             // Ad-soyad + doğum tarihi kombinasyonu zaten kayıtlı
-            if ($e->getMessage() === '__KISI_ZATEN_KAYITLI__') {
-                return Response::redirect('/uye-ol?durum=kisi_kayitli');
+            if ($msg === '__KISI_ZATEN_KAYITLI__') {
+                return $isAjax
+                    ? Response::json(['durum' => 'kisi_kayitli', 'mesaj' => 'Bu ad-soyad ve doğum tarihi ile eşleşen bir kayıt zaten mevcuttur.'], 409)
+                    : Response::redirect('/uye-ol?durum=kisi_kayitli');
             }
 
             // E-posta adresi zaten kayıtlı
-            if ($e->getMessage() === '__EPOSTA_KAYITLI__') {
-                return Response::redirect('/uye-ol?durum=eposta_kayitli');
+            if ($msg === '__EPOSTA_KAYITLI__') {
+                return $isAjax
+                    ? Response::json(['durum' => 'eposta_kayitli', 'mesaj' => 'Bu e-posta adresi ile daha önce başvuru yapılmıştır.'], 409)
+                    : Response::redirect('/uye-ol?durum=eposta_kayitli');
             }
 
-            $this->logger->error('Üyelik başvurusu doğrulama hatası: ' . $e->getMessage());
+            $this->logger->error('Üyelik başvurusu doğrulama hatası: ' . $msg);
 
-            return Response::redirect('/uye-ol?durum=hata&hata_mesaji=' . urlencode($e->getMessage()));
+            return $isAjax
+                ? Response::json(['durum' => 'hata', 'mesaj' => $msg], 422)
+                : Response::redirect('/uye-ol?durum=hata&hata_mesaji=' . urlencode($msg));
         } catch (\Throwable $e) {
             $this->logger->exception($e);
 
-            return Response::redirect('/uye-ol?durum=hata&hata_mesaji=' . urlencode($e->getMessage()));
+            return $isAjax
+                ? Response::json(['durum' => 'hata', 'mesaj' => 'Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.'], 500)
+                : Response::redirect('/uye-ol?durum=hata&hata_mesaji=' . urlencode($e->getMessage()));
         }
     }
 

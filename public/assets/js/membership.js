@@ -464,10 +464,13 @@
 
   // -----------------------------------------------------------------------
   // Form submit — tüm zorunlu alanları doğrula, hata varsa durdur
+  // Başarılıysa AJAX ile gönder — veriler korunur
   // -----------------------------------------------------------------------
 
   form.addEventListener('submit', function (e) {
-    const sonuclar = [
+    e.preventDefault();
+
+    var sonuclar = [
       dogrulaAdSoyad(),
       dogrulaTelefon(),
       dogrulaEposta(),
@@ -479,20 +482,130 @@
       dogrulaCaptcha(),
     ];
 
-    const basarisiz = sonuclar.some(function (s) { return s === false; });
+    var basarisiz = sonuclar.some(function (s) { return s === false; });
 
     if (basarisiz) {
-      e.preventDefault();
-
-      const ilkHatali = /** @type {HTMLElement|null} */ (
+      var ilkHatali = /** @type {HTMLElement|null} */ (
         form.querySelector('[aria-invalid="true"]')
       );
       if (ilkHatali) {
         ilkHatali.focus();
         ilkHatali.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
+      return;
     }
+
+    // AJAX gönderim — form verilerini korur
+    var gonderBtn = document.getElementById('ub-basvuru-gonder');
+    if (gonderBtn) {
+      gonderBtn.disabled = true;
+      gonderBtn.textContent = 'Gönderiliyor...';
+    }
+
+    var formData = new FormData(form);
+
+    fetch(form.action, {
+      method: 'POST',
+      body: formData,
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(function (res) {
+      return res.json();
+    })
+    .then(function (veri) {
+      // Başarılı — yönlendir
+      if (veri.durum === 'basarili') {
+        window.location.href = '/uye-ol?durum=basarili';
+        return;
+      }
+
+      // Hata — mesajı göster, formu temizleme
+      ajaxHataGoster(veri.mesaj || 'Başvurunuz gönderilemedi.', veri.durum || 'hata');
+
+      if (gonderBtn) {
+        gonderBtn.disabled = false;
+        gonderBtn.textContent = 'Başvuruyu Tamamla';
+      }
+
+      // Captcha'yı yenile
+      captchaYenile();
+    })
+    .catch(function () {
+      ajaxHataGoster('Bir bağlantı hatası oluştu. Lütfen tekrar deneyin.', 'hata');
+      if (gonderBtn) {
+        gonderBtn.disabled = false;
+        gonderBtn.textContent = 'Başvuruyu Tamamla';
+      }
+    });
   });
+
+  /**
+   * AJAX hatası durumunda sayfada bildirim gösterir.
+   * Mevcut bildiri alanını kullanır veya oluşturur.
+   *
+   * @param {string} mesaj     - Gösterilecek hata mesajı
+   * @param {string} durumTipi - Durum türü (hata, telefon_kayitli vb.)
+   */
+  function ajaxHataGoster(mesaj, durumTipi) {
+    // Varolan bildiriyi kaldır
+    var mevcutBildiri = document.querySelector('.ub-bildiri');
+    if (mevcutBildiri) mevcutBildiri.remove();
+
+    var bildiri = document.createElement('div');
+    bildiri.className = durumTipi === 'hata' ? 'ub-bildiri ub-bildiri--hata' : 'ub-bildiri ub-bildiri--uyari';
+    bildiri.setAttribute('role', 'alert');
+
+    var baslikMap = {
+      'hata': 'Gönderim Başarısız',
+      'telefon_kayitli': 'Bu Telefon Numarası Zaten Kayıtlı',
+      'kisi_kayitli': 'Bu Kişi Zaten Kayıtlı',
+      'eposta_kayitli': 'Bu E-posta Adresi Zaten Kayıtlı'
+    };
+
+    var ikon = durumTipi === 'hata'
+      ? '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>'
+      : '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+
+    bildiri.innerHTML = ikon + '<div><strong>' + (baslikMap[durumTipi] || 'Hata') + '</strong><p>' + mesaj + '</p></div>';
+
+    // Formun başına ekle
+    form.insertBefore(bildiri, form.firstChild);
+
+    // Görünür alana kaydır
+    bildiri.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  /**
+   * Captcha'yı yeniler — sayfayı yenilemeden yeni soru almak için
+   * sayfayı GET ile çeker ve yeni captcha değerlerini günceller.
+   */
+  function captchaYenile() {
+    fetch('/uye-ol', { method: 'GET', credentials: 'same-origin' })
+      .then(function(r) { return r.text(); })
+      .then(function(html) {
+        var parser = new DOMParser();
+        var doc = parser.parseFromString(html, 'text/html');
+        var yeniA = doc.querySelector('[name="captcha_a"]');
+        var yeniB = doc.querySelector('[name="captcha_b"]');
+        var yeniToken = doc.querySelector('[name="captcha_token"]');
+        var yeniSoru = doc.querySelector('.ub-math-captcha__soru');
+
+        if (yeniA && elCaptchaA) elCaptchaA.value = yeniA.value;
+        if (yeniB && elCaptchaB) elCaptchaB.value = yeniB.value;
+        if (yeniToken) {
+          var tokenEl = form.querySelector('[name="captcha_token"]');
+          if (tokenEl) tokenEl.value = yeniToken.value;
+        }
+        if (yeniSoru) {
+          var mevcutSoru = document.querySelector('.ub-math-captcha__soru');
+          if (mevcutSoru) mevcutSoru.innerHTML = yeniSoru.innerHTML;
+        }
+        if (elCaptcha) elCaptcha.value = '';
+      })
+      .catch(function() {
+        // Sessizce geç — captcha eski kalır ama fonksiyonel sorun olmaz
+      });
+  }
 
 })();
 
