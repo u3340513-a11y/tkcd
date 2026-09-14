@@ -812,40 +812,27 @@ p {
 }
 
 .marka img {
-  width: 54px;
-  height: 54px;
+  width: 72px;
+  height: 72px;
   object-fit: contain;
   transition: transform var(--gecis-normal);
 }
 
 .marka:hover img {
-  transform: scale(1.05);
+  transform: scale(1.08);
 }
 
-.marka__yazi {
-  display: none;
-  line-height: 1.25;
-}
-
-.marka__ad {
-  display: block;
-  font-size: 0.95rem;
-  font-weight: 750;
-  letter-spacing: -0.01em;
-  color: var(--renk-marka);
-}
-
-.marka__alt {
-  display: block;
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--renk-metin-silik);
-}
-
-@media (min-width: 480px) {
-  .marka__yazi { display: block; }
+/* Screen-reader için erişilebilirlik metni */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* Masaüstü menü */

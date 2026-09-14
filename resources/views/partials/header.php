@@ -20,11 +20,8 @@ $membershipUrl = (string) ($site['membership_form_url'] ?? '/uye-ol');
         <a class="marka" href="/" aria-label="<?= $view->e((string) ($site['name'] ?? '')) ?> — Ana sayfa">
             <img src="<?= $view->e($view->asset('assets/img/logo.webp')) ?>"
                  alt="<?= $view->e((string) ($site['name'] ?? '')) ?> logosu"
-                 width="54" height="54" fetchpriority="high">
-            <span class="marka__yazi">
-                <span class="marka__ad">Trabzonlu Kamu Çalışanları</span>
-                <span class="marka__alt">Derneği</span>
-            </span>
+                 width="72" height="72" fetchpriority="high" style="object-fit: contain;">
+            <span class="sr-only"><?= $view->e((string) ($site['name'] ?? 'Trabzonlu Kamu Çalışanları Derneği')) ?></span>
         </a>
 
         <nav class="ana-menu" aria-label="Ana menü">
