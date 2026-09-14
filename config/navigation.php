@@ -38,9 +38,12 @@ return [
     ],
     [
         'label' => 'Yönetim Kurulu',
-        'path' => '/yonetim-kurulu',
+        'path'  => '/yonetim-kurulu',
         'priority' => '0.7',
-        'children' => [],
+        'children' => [
+            ['label' => 'Başkanlık',    'path' => '/yonetim-kurulu',              'priority' => '0.7'],
+            ['label' => 'Üye Listesi', 'path' => '/yonetim-kurulu/uye-listesi', 'priority' => '0.6'],
+        ],
     ],
     [
         'label' => 'İletişim',

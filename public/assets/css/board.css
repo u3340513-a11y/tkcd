@@ -321,3 +321,160 @@
     margin-inline: auto;
   }
 }
+
+/* ============================================================
+   ÜYE LİSTESİ TABLOSU
+   ============================================================ */
+
+.yk-liste-kartlari {
+  background: #fff;
+  border-radius: var(--yuvarlak-xl, 1.25rem);
+  box-shadow:
+    0 1px 3px rgba(74, 25, 39, 0.06),
+    0 8px 32px rgba(74, 25, 39, 0.1);
+  overflow: hidden;
+  margin-bottom: clamp(2rem, 4vw, 3rem);
+}
+
+.yk-liste-baslik {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: clamp(1.25rem, 3vw, 2rem) clamp(1.5rem, 3vw, 2.5rem);
+  background: linear-gradient(135deg, var(--bordo-800), var(--bordo-700));
+  color: #fff;
+}
+
+.yk-liste-kartlari--yedek .yk-liste-baslik {
+  background: linear-gradient(135deg, var(--mavi-800, #1a365d), var(--mavi-700, #2a4a7f));
+}
+
+.yk-liste-baslik__metin {
+  font-size: var(--olcek-xl, 1.25rem);
+  font-weight: 800;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--bosluk-3, 0.75rem);
+}
+
+.yk-liste-baslik__ikon {
+  font-size: 1.5rem;
+}
+
+.yk-liste-baslik__sayi {
+  font-size: var(--olcek-sm, 0.875rem);
+  opacity: 0.75;
+  font-weight: 600;
+}
+
+.yk-tablo-sarmal {
+  overflow-x: auto;
+}
+
+.yk-tablo {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.yk-tablo__th {
+  text-align: left;
+  padding: 1rem 1.5rem;
+  font-size: var(--olcek-sm, 0.875rem);
+  font-weight: 700;
+  color: var(--bordo-700, #5a1a2a);
+  background: var(--bordo-50, #fbf4f6);
+  border-bottom: 2px solid var(--bordo-100, #f0dde3);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.yk-liste-kartlari--yedek .yk-tablo__th {
+  color: var(--mavi-700, #2a4a7f);
+  background: #f0f4fa;
+  border-bottom-color: #dce5f0;
+}
+
+.yk-tablo__th--no {
+  width: 5rem;
+  text-align: center;
+}
+
+.yk-tablo__satir {
+  transition: background var(--gecis-hizli, 150ms ease);
+}
+
+.yk-tablo__satir:hover {
+  background: rgba(74, 25, 39, 0.03);
+}
+
+.yk-liste-kartlari--yedek .yk-tablo__satir:hover {
+  background: rgba(26, 54, 93, 0.03);
+}
+
+.yk-tablo__satir:not(:last-child) .yk-tablo__td {
+  border-bottom: 1px solid #f0f0f5;
+}
+
+.yk-tablo__td {
+  padding: 1rem 1.5rem;
+  font-size: var(--olcek-base, 1rem);
+}
+
+.yk-tablo__td--no {
+  text-align: center;
+  font-weight: 800;
+  color: var(--bordo-500, #8b2252);
+  font-size: var(--olcek-lg, 1.125rem);
+}
+
+.yk-liste-kartlari--yedek .yk-tablo__td--no {
+  color: var(--mavi-600, #3b6cb5);
+}
+
+.yk-tablo__td--ad {
+  font-weight: 700;
+  color: var(--bordo-800, #3e1020);
+}
+
+.yk-gorev-badge {
+  display: inline-block;
+  padding: 0.3rem 0.85rem;
+  border-radius: 9999px;
+  font-size: var(--olcek-xs, 0.75rem);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.yk-gorev-badge--asil {
+  background: rgba(139, 34, 82, 0.1);
+  color: var(--bordo-700, #5a1a2a);
+}
+
+.yk-gorev-badge--yedek {
+  background: rgba(59, 108, 181, 0.1);
+  color: var(--mavi-700, #2a4a7f);
+}
+
+/* Genel Başkan vurgulama */
+.yk-tablo__satir:first-child .yk-tablo__td--ad {
+  font-size: var(--olcek-lg, 1.125rem);
+}
+
+@media (max-width: 640px) {
+  .yk-tablo__th,
+  .yk-tablo__td {
+    padding: 0.75rem 1rem;
+  }
+
+  .yk-tablo__th--no,
+  .yk-tablo__td--no {
+    width: 3.5rem;
+  }
+
+  .yk-liste-baslik {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}

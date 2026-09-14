@@ -37,4 +37,26 @@ final class BoardController
             'uyeler' => $uyeler,
         ]);
     }
+
+    public function members(): Response
+    {
+        $seo = $this->responder->seo(
+            title: 'Yönetim Kurulu Üye Listesi',
+            description: 'Trabzonlu Kamu Çalışanları Derneği yönetim kurulu asil ve yedek üye listesi.',
+            canonicalPath: '/yonetim-kurulu/uye-listesi',
+            breadcrumbs: [
+                ['label' => 'Yönetim Kurulu', 'path' => '/yonetim-kurulu'],
+                ['label' => 'Üye Listesi',    'path' => '/yonetim-kurulu/uye-listesi'],
+            ],
+        );
+
+        /** @var array{asil: list<array{ad: string, gorev: string}>, yedek: list<array{ad: string, gorev: string}>} $uyeListesi */
+        $uyeListesi = require dirname(__DIR__, 3) . '/resources/data/board-members.php';
+
+        return $this->responder->page('pages/board-members', $seo, [
+            'styles'     => ['board.css'],
+            'asilUyeler' => $uyeListesi['asil'],
+            'yedekUyeler' => $uyeListesi['yedek'],
+        ]);
+    }
 }

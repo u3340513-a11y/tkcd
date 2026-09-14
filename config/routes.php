@@ -30,6 +30,7 @@ return [
     ['GET', '/etkinlikler/{slug}', EventController::class, 'show', 'events.show'],
 
     ['GET', '/yonetim-kurulu', BoardController::class, 'index', 'board.index'],
+    ['GET', '/yonetim-kurulu/uye-listesi', BoardController::class, 'members', 'board.members'],
     ['GET',  '/iletisim', ContactController::class, 'index', 'contact.index'],
     ['POST', '/iletisim', ContactController::class, 'store', 'contact.store'],
     ['GET',  '/uye-ol', MembershipController::class, 'index', 'membership.index'],
