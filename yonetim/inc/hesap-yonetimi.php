@@ -137,8 +137,42 @@ if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'hesap_sil' && isset($_GET['
         $mesaj_turu = "danger";
     }
 }
+// ─── ROL GÜNCELLEME ────────────────────────────────────────────
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rol_guncelle'])) {
+    $hedef_id  = intval($_POST['hesap_id'] ?? 0);
+    $yeni_rol  = trim($_POST['yeni_rol'] ?? '');
+    $gecerli_roller = ['yonetim', 'il_baskani', 'ilce_baskani', 'kurum_temsilcisi', 'kadin_kollari_baskani'];
 
-// ─── MEVCUT HESAPLARI LİSTELE ───────────────────────────────────────────
+    if ($hedef_id <= 0 || !in_array($yeni_rol, $gecerli_roller, true)) {
+        $mesaj = "Geçersiz hesap veya rol seçimi!";
+        $mesaj_turu = "danger";
+    } else {
+        try {
+            $hedef_ad_sorgu = $db_baglanti->prepare("SELECT kullanici_adi, rol FROM dernek_yoneticiler WHERE id = ?");
+            $hedef_ad_sorgu->execute([$hedef_id]);
+            $hedef = $hedef_ad_sorgu->fetch();
+            $hedef_adi = $hedef['kullanici_adi'] ?? ('Bilinmeyen #' . $hedef_id);
+            $eski_rol  = $hedef['rol'] ?? '-';
+
+            if ($hedef_adi === 'admin61') {
+                $mesaj = "Ana yönetici hesabının rolü değiştirilemez!";
+                $mesaj_turu = "danger";
+            } else {
+                $guncelle = $db_baglanti->prepare("UPDATE dernek_yoneticiler SET rol = ? WHERE id = ?");
+                $guncelle->execute([$yeni_rol, $hedef_id]);
+                $mesaj = htmlspecialchars($hedef_adi) . " hesabının rolü güncellendi: " . htmlspecialchars($eski_rol) . " → " . htmlspecialchars($yeni_rol);
+                $mesaj_turu = "success";
+                log_kaydet($db_baglanti, 'rol_guncelle', $hedef_adi . ' rolü değiştirildi: ' . $eski_rol . ' → ' . $yeni_rol, 'dernek_yoneticiler', $hedef_id);
+            }
+        } catch (\PDOException $e) {
+            error_log('Rol güncelleme hatası: ' . $e->getMessage());
+            $mesaj = "Rol güncellenirken bir hata oluştu!";
+            $mesaj_turu = "danger";
+        }
+    }
+}
+
+// ─── MEVCUT HESAPLARI LİSTELE ────────────────────────────────────────────
 try {
     $hesaplar_sorgu = $db_baglanti->query(
         "SELECT id, kullanici_adi, rol, sorumlu_il, sorumlu_ilce, sorumlu_kurum, olusturma_tarihi 
@@ -271,6 +305,10 @@ $rol_etiketleri = [
                                                 <i class="fa-solid fa-key me-1"></i>Şifre
                                             </button>
                                             <?php if ($hesap['kullanici_adi'] !== 'admin61'): ?>
+                                                <button type="button" class="btn btn-outline-secondary btn-sm fw-bold px-2"
+                                                        onclick="rolGuncelleModal(<?= $hesap['id']; ?>, '<?= htmlspecialchars($hesap['kullanici_adi']); ?>', '<?= htmlspecialchars($hesap['rol']); ?>')">
+                                                    <i class="fa-solid fa-tag me-1"></i>Rol
+                                                </button>
                                                 <a href="index.php?sayfa=hesap-yonetimi&aksiyon=hesap_sil&id=<?= $hesap['id']; ?>" 
                                                    class="btn btn-outline-danger btn-sm fw-bold px-2"
                                                    onclick="return confirm('<?= htmlspecialchars($hesap['kullanici_adi']); ?> hesabını tamamen silmek istediğinize emin misiniz?');">
@@ -460,4 +498,55 @@ function sifreSifirlaModal(hesapId, kullaniciAdi) {
     var modal = new bootstrap.Modal(document.getElementById('sifreSifirlaModal'));
     modal.show();
 }
+
+/**
+ * Rol güncelleme modalını açar.
+ */
+function rolGuncelleModal(hesapId, kullaniciAdi, mevcutRol) {
+    document.getElementById('rolHesapId').value = hesapId;
+    document.getElementById('rolKullaniciAdi').textContent = kullaniciAdi;
+    var select = document.getElementById('yeniRolSecim');
+    select.value = mevcutRol;
+    var modal = new bootstrap.Modal(document.getElementById('rolGuncelleModal'));
+    modal.show();
+}
 </script>
+
+<!-- Rol Güncelleme Modalı -->
+<div class="modal fade" id="rolGuncelleModal" tabindex="-1" aria-labelledby="rolGuncelleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <form method="POST" action="index.php?sayfa=hesap-yonetimi">
+                <div class="modal-header text-white" style="background: linear-gradient(135deg,#6a1b9a,#9c27b0);">
+                    <h5 class="modal-title fw-bold" id="rolGuncelleModalLabel">
+                        <i class="fa-solid fa-tag me-2"></i>Rol Değiştir
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <input type="hidden" name="hesap_id" id="rolHesapId" value="">
+                    <p class="text-muted mb-3">
+                        <strong id="rolKullaniciAdi" class="text-dark"></strong> hesabının rolünü değiştirin:
+                    </p>
+                    <div class="form-group">
+                        <label class="form-label fw-bold">Yeni Rol <span class="text-danger">*</span></label>
+                        <select name="yeni_rol" id="yeniRolSecim" class="form-select" required>
+                            <option value="">— Rol Seçin —</option>
+                            <option value="yonetim">Yönetim</option>
+                            <option value="il_baskani">İl Başkanı</option>
+                            <option value="ilce_baskani">İlçe Başkanı</option>
+                            <option value="kurum_temsilcisi">Kurum Temsilcisi</option>
+                            <option value="kadin_kollari_baskani">Kadın Kolları Başkanı</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-top">
+                    <button type="button" class="btn btn-secondary fw-bold px-3" data-bs-dismiss="modal">İptal</button>
+                    <button type="submit" name="rol_guncelle" class="btn fw-bold px-4 shadow-sm text-white" style="background:#6a1b9a;">
+                        <i class="fa-solid fa-save me-1"></i>Rolü Güncelle
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
