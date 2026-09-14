@@ -23,6 +23,15 @@
     linear-gradient(140deg, var(--bordo-800) 0%, var(--bordo-700) 45%, var(--mavi-800) 100%);
 }
 
+.yk-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url('/assets/img/logo.webp') center center / clamp(10rem, 22vw, 18rem) no-repeat;
+  opacity: 0.08;
+  pointer-events: none;
+}
+
 .yk-hero__ic {
   position: relative;
   display: flex;
