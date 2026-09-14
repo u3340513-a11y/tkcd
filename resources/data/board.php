@@ -49,6 +49,32 @@ return [
             'linkedin'  => '',
         ],
     ],
+    [
+        'slug'      => 'omer-cakir',
+        'ad'        => 'Ömer Çakır',
+        'unvan'     => 'Başkan Vekili',
+        'fotograf'  => 'omer-cakir.png',
+        'biyografi' => '',
+        'gorevler'  => [],
+        'sosyal' => [
+            'facebook'  => '',
+            'instagram' => '',
+            'linkedin'  => '',
+        ],
+    ],
+    [
+        'slug'      => 'orhan-karal',
+        'ad'        => 'Orhan Karal',
+        'unvan'     => 'Genel Sekreter',
+        'fotograf'  => 'orhan_abi.png',
+        'biyografi' => '',
+        'gorevler'  => [],
+        'sosyal' => [
+            'facebook'  => '',
+            'instagram' => '',
+            'linkedin'  => '',
+        ],
+    ],
     // Geçici olarak gizlendi — aktifleştirmek için yorum satırını kaldırın.
     // [
     //     'slug'      => 'ilyas-demir',
