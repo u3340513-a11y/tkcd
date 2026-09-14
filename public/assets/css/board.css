@@ -356,6 +356,7 @@
   display: flex;
   align-items: center;
   gap: var(--bosluk-3, 0.75rem);
+  color: #fff !important;
 }
 
 .yk-liste-baslik__ikon {
@@ -366,6 +367,7 @@
   font-size: var(--olcek-sm, 0.875rem);
   opacity: 0.75;
   font-weight: 600;
+  color: #fff !important;
 }
 
 .yk-tablo-sarmal {
