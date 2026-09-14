@@ -91,14 +91,52 @@
   margin: 0;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: clamp(2rem, 4vw, 3.5rem);
+  gap: clamp(1.5rem, 3vw, 2.5rem);
   justify-items: center;
 }
 
-/* İlk iki kart (Onursal Başkan + Dernek Başkanı) tam satır, ortalı */
-.yk-karti:nth-child(1),
-.yk-karti:nth-child(2) {
+/* 5–8. kartlar (Başkan Yardımcıları) → 4'lü sıra */
+.yk-karti:nth-child(n+5):nth-child(-n+8) {
+  max-width: 18rem;
+}
+
+/* Sayman (9. kart) → ortalı tek */
+.yk-karti:nth-child(9) {
   grid-column: 1 / -1;
+}
+
+/* 4'lü satır için grid override */
+@media (min-width: 900px) {
+  .yk-izgara {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  /* İlk 2 kart (Onursal + Başkan) → ortada 2'li */
+  .yk-karti:nth-child(1) {
+    grid-column: 2 / 3;
+  }
+  .yk-karti:nth-child(2) {
+    grid-column: 3 / 4;
+  }
+  
+  /* 3-4 (Başkan Vekili + Genel Sekreter) → ortada 2'li */
+  .yk-karti:nth-child(3) {
+    grid-column: 2 / 3;
+  }
+  .yk-karti:nth-child(4) {
+    grid-column: 3 / 4;
+  }
+
+  /* 5–8 (Başkan Yardımcıları) → 4'lü sıra */
+  .yk-karti:nth-child(5) { grid-column: 1 / 2; }
+  .yk-karti:nth-child(6) { grid-column: 2 / 3; }
+  .yk-karti:nth-child(7) { grid-column: 3 / 4; }
+  .yk-karti:nth-child(8) { grid-column: 4 / 5; }
+  
+  /* 9. kart (Sayman) → ortalı */
+  .yk-karti:nth-child(9) {
+    grid-column: 2 / 4;
+  }
 }
 
 /* ============================================================
