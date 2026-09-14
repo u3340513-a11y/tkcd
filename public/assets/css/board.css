@@ -95,11 +95,6 @@
   justify-items: center;
 }
 
-/* 5–8. kartlar (Başkan Yardımcıları) → 4'lü sıra */
-.yk-karti:nth-child(n+5):nth-child(-n+8) {
-  max-width: 18rem;
-}
-
 /* Sayman (9. kart) → ortalı tek */
 .yk-karti:nth-child(9) {
   grid-column: 1 / -1;
