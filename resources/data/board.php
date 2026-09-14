@@ -79,7 +79,7 @@ return [
         'slug'      => 'ahmet-cihangir',
         'ad'        => 'Ahmet Cihangir',
         'unvan'     => 'Başkan Yardımcısı',
-        'fotograf'  => 'ahmet-cihangir.webp',
+        'fotograf'  => 'ahmet-cihangir.png',
         'biyografi' => '',
         'gorevler'  => [],
         'sosyal' => [
@@ -92,7 +92,7 @@ return [
         'slug'      => 'hasan-ekinci',
         'ad'        => 'Hasan Ekinci',
         'unvan'     => 'Başkan Yardımcısı',
-        'fotograf'  => 'hasan-ekinci.webp',
+        'fotograf'  => 'hasan-ekinci.png',
         'biyografi' => '',
         'gorevler'  => [],
         'sosyal' => [
@@ -105,7 +105,7 @@ return [
         'slug'      => 'sener-kurt',
         'ad'        => 'Şener Kurt',
         'unvan'     => 'Başkan Yardımcısı',
-        'fotograf'  => 'sener-kurt.webp',
+        'fotograf'  => 'placeholder-kisi.svg',
         'biyografi' => '',
         'gorevler'  => [],
         'sosyal' => [
@@ -118,7 +118,7 @@ return [
         'slug'      => 'musa-eski',
         'ad'        => 'Musa Eski',
         'unvan'     => 'Başkan Yardımcısı',
-        'fotograf'  => 'musa-eski.webp',
+        'fotograf'  => 'placeholder-kisi.svg',
         'biyografi' => '',
         'gorevler'  => [],
         'sosyal' => [
@@ -131,7 +131,7 @@ return [
         'slug'      => 'mustafa-sahin',
         'ad'        => 'Mustafa Şahin',
         'unvan'     => 'Sayman',
-        'fotograf'  => 'mustafa-sahin.webp',
+        'fotograf'  => 'placeholder-kisi.svg',
         'biyografi' => '',
         'gorevler'  => [],
         'sosyal' => [
