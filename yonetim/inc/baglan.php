@@ -206,4 +206,20 @@ function csrf_hidden_alan(): string
             error_log("Migration hatası ({$kolon}): " . $e->getMessage());
         }
     }
+
+    // dernek_yoneticiler.rol kolonu varchar(20) → varchar(50)
+    // kadin_kollari_baskani (22 karakter) varchar(20)'ye sığmıyor; UPDATE sessizce kırpılıyordu.
+    try {
+        $rolKolon = $db_baglanti->prepare(
+            "SELECT CHARACTER_MAXIMUM_LENGTH FROM INFORMATION_SCHEMA.COLUMNS
+              WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'dernek_yoneticiler' AND COLUMN_NAME = 'rol'"
+        );
+        $rolKolon->execute([$db_adi]);
+        $maxLen = (int) $rolKolon->fetchColumn();
+        if ($maxLen > 0 && $maxLen < 50) {
+            $db_baglanti->exec("ALTER TABLE `dernek_yoneticiler` MODIFY COLUMN `rol` VARCHAR(50) NOT NULL DEFAULT 'admin'");
+        }
+    } catch (\PDOException $e) {
+        error_log("Migration hatası (rol kolonu genişletme): " . $e->getMessage());
+    }
 })();
