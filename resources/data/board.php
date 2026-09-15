@@ -3,168 +3,156 @@
 declare(strict_types=1);
 
 /**
- * Yönetim Kurulu üyeleri.
+ * Yönetim Kurulu hiyerarşik yapısı.
  *
- * Alanlar:
- *   slug        — URL-safe tanımlayıcı
- *   ad          — Ad soyad
- *   unvan       — Dernekteki unvan / görev
- *   fotograf    — /assets/img/ altındaki dosya adı (uzantısız değil, tam ad)
- *   biyografi   — Kısa biyografi paragrafı (isteğe bağlı)
- *   gorevler    — Diğer görev ve üyelikler (list<string>)
- *   sosyal      — platform → url eşlemesi; boş string varsa gösterilmez
+ * Her grup bir 'bolum' (bölüm başlığı) ve 'uyeler' (kart listesi) içerir.
+ * Tek kişilik satırlar 'tek' => true ile işaretlenir (tam genişlik).
+ * Görsel olmayanlara 'placeholder-kisi.svg' atanır.
  *
- * @return list<array{slug:string,ad:string,unvan:string,fotograf:string,biyografi:string,gorevler:list<string>,sosyal:array<string,string>}>
+ * @return list<array{baslik:string|null, uyeler: list<array{
+ *   slug:string, ad:string, unvan:string, fotograf:string,
+ *   biyografi:string, gorevler:list<string>, sosyal:array<string,string>
+ * }>}>
  */
+
+/** @return array{slug:string,ad:string,unvan:string,fotograf:string,biyografi:string,gorevler:list<string>,sosyal:array<string,string>} */
+function kisi(
+    string $slug,
+    string $ad,
+    string $unvan,
+    string $fotograf = 'placeholder-kisi.svg',
+    string $biyografi = '',
+    array $gorevler = [],
+    array $sosyal = [],
+): array {
+    return compact('slug', 'ad', 'unvan', 'fotograf', 'biyografi', 'gorevler', 'sosyal');
+}
+
 return [
+    // ── 1. KURUCU ve ONURSAL BAŞKAN ──────────────────────────────────────────
     [
-        'slug'      => 'ismail-turgut-oksuz',
-        'ad'        => 'İsmail Turgut Öksüz',
-        'unvan'     => 'Kurucu ve Onursal Başkanımız',
-        'fotograf'  => 'ismailturgutoksuz.webp',
-        'biyografi' => '',
-        'gorevler'  => [
-            'Trabzonlular Federasyonu Başkanı',
-            'Trabzonspor Kongre Üyesi',
-        ],
-        'sosyal' => [
-            'facebook'  => 'https://www.facebook.com/ismailturgutoksuz61',
-            'instagram' => 'https://www.instagram.com/ismailturgutoksuz/',
-            'linkedin'  => 'https://tr.linkedin.com/in/ismailturgutoksuz',
+        'baslik' => null,
+        'uyeler' => [
+            kisi(
+                slug:     'ismail-turgut-oksuz',
+                ad:       'İsmail Turgut Öksüz',
+                unvan:    'Kurucu ve Onursal Başkanımız',
+                fotograf: 'ismailturgutoksuz.webp',
+                gorevler: ['Trabzonlular Federasyonu Başkanı', 'Trabzonspor Kongre Üyesi'],
+                sosyal:   [
+                    'facebook'  => 'https://www.facebook.com/ismailturgutoksuz61',
+                    'instagram' => 'https://www.instagram.com/ismailturgutoksuz/',
+                    'linkedin'  => 'https://tr.linkedin.com/in/ismailturgutoksuz',
+                ],
+            ),
         ],
     ],
+
+    // ── 2. GENEL BAŞKAN ───────────────────────────────────────────────────────
     [
-        'slug'      => 'hakan-turan',
-        'ad'        => 'Hakan Turan',
-        'unvan'     => 'Dernek Başkanı',
-        'fotograf'  => 'hakan-turan.webp',
-        'biyografi' => '',
-        'gorevler'  => [
-            'K.M.S Derneği Başkanı',
-            'TGİYD. Derneği Y.K Üyesi',
-        ],
-        'sosyal' => [
-            'facebook'  => 'https://www.facebook.com/hakanalituran1453/',
-            'instagram' => 'https://www.instagram.com/hakan_turan61',
-            'linkedin'  => '',
+        'baslik' => null,
+        'uyeler' => [
+            kisi(
+                slug:     'hakan-turan',
+                ad:       'Hakan Turan',
+                unvan:    'Genel Başkan',
+                fotograf: 'hakan-turan.webp',
+                gorevler: ['K.M.S Derneği Başkanı', 'TGİYD. Derneği Y.K Üyesi'],
+                sosyal:   [
+                    'facebook'  => 'https://www.facebook.com/hakanalituran1453/',
+                    'instagram' => 'https://www.instagram.com/hakan_turan61',
+                ],
+            ),
         ],
     ],
+
+    // ── 3. BAŞKAN VEKİLİ + GENEL SEKRETER ───────────────────────────────────
     [
-        'slug'      => 'omer-cakir',
-        'ad'        => 'Ömer Çakır',
-        'unvan'     => 'Başkan Vekili',
-        'fotograf'  => 'omer-cakir.png',
-        'biyografi' => '',
-        'gorevler'  => [],
-        'sosyal' => [
-            'facebook'  => '',
-            'instagram' => '',
-            'linkedin'  => '',
+        'baslik' => null,
+        'uyeler' => [
+            kisi(slug: 'omer-cakir',    ad: 'Ömer Çakır',   unvan: 'Başkan Vekili',  fotograf: 'omer-cakir.png'),
+            kisi(slug: 'orhan-karal',   ad: 'Orhan Karal',   unvan: 'Genel Sekreter', fotograf: 'orhan_abi.png'),
         ],
     ],
+
+    // ── 4. BAŞKAN YARDIMCILARI ───────────────────────────────────────────────
     [
-        'slug'      => 'orhan-karal',
-        'ad'        => 'Orhan Karal',
-        'unvan'     => 'Genel Sekreter',
-        'fotograf'  => 'orhan_abi.png',
-        'biyografi' => '',
-        'gorevler'  => [],
-        'sosyal' => [
-            'facebook'  => '',
-            'instagram' => '',
-            'linkedin'  => '',
+        'baslik' => 'Başkan Yardımcıları',
+        'uyeler' => [
+            kisi(slug: 'ahmet-cihangir', ad: 'Ahmet Cihangir', unvan: 'Başkan Yardımcısı', fotograf: 'ahmet-cihangir.png'),
+            kisi(slug: 'hasan-ekinci',   ad: 'Hasan Ekinci',   unvan: 'Başkan Yardımcısı', fotograf: 'hasan-ekinci.png'),
+            kisi(slug: 'sener-kurt',     ad: 'Şener Kurt',     unvan: 'Başkan Yardımcısı'),
+            kisi(slug: 'musa-eski',      ad: 'Musa Eski',      unvan: 'Başkan Yardımcısı'),
         ],
     ],
+
+    // ── 5. SAYMAN + HUKUK İŞLERİ ─────────────────────────────────────────────
     [
-        'slug'      => 'ahmet-cihangir',
-        'ad'        => 'Ahmet Cihangir',
-        'unvan'     => 'Başkan Yardımcısı',
-        'fotograf'  => 'ahmet-cihangir.png',
-        'biyografi' => '',
-        'gorevler'  => [],
-        'sosyal' => [
-            'facebook'  => '',
-            'instagram' => '',
-            'linkedin'  => '',
+        'baslik' => null,
+        'uyeler' => [
+            kisi(slug: 'mustafa-sahin',      ad: 'Mustafa Şahin',     unvan: 'Sayman'),
+            kisi(slug: 'zeynep-hilal-umur',  ad: 'Zeynep Hilal Umur', unvan: 'Hukuk İşleri Başkanı', biyografi: 'Dernek Avukatı'),
         ],
     ],
+
+    // ── 6a. GENÇLİK KOLLARI ──────────────────────────────────────────────────
     [
-        'slug'      => 'hasan-ekinci',
-        'ad'        => 'Hasan Ekinci',
-        'unvan'     => 'Başkan Yardımcısı',
-        'fotograf'  => 'hasan-ekinci.png',
-        'biyografi' => '',
-        'gorevler'  => [],
-        'sosyal' => [
-            'facebook'  => '',
-            'instagram' => '',
-            'linkedin'  => '',
+        'baslik' => 'Gençlik Kolları',
+        'uyeler' => [
+            kisi(slug: 'ilyas-demir',   ad: 'İlyas Demir',    unvan: 'Gençlik Kolları Başkanı'),
+            kisi(slug: 'umit-bolukbas', ad: 'Ümit Bölükbaş',  unvan: 'Başkan Yardımcısı'),
+            kisi(slug: 'samet-celik',   ad: 'Samet Çelik',    unvan: 'Başkan Yardımcısı'),
+            kisi(slug: 'berkay-soylu',  ad: 'Berkay Soylu',   unvan: 'Başkan Yardımcısı'),
         ],
     ],
+
+    // ── 6b. TEŞKİLATLANMADAN SORUMLU ─────────────────────────────────────────
     [
-        'slug'      => 'sener-kurt',
-        'ad'        => 'Şener Kurt',
-        'unvan'     => 'Başkan Yardımcısı',
-        'fotograf'  => 'placeholder-kisi.svg',
-        'biyografi' => '',
-        'gorevler'  => [],
-        'sosyal' => [
-            'facebook'  => '',
-            'instagram' => '',
-            'linkedin'  => '',
+        'baslik' => 'Teşkilatlanmadan Sorumlu',
+        'uyeler' => [
+            kisi(slug: 'huseyin-koc',      ad: 'Hüseyin Koç',      unvan: 'Teşkilatlanmadan Sorumlu Başkan'),
+            kisi(slug: 'mert-hayrioglu',   ad: 'Mert Hayrioğlu',   unvan: 'Başkan Yardımcısı'),
+            kisi(slug: 'murat-bayraktar',  ad: 'Murat Bayraktar',  unvan: 'Başkan Yardımcısı'),
+            kisi(slug: 'ugur-kayazoglu',   ad: 'Uğur Kayazoğlu',   unvan: 'Başkan Yardımcısı'),
         ],
     ],
+
+    // ── 6c. KADIN KOLLARI ────────────────────────────────────────────────────
     [
-        'slug'      => 'musa-eski',
-        'ad'        => 'Musa Eski',
-        'unvan'     => 'Başkan Yardımcısı',
-        'fotograf'  => 'placeholder-kisi.svg',
-        'biyografi' => '',
-        'gorevler'  => [],
-        'sosyal' => [
-            'facebook'  => '',
-            'instagram' => '',
-            'linkedin'  => '',
+        'baslik' => 'Kadın Kolları',
+        'uyeler' => [
+            kisi(slug: 'busra-yilmaz',       ad: 'Büşra Yılmaz',       unvan: 'Kadın Kolları Başkanı'),
+            kisi(slug: 'guluzar-aydogdu',    ad: 'Gülüzar Aydoğdu',    unvan: 'Başkan Yardımcısı'),
+            kisi(slug: 'nurcan-degirmenci',  ad: 'Nurcan Değirmenci',   unvan: 'Başkan Yardımcısı'),
+            kisi(slug: 'emine-aydin',        ad: 'Emine Aydın',        unvan: 'Başkan Yardımcısı'),
         ],
     ],
+
+    // ── 7. YÖNETİM KURULU ÜYELERİ ────────────────────────────────────────────
     [
-        'slug'      => 'mustafa-sahin',
-        'ad'        => 'Mustafa Şahin',
-        'unvan'     => 'Sayman',
-        'fotograf'  => 'placeholder-kisi.svg',
-        'biyografi' => '',
-        'gorevler'  => [],
-        'sosyal' => [
-            'facebook'  => '',
-            'instagram' => '',
-            'linkedin'  => '',
+        'baslik' => 'Yönetim Kurulu Üyeleri',
+        'uyeler' => [
+            kisi(slug: 'mehmet-volkan-yavuzturk', ad: 'Mehmet Volkan Yavuztürk', unvan: 'Yönetim Kurulu Üyesi'),
+            kisi(slug: 'enes-ustun',              ad: 'Enes Üstün',              unvan: 'Yönetim Kurulu Üyesi'),
+            kisi(slug: 'selim-sandikci',          ad: 'Selim Sandıkçı',          unvan: 'Yönetim Kurulu Üyesi'),
+            kisi(slug: 'muhammet-ali-topcu',      ad: 'Muhammet Ali Topçu',      unvan: 'Yönetim Kurulu Üyesi'),
+            kisi(slug: 'yunus-okutan',            ad: 'Yunus Okutan',            unvan: 'Yönetim Kurulu Üyesi'),
+            kisi(slug: 'dursun-ali-suleymanogl',  ad: 'Dursun Ali Süleymanoğlu', unvan: 'Yönetim Kurulu Üyesi'),
+            kisi(slug: 'ahmet-yilmaz',            ad: 'Ahmet Yılmaz',            unvan: 'Yönetim Kurulu Üyesi'),
+            kisi(slug: 'mehmet-uzunoglu',         ad: 'Mehmet Uzunoğlu',         unvan: 'Yönetim Kurulu Üyesi'),
+            kisi(slug: 'onur-yildiz',             ad: 'Onur Yıldız',             unvan: 'Yönetim Kurulu Üyesi'),
+            kisi(slug: 'yucel-alp',               ad: 'Yücel Alp',               unvan: 'Yönetim Kurulu Üyesi'),
+            kisi(slug: 'ugur-okumus',             ad: 'Uğur Okumuş',             unvan: 'Yönetim Kurulu Üyesi'),
+            kisi(slug: 'salim-suleymanogl',       ad: 'Salim Süleymanoğlu',      unvan: 'Yönetim Kurulu Üyesi'),
+            kisi(slug: 'fatma-demir',             ad: 'Fatma Demir',             unvan: 'Yönetim Kurulu Üyesi'),
         ],
     ],
-    // Geçici olarak gizlendi — aktifleştirmek için yorum satırını kaldırın.
-    // [
-    //     'slug'      => 'ilyas-demir',
-    //     'ad'        => 'İlyas Demir',
-    //     'unvan'     => 'Gençlik Kolları Başkanı',
-    //     'fotograf'  => 'ilyas-demir.jpeg',
-    //     'biyografi' => '',
-    //     'gorevler'  => [],
-    //     'sosyal' => [
-    //         'facebook'  => '',
-    //         'instagram' => '',
-    //         'linkedin'  => '',
-    //     ],
-    // ],
-    // [
-    //     'slug'      => 'fatma-demir',
-    //     'ad'        => 'Fatma Demir',
-    //     'unvan'     => 'Kadın Kolları Başkanı',
-    //     'fotograf'  => 'fatma-demir.jpeg',
-    //     'biyografi' => '',
-    //     'gorevler'  => [],
-    //     'sosyal' => [
-    //         'facebook'  => '',
-    //         'instagram' => '',
-    //         'linkedin'  => '',
-    //     ],
-    // ],
+
+    // ── 8. DİJİTAL PROJELER KOORDİNATÖRÜ ────────────────────────────────────
+    [
+        'baslik' => 'Dijital Projeler ve Teknoloji',
+        'uyeler' => [
+            kisi(slug: 'ugur-kotbas', ad: 'Uğur Kotbaş', unvan: 'Koordinatör'),
+        ],
+    ],
 ];

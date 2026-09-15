@@ -29,12 +29,12 @@ final class BoardController
             breadcrumbs: [['label' => 'Yönetim Kurulu', 'path' => '/yonetim-kurulu']],
         );
 
-        /** @var list<array{slug:string,ad:string,unvan:string,fotograf:string,biyografi:string,gorevler:list<string>,sosyal:array<string,string>}> $uyeler */
-        $uyeler = require dirname(__DIR__, 3) . '/resources/data/board.php';
+        /** @var list<array{baslik:string|null, uyeler: list<array{slug:string,ad:string,unvan:string,fotograf:string,biyografi:string,gorevler:list<string>,sosyal:array<string,string>}>}> $gruplar */
+        $gruplar = require dirname(__DIR__, 3) . '/resources/data/board.php';
 
         return $this->responder->page('pages/board', $seo, [
-            'styles' => ['board.css'],
-            'uyeler' => $uyeler,
+            'styles'  => ['board.css'],
+            'gruplar' => $gruplar,
         ]);
     }
 

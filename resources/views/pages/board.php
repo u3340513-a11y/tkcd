@@ -6,16 +6,12 @@ use App\Core\View\PhpViewRenderer;
 use App\Core\View\SeoMeta;
 
 /**
- * Yönetim Kurulu sayfası.
- *
- * Bölümler:
- *   1. Hero      : Markalı başlık şeridi
- *   2. Üye Kartları : Fotoğraf, unvan, görevler, sosyal bağlantılar
+ * Yönetim Kurulu sayfası — hiyerarşik gruplu düzen.
  *
  * @var PhpViewRenderer $view
  * @var SeoMeta         $seo
  * @var array<string, mixed> $site
- * @var list<array{slug:string,ad:string,unvan:string,fotograf:string,biyografi:string,gorevler:list<string>,sosyal:array<string,string>}> $uyeler
+ * @var list<array{baslik:string|null, uyeler: list<array{slug:string,ad:string,unvan:string,fotograf:string,biyografi:string,gorevler:list<string>,sosyal:array<string,string>}>}> $gruplar
  */
 
 /** @var array<string, string> */
@@ -28,6 +24,19 @@ $sosyalEtiketler = [
     'whatsapp'  => 'WhatsApp',
 ];
 
+// Grup başlıklarına göre kolon sayısı belirle
+$kolonSayisi = static function (string|null $baslik, int $uyeSayisi): string {
+    if ($uyeSayisi === 1) {
+        return 'yk-grup-izgara--tek';
+    }
+    if ($uyeSayisi === 2) {
+        return 'yk-grup-izgara--ikili';
+    }
+    if ($uyeSayisi >= 4) {
+        return 'yk-grup-izgara--dortlu';
+    }
+    return 'yk-grup-izgara--uclu';
+};
 ?>
 
 <!-- ╔══════════════════════════════════════════════════════╗ -->
@@ -57,69 +66,80 @@ $sosyalEtiketler = [
 </section>
 
 <!-- ╔══════════════════════════════════════════════════════╗ -->
-<!-- ║  2. ÜYE KARTLARI                                     ║ -->
+<!-- ║  2. HİYERARŞİK GRUPLAR                               ║ -->
 <!-- ╚══════════════════════════════════════════════════════╝ -->
-<section class="yk-bolum" aria-label="Yönetim kurulu üyeleri">
+<section class="yk-bolum" aria-label="Yönetim kurulu hiyerarşisi">
     <div class="kapsayici">
-        <ul class="yk-izgara">
-            <?php foreach ($uyeler as $uye): ?>
-            <li class="yk-karti belirme" id="uye-<?= $view->e($uye['slug']) ?>">
+        <?php foreach ($gruplar as $grup): ?>
+        <div class="yk-grup belirme">
 
-                <!-- Fotoğraf -->
-                <div class="yk-karti__fotograf-cerceve" aria-hidden="true">
-                    <img
-                        class="yk-karti__fotograf"
-                        src="<?= $view->e($view->asset('assets/img/' . $uye['fotograf'])) ?>"
-                        alt="<?= $view->e($uye['ad']) ?> fotoğrafı"
-                        width="200" height="200"
-                        loading="lazy"
-                        decoding="async"
-                    >
-                </div>
+            <?php if (!empty($grup['baslik'])): ?>
+            <div class="yk-grup__baslik-bant">
+                <span><?= $view->e($grup['baslik']) ?></span>
+            </div>
+            <?php endif; ?>
 
-                <!-- Bilgiler -->
-                <div class="yk-karti__govde">
-                    <h2 class="yk-karti__ad"><?= $view->e($uye['ad']) ?></h2>
-                    <p class="yk-karti__unvan"><?= $view->e($uye['unvan']) ?></p>
+            <ul class="yk-grup-izgara <?= $kolonSayisi($grup['baslik'], count($grup['uyeler'])) ?>">
+                <?php foreach ($grup['uyeler'] as $uye): ?>
+                <li class="yk-karti" id="uye-<?= $view->e($uye['slug']) ?>">
 
-                    <?php if (!empty($uye['biyografi'])): ?>
-                    <p class="yk-karti__biyografi"><?= $view->e($uye['biyografi']) ?></p>
-                    <?php endif; ?>
+                    <!-- Fotoğraf -->
+                    <div class="yk-karti__fotograf-cerceve" aria-hidden="true">
+                        <img
+                            class="yk-karti__fotograf"
+                            src="<?= $view->e($view->asset('assets/img/' . $uye['fotograf'])) ?>"
+                            alt="<?= $view->e($uye['ad']) ?> fotoğrafı"
+                            width="200" height="200"
+                            loading="lazy"
+                            decoding="async"
+                        >
+                    </div>
 
-                    <?php if (!empty($uye['gorevler'])): ?>
-                    <ul class="yk-karti__gorevler" aria-label="Diğer görevler">
-                        <?php foreach ($uye['gorevler'] as $gorev): ?>
-                        <li><?= $view->e($gorev) ?></li>
-                        <?php endforeach; ?>
-                    </ul>
-                    <?php endif; ?>
+                    <!-- Bilgiler -->
+                    <div class="yk-karti__govde">
+                        <h2 class="yk-karti__ad"><?= $view->e($uye['ad']) ?></h2>
+                        <p class="yk-karti__unvan"><?= $view->e($uye['unvan']) ?></p>
 
-                    <!-- Sosyal bağlantılar -->
-                    <?php
-                    $aktifSosyal = array_filter(
-                        $uye['sosyal'],
-                        static fn(string $url): bool => $url !== ''
-                    );
-                    ?>
-                    <?php if (!empty($aktifSosyal)): ?>
-                    <ul class="yk-karti__sosyal" aria-label="<?= $view->e($uye['ad']) ?> sosyal medya">
-                        <?php foreach ($aktifSosyal as $platform => $url): ?>
-                        <li>
-                            <a class="yk-karti__sosyal-link yk-karti__sosyal-link--<?= $view->e($platform) ?>"
-                               href="<?= $view->e($url) ?>"
-                               target="_blank"
-                               rel="noopener noreferrer"
-                               aria-label="<?= $view->e($sosyalEtiketler[$platform] ?? $platform) ?>">
-                                <?= $view->icon($platform) ?>
-                            </a>
-                        </li>
-                        <?php endforeach; ?>
-                    </ul>
-                    <?php endif; ?>
-                </div>
+                        <?php if (!empty($uye['biyografi'])): ?>
+                        <p class="yk-karti__biyografi"><?= $view->e($uye['biyografi']) ?></p>
+                        <?php endif; ?>
 
-            </li>
-            <?php endforeach; ?>
-        </ul>
+                        <?php if (!empty($uye['gorevler'])): ?>
+                        <ul class="yk-karti__gorevler" aria-label="Diğer görevler">
+                            <?php foreach ($uye['gorevler'] as $gorev): ?>
+                            <li><?= $view->e($gorev) ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                        <?php endif; ?>
+
+                        <!-- Sosyal bağlantılar -->
+                        <?php
+                        $aktifSosyal = array_filter(
+                            $uye['sosyal'],
+                            static fn(string $url): bool => $url !== ''
+                        );
+                        ?>
+                        <?php if (!empty($aktifSosyal)): ?>
+                        <ul class="yk-karti__sosyal" aria-label="<?= $view->e($uye['ad']) ?> sosyal medya">
+                            <?php foreach ($aktifSosyal as $platform => $url): ?>
+                            <li>
+                                <a class="yk-karti__sosyal-link yk-karti__sosyal-link--<?= $view->e($platform) ?>"
+                                   href="<?= $view->e($url) ?>"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   aria-label="<?= $view->e($sosyalEtiketler[$platform] ?? $platform) ?>">
+                                    <?= $view->icon($platform) ?>
+                                </a>
+                            </li>
+                            <?php endforeach; ?>
+                        </ul>
+                        <?php endif; ?>
+                    </div>
+
+                </li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+        <?php endforeach; ?>
     </div>
 </section>
