@@ -106,7 +106,7 @@ return [
             kisi(slug: 'huseyin-koc',      ad: 'Hüseyin Koç',      unvan: 'Teşkilatlanmadan Sorumlu Başkan', fotograf: 'huseyin_koc.png'),
             kisi(slug: 'mert-hayrioglu',   ad: 'Mert Hayrioğlu',   unvan: 'Başkan Yardımcısı', fotograf: 'mert-hayrioglu.jpeg'),
             kisi(slug: 'murat-bayraktar',  ad: 'Murat Bayraktar',  unvan: 'Başkan Yardımcısı'),
-            kisi(slug: 'ugur-kayazoglu',   ad: 'Uğur Kayazoğlu',   unvan: 'Başkan Yardımcısı'),
+            kisi(slug: 'ugur-kayazoglu',   ad: 'Uğur Kayazoğlu',   unvan: 'Başkan Yardımcısı', fotograf: 'ugur-kayazoglu.png'),
         ],
     ],
 
@@ -127,7 +127,7 @@ return [
         'uyeler' => [
             kisi(slug: 'mehmet-volkan-yavuzturk', ad: 'Mehmet Volkan Yavuztürk', unvan: 'Yönetim Kurulu Üyesi'),
             kisi(slug: 'enes-ustun',              ad: 'Enes Üstün',              unvan: 'Yönetim Kurulu Üyesi'),
-            kisi(slug: 'selim-sandikci',          ad: 'Selim Sandıkçı',          unvan: 'Yönetim Kurulu Üyesi'),
+            kisi(slug: 'selim-sandikci',          ad: 'Selim Sandıkçı',          unvan: 'Yönetim Kurulu Üyesi', fotograf: 'selim-sandikci.png'),
             kisi(slug: 'muhammet-ali-topcu',      ad: 'Muhammet Ali Topçu',      unvan: 'Yönetim Kurulu Üyesi'),
             kisi(slug: 'yunus-okutan',            ad: 'Yunus Okutan',            unvan: 'Yönetim Kurulu Üyesi'),
             kisi(slug: 'dursun-ali-suleymanogl',  ad: 'Dursun Ali Süleymanoğlu', unvan: 'Yönetim Kurulu Üyesi'),
@@ -137,7 +137,7 @@ return [
             kisi(slug: 'yucel-alp',               ad: 'Yücel Alp',               unvan: 'Yönetim Kurulu Üyesi'),
             kisi(slug: 'ugur-okumus',             ad: 'Uğur Okumuş',             unvan: 'Yönetim Kurulu Üyesi'),
             kisi(slug: 'salim-suleymanogl',       ad: 'Salim Süleymanoğlu',      unvan: 'Yönetim Kurulu Üyesi'),
-            kisi(slug: 'fatma-demir',             ad: 'Fatma Demir',             unvan: 'Yönetim Kurulu Üyesi'),
+            kisi(slug: 'fatma-demir',             ad: 'Fatma Demir',             unvan: 'Yönetim Kurulu Üyesi', fotograf: 'fatma-demir.png'),
         ],
     ],
 
