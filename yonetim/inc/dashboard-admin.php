@@ -38,9 +38,7 @@
  * @var array  $son_faaliyetler
  */
 
-// Geçici debug — sorun tespiti için
-error_reporting(E_ALL);
-ini_set('display_errors', '1');
+
 
 // Faaliyetler (log) — Son 10 kayıt
 $son_faaliyetler = [];
@@ -309,19 +307,23 @@ $bolge_degerler  = array_values($bolge_sayilari);
                 <span class="dash-card__action">Son 12 Ay</span>
             </div>
             <div class="dash-card__body">
-                <canvas id="uyeArtisTrendi" height="260"></canvas>
+                <div style="position:relative; height:260px; max-height:260px;">
+                    <canvas id="uyeArtisTrendi"></canvas>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Sağ: Bölge Dağılımı -->
     <div class="col-lg-4">
-        <div class="dash-card h-100">
+        <div class="dash-card">
             <div class="dash-card__header">
                 <h5 class="dash-card__title"><i class="fa-solid fa-pie-chart text-success"></i> Bölge Dağılımı</h5>
             </div>
             <div class="dash-card__body text-center">
-                <canvas id="bolgeDagilimi" height="220"></canvas>
+                <div style="position:relative; height:220px; max-height:220px;">
+                    <canvas id="bolgeDagilimi"></canvas>
+                </div>
                 <div class="mt-3 d-flex flex-wrap justify-content-center gap-2">
                     <?php foreach ($bolge_sayilari as $bolge => $sayi): ?>
                     <span class="badge bg-light text-dark border px-2 py-1" style="font-size:0.75rem;">
@@ -371,7 +373,9 @@ $bolge_degerler  = array_values($bolge_sayilari);
             </div>
             <div class="dash-card__body text-center">
                 <?php if (!empty($admin_kan_etiketler)): ?>
-                <canvas id="kanGrubuGrafik" height="200"></canvas>
+                <div style="position:relative; height:200px; max-height:200px;">
+                    <canvas id="kanGrubuGrafik"></canvas>
+                </div>
                 <div class="mt-3 d-flex flex-wrap justify-content-center gap-2">
                     <?php
                     $kan_toplam = array_sum($admin_kan_sayilar);
