@@ -101,7 +101,7 @@ return [
 
     // ── 6b. TEŞKİLATLANMADAN SORUMLU ─────────────────────────────────────────
     [
-        'baslik' => 'Teşkilatlanmadan Sorumlu',
+        'baslik' => 'Teşkilatlanma',
         'uyeler' => [
             kisi(slug: 'huseyin-koc',      ad: 'Hüseyin Koç',      unvan: 'Teşkilatlanmadan Sorumlu Başkan'),
             kisi(slug: 'mert-hayrioglu',   ad: 'Mert Hayrioğlu',   unvan: 'Başkan Yardımcısı'),

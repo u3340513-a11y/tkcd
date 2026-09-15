@@ -110,6 +110,7 @@
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  text-align: center;
   padding: 0.85rem 2rem;
   border-radius: var(--yuvarlak-xl, 1.25rem) var(--yuvarlak-xl, 1.25rem) 0 0;
 }
