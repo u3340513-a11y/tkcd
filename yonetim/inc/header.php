@@ -6,26 +6,14 @@
     <title>Dernek Yönetim Paneli</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="assets/panel.css" rel="stylesheet">
     <style>
         body {
-            background-color: #f8f9fa;
+            background-color: var(--panel-bg, #f0f2f5);
+            margin: 0;
+            overflow-x: hidden;
         }
-        .navbar-trabzon {
-            background-color: #610012; /* Bordo */
-        }
-        .navbar-trabzon .navbar-brand, 
-        .navbar-trabzon .nav-link {
-            color: #ffffff !important;
-        }
-        .navbar-trabzon .nav-link:hover {
-            color: #004d66 !important; /* Mavi tonu */
-            background-color: rgba(255,255,255,0.1);
-            border-radius: 5px;
-        }
-        .navbar-trabzon .active {
-            background-color: #004d66 !important;
-            border-radius: 5px;
-        }
+        /* Eski card-stat hover (geriye uyumluluk) */
         .card-stat {
             border: none;
             border-radius: 10px;
@@ -38,3 +26,4 @@
     </style>
 </head>
 <body>
+<div class="panel-layout">

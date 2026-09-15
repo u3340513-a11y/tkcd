@@ -286,7 +286,10 @@ $is_yetki_var        = ($is_admin || $is_yonetim || $is_gelistirici);
 $sayfa = isset($_GET['sayfa']) ? trim($_GET['sayfa']) : 'dashboard';
 
 include 'inc/header.php';
-include 'inc/navbar.php';
+include 'inc/sidebar.php';
+echo '<div class="panel-content">';
+include 'inc/topbar.php';
+echo '<div class="panel-main">';
 
 switch ($sayfa) {
     case 'uyeler':
