@@ -167,11 +167,25 @@
   border-top-right-radius: 0;
 }
 
+/* 4'lü grid kartlarında isim daha küçük → tek satır sığar */
+.yk-grup-izgara--dortlu .yk-karti__ad {
+  font-size: var(--olcek-lg, 1.125rem);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
 @media (max-width: 640px) {
   .yk-grup-izgara--ikili,
   .yk-grup-izgara--dortlu,
   .yk-grup-izgara--uclu {
     grid-template-columns: 1fr;
+  }
+
+  /* Mobilde nowrap kaldır — tek kolon olduğunda yer var */
+  .yk-grup-izgara--dortlu .yk-karti__ad {
+    white-space: normal;
   }
 }
 

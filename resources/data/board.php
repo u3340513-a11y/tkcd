@@ -29,7 +29,7 @@ function kisi(
 }
 
 return [
-    // ── 1. KURUCU ve ONURSAL BAŞKAN ──────────────────────────────────────────
+    // ── 1. KURUCU/ONURSAL BAŞKAN + GENEL BAŞKAN ──────────────────────────────────────
     [
         'baslik' => null,
         'uyeler' => [
@@ -45,13 +45,6 @@ return [
                     'linkedin'  => 'https://tr.linkedin.com/in/ismailturgutoksuz',
                 ],
             ),
-        ],
-    ],
-
-    // ── 2. GENEL BAŞKAN ───────────────────────────────────────────────────────
-    [
-        'baslik' => null,
-        'uyeler' => [
             kisi(
                 slug:     'hakan-turan',
                 ad:       'Hakan Turan',
