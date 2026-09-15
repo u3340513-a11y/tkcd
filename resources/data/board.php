@@ -92,7 +92,7 @@ return [
     [
         'baslik' => 'Gençlik Kolları',
         'uyeler' => [
-            kisi(slug: 'ilyas-demir',   ad: 'İlyas Demir',    unvan: 'Gençlik Kolları Başkanı'),
+            kisi(slug: 'ilyas-demir',   ad: 'İlyas Demir',    unvan: 'Gençlik Kolları Başkanı', fotograf: 'ilyas-demir.png'),
             kisi(slug: 'umit-bolukbas', ad: 'Ümit Bölükbaş',  unvan: 'Başkan Yardımcısı'),
             kisi(slug: 'samet-celik',   ad: 'Samet Çelik',    unvan: 'Başkan Yardımcısı'),
             kisi(slug: 'berkay-soylu',  ad: 'Berkay Soylu',   unvan: 'Başkan Yardımcısı'),
@@ -103,8 +103,8 @@ return [
     [
         'baslik' => 'Teşkilatlanma',
         'uyeler' => [
-            kisi(slug: 'huseyin-koc',      ad: 'Hüseyin Koç',      unvan: 'Teşkilatlanmadan Sorumlu Başkan'),
-            kisi(slug: 'mert-hayrioglu',   ad: 'Mert Hayrioğlu',   unvan: 'Başkan Yardımcısı'),
+            kisi(slug: 'huseyin-koc',      ad: 'Hüseyin Koç',      unvan: 'Teşkilatlanmadan Sorumlu Başkan', fotograf: 'huseyin_koc.png'),
+            kisi(slug: 'mert-hayrioglu',   ad: 'Mert Hayrioğlu',   unvan: 'Başkan Yardımcısı', fotograf: 'mert-hayrioglu.jpeg'),
             kisi(slug: 'murat-bayraktar',  ad: 'Murat Bayraktar',  unvan: 'Başkan Yardımcısı'),
             kisi(slug: 'ugur-kayazoglu',   ad: 'Uğur Kayazoğlu',   unvan: 'Başkan Yardımcısı'),
         ],
