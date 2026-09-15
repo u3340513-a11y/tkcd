@@ -222,4 +222,21 @@ function csrf_hidden_alan(): string
     } catch (\PDOException $e) {
         error_log("Migration hatası (rol kolonu genişletme): " . $e->getMessage());
     }
+
+    // duyurular tablosu — Dashboard'da gösterilecek geliştirici duyuruları
+    try {
+        $db_baglanti->exec("
+            CREATE TABLE IF NOT EXISTS `duyurular` (
+                `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                `baslik` VARCHAR(255) NOT NULL,
+                `icerik` TEXT NULL,
+                `aktif` TINYINT(1) NOT NULL DEFAULT 1,
+                `tarih` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                `olusturan` VARCHAR(100) NULL,
+                INDEX `idx_aktif_tarih` (`aktif`, `tarih` DESC)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        ");
+    } catch (\PDOException $e) {
+        error_log("Migration hatası (duyurular tablosu): " . $e->getMessage());
+    }
 })();
