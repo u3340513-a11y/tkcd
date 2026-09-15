@@ -38,6 +38,10 @@
  * @var array  $son_faaliyetler
  */
 
+// Geçici debug — sorun tespiti için
+error_reporting(E_ALL);
+ini_set('display_errors', '1');
+
 // Faaliyetler (log) — Son 10 kayıt
 $son_faaliyetler = [];
 try {
@@ -46,35 +50,52 @@ try {
            FROM yonetim_log
           ORDER BY tarih DESC LIMIT 10"
     );
-    $son_faaliyetler = $faaliyet_sorgu->fetchAll(PDO::FETCH_ASSOC);
+    if ($faaliyet_sorgu) {
+        $son_faaliyetler = $faaliyet_sorgu->fetchAll(PDO::FETCH_ASSOC);
+    }
 } catch (\PDOException $e) {
+    $son_faaliyetler = [];
+} catch (\Throwable $e) {
     $son_faaliyetler = [];
 }
 
 // Duyurular
 $duyurular = [];
 try {
-    $duyuru_sorgu = $db_baglanti->query(
-        "SELECT baslik, icerik, tarih FROM duyurular WHERE aktif = 1 ORDER BY tarih DESC LIMIT 5"
+    // Tablo var mı kontrol et (idempotent)
+    $tablo_kontrol = $db_baglanti->query(
+        "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'duyurular'"
     );
-    $duyurular = $duyuru_sorgu->fetchAll(PDO::FETCH_ASSOC);
+    if ($tablo_kontrol && (int) $tablo_kontrol->fetchColumn() > 0) {
+        $duyuru_sorgu = $db_baglanti->query(
+            "SELECT baslik, icerik, tarih FROM duyurular WHERE aktif = 1 ORDER BY tarih DESC LIMIT 5"
+        );
+        if ($duyuru_sorgu) {
+            $duyurular = $duyuru_sorgu->fetchAll(PDO::FETCH_ASSOC);
+        }
+    }
 } catch (\PDOException $e) {
-    // Tablo henüz yoksa boş bırak
+    $duyurular = [];
+} catch (\Throwable $e) {
     $duyurular = [];
 }
 
 // Avatar renk paleti (hash'e göre)
 $avatar_renkleri = ['#3b82f6','#ef4444','#f59e0b','#10b981','#8b5cf6','#ec4899','#06b6d4','#f97316','#14b8a6','#6366f1'];
-function avatarRengi(string $isim, array $renkler): string {
-    return $renkler[crc32($isim) % count($renkler)];
-}
-function basHarfleri(string $isim): string {
-    $parcalar = explode(' ', trim($isim));
-    $harfler = '';
-    foreach (array_slice($parcalar, 0, 2) as $p) {
-        $harfler .= mb_strtoupper(mb_substr(trim($p), 0, 1));
+if (!function_exists('avatarRengi')) {
+    function avatarRengi(string $isim, array $renkler): string {
+        return $renkler[abs(crc32($isim)) % count($renkler)];
     }
-    return $harfler;
+}
+if (!function_exists('basHarfleri')) {
+    function basHarfleri(string $isim): string {
+        $parcalar = explode(' ', trim($isim));
+        $harfler = '';
+        foreach (array_slice($parcalar, 0, 2) as $p) {
+            $harfler .= mb_strtoupper(mb_substr(trim($p), 0, 1));
+        }
+        return $harfler;
+    }
 }
 
 // Üye artış trendi — Son 12 ay
