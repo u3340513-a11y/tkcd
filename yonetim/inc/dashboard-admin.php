@@ -155,12 +155,12 @@ $bolge_degerler  = array_values($bolge_sayilari);
      ═══════════════════════════════════════════════════════════════ -->
 <div class="dash-banner mb-4">
     <div class="dash-banner__text">
-        <h3><i class="fa-solid fa-flag me-2"></i>Trabzon'un gücü, gönül veren insanlarında…</h3>
+        <h3>Trabzon'un gücü, gönül veren insanlarında…</h3>
         <p>Bugün derneğimizde <strong><?= number_format($toplam_uye) ?></strong> kayıtlı üye,
            <strong><?= $toplam_il ?></strong> aktif ilde teşkilatlanma ile güçlenmeye devam ediyoruz.</p>
     </div>
     <div class="dash-banner__quote">
-        "Memleket sevdası,<br>insana en güzel hizmeti yaptırır."
+        “Memleket sevdası,<br>insana en güzel hizmeti yaptırır.”
     </div>
 </div>
 
