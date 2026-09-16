@@ -15,6 +15,10 @@ $is_kurum_temsilcisi = ($kullanici_rolu === 'kurum_temsilcisi');
 $is_kadin_kollari    = ($kullanici_rolu === 'kadin_kollari_baskani');
 $is_kisitli_rol      = ($is_il_baskani || $is_ilce_baskani || $is_kurum_temsilcisi || $is_kadin_kollari);
 
+// Sadece başvuru SAYISINI görebilen kullanıcılar (liste görememez)
+$yalnizca_sayim_kullanicilari = ['yonetim_ukk', 'yonetim_mh', 'yonetim_mb', 'yonetim_he', 'yonetim_hk'];
+$is_yalnizca_sayim = in_array($oturum_kullanici_adi, $yalnizca_sayim_kullanicilari, true);
+
 // --- BAŞVURU ONAYLAMA MOTORU ---
 if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'basvuru_onayla' && isset($_GET['id'])) {
     if ($oturum_kullanici_adi === 'yonetim_kby') {
@@ -135,6 +139,33 @@ try {
             <strong><i class="fa-solid fa-circle-info me-2"></i></strong> <?= $mesaj; ?>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="padding: 12px;"></button>
         </div>
+    <?php endif; ?>
+
+    <?php if ($is_yalnizca_sayim): ?>
+    <!-- ── SADECE SAYI GÖRÜNÜMÜ (yonetim_ukk, mh, mb, he, hk) ── -->
+    <div class="row justify-content-center mt-4">
+        <div class="col-sm-8 col-md-5">
+            <div class="card border-0 shadow rounded-4 text-center py-5 px-4"
+                 style="background:linear-gradient(135deg,#fff5f5,#fff);">
+                <div class="mb-3">
+                    <span class="rounded-circle d-inline-flex align-items-center justify-content-center"
+                          style="width:72px;height:72px;background:#c628280f;border:2px solid #c6282822;">
+                        <i class="fa-solid fa-user-clock fa-2x" style="color:#c62828;"></i>
+                    </span>
+                </div>
+                <div class="fw-bold mb-1" style="font-size:3.5rem;color:#c62828;line-height:1;">
+                    <?= count($bekleyenler) ?>
+                </div>
+                <div class="text-muted fw-semibold" style="font-size:1rem;">
+                    Bekleyen Üyelik Başvurusu
+                </div>
+                <div class="text-muted mt-2" style="font-size:0.8rem;">
+                    Başvuru listesini görüntüleme yetkiniz bulunmuyor.
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php return; ?>
     <?php endif; ?>
 
     <div class="card border-0 shadow-sm rounded-3">
