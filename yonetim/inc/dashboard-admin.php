@@ -768,11 +768,11 @@ $bolge_degerler  = array_values($bolge_sayilari);
 <!-- ═══════════════════════════════════════════════════════════════
      CHART.JS GRAFİKLER
      ═══════════════════════════════════════════════════════════════ -->
-<!-- Leaflet.js — Türkiye Haritası -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- Leaflet.js — Yerel kurulum -->
+<link rel="stylesheet" href="../assets/leaflet/leaflet.min.css">
+<script src="../assets/leaflet/leaflet.min.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+window.addEventListener('load', function () {
 
     var haritaEl = document.getElementById('turkiyeHaritasi');
     if (!haritaEl || typeof L === 'undefined') return;
@@ -803,6 +803,10 @@ document.addEventListener('DOMContentLoaded', function () {
         var oran = Math.pow(sayi / maksUye, 0.4);
         return 'rgb(198,' + Math.round(228 - 208 * oran) + ',' + Math.round(236 - 196 * oran) + ')';
     }
+
+    // Leaflet marker ikon hatasını önle (choropleth için ikon gerekmiyor)
+    delete L.Icon.Default.prototype._getIconUrl;
+    L.Icon.Default.mergeOptions({ iconUrl: '', shadowUrl: '', iconRetinaUrl: '' });
 
     var harita = L.map('turkiyeHaritasi', {
         center: [39.0, 35.5],
