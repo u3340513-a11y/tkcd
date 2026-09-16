@@ -266,13 +266,12 @@ function kisi_bilgisi_gorebilir(): bool
     /** @var string[] İzin verilen kullanıcı adları (rol bağımsız) */
     $izinli_kullanicilar = ['admin61', 'yonetim_hk'];
 
-    $rol   = $_SESSION['rol']           ?? '';
-    $kadi  = $_SESSION['kullanici_adi'] ?? '';
+    // Hesap geçişi (impersonation) modunda MEVCUT kullanıcının rolü kullanılır.
+    // Geliştirici başka hesaba geçiş yaptığında, o hesabın kısıtlamaları geçerli olur.
+    $rol  = $_SESSION['rol']           ?? '';
+    $kadi = $_SESSION['kullanici_adi'] ?? '';
 
-    // Geliştirici hesap geçişi yapıyorsa gerçek rolünü kontrol et
-    $gercek_rol = $_SESSION['gercek_rol'] ?? $rol;
-
-    $sonuc = $gercek_rol === 'gelistirici'
+    $sonuc = $rol === 'gelistirici'
           || in_array($kadi, $izinli_kullanicilar, true);
 
     return $sonuc;
