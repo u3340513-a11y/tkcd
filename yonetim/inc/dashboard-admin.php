@@ -773,7 +773,6 @@ $bolge_degerler  = array_values($bolge_sayilari);
 <script src="/yonetim/assets/leaflet/leaflet.min.js"></script>
 <script>
 window.addEventListener('load', function () {
-
     var haritaEl = document.getElementById('turkiyeHaritasi');
     if (!haritaEl || typeof L === 'undefined') return;
 
@@ -788,11 +787,8 @@ window.addEventListener('load', function () {
         echo json_encode($il_map, JSON_UNESCAPED_UNICODE);
     ?>;
 
-    // GeoJSON — PHP ile inline gömülü (fetch yok, CDN bağımlılığı yok)
-    var turkeyGeoJSON = <?php
-        $geojson_path = dirname(__DIR__, 2) . '/public/assets/data/turkey-provinces.geojson';
-        echo file_exists($geojson_path) ? file_get_contents($geojson_path) : '{"type":"FeatureCollection","features":[]}';
-    ?>;
+    // GeoJSON — ayrı PHP endpoint üzerinden sunuluyor (büyük dosya, inline gömmek yerine)
+    var haritaGeojsonUrl = '/yonetim/api/harita-geojson.php';
 
     var maksUye = 0;
     Object.values(ilVerileri).forEach(function(v) { if (v > maksUye) maksUye = v; });
@@ -804,7 +800,6 @@ window.addEventListener('load', function () {
         return 'rgb(198,' + Math.round(228 - 208 * oran) + ',' + Math.round(236 - 196 * oran) + ')';
     }
 
-    // Leaflet marker ikon hatasını önle (choropleth için ikon gerekmiyor)
     delete L.Icon.Default.prototype._getIconUrl;
     L.Icon.Default.mergeOptions({ iconUrl: '', shadowUrl: '', iconRetinaUrl: '' });
 
@@ -823,7 +818,7 @@ window.addEventListener('load', function () {
 
     var geojsonLayer;
 
-    // Highcharts GeoJSON'daki İngilizce/transkript adları → DB Türkçe adları
+    // Natural Earth adları → DB Türkçe adları eşleme tablosu
     var ilEsleme = {
         'Adana':'Adana','Adiyaman':'Adıyaman','Afyonkarahisar':'Afyonkarahisar',
         'Agri':'Ağrı','Aksaray':'Aksaray','Amasya':'Amasya','Ankara':'Ankara',
@@ -835,7 +830,7 @@ window.addEventListener('load', function () {
         'Erzurum':'Erzurum','Eskisehir':'Eskişehir','Gaziantep':'Gaziantep',
         'Giresun':'Giresun','Gümüshane':'Gümüşhane','Hakkari':'Hakkari',
         'Hatay':'Hatay','Isparta':'Isparta','Istanbul':'İstanbul','Izmir':'İzmir',
-        'Iğdır':'Iğdır','K. Maras':'Kahramanmaraş','Karabük':'Karabük',
+        'Iğdir':'Iğdır','K. Maras':'Kahramanmaraş','Karabük':'Karabük',
         'Karaman':'Karaman','Kars':'Kars','Kastamonu':'Kastamonu','Kayseri':'Kayseri',
         'Kilis':'Kilis','Kinkkale':'Kırıkkale','Kirklareli':'Kırklareli',
         'Kirsehir':'Kırşehir','Kocaeli':'Kocaeli','Konya':'Konya','Kütahya':'Kütahya',
@@ -874,16 +869,22 @@ window.addEventListener('load', function () {
         });
     }
 
-    if (turkeyGeoJSON.features && turkeyGeoJSON.features.length > 0) {
-        geojsonLayer = L.geoJSON(turkeyGeoJSON, {
-            style: stilFonksiyonu,
-            onEachFeature: onEachFeature,
-        }).addTo(harita);
-        harita.fitBounds(geojsonLayer.getBounds(), { padding: [8, 8] });
-    }
-
-    // Kapsayıcı boyutu değişirse haritayı yenile
-    setTimeout(function() { harita.invalidateSize(); }, 300);
+    fetch(haritaGeojsonUrl)
+        .then(function(r) {
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            return r.json();
+        })
+        .then(function(data) {
+            geojsonLayer = L.geoJSON(data, {
+                style: stilFonksiyonu,
+                onEachFeature: onEachFeature,
+            }).addTo(harita);
+            harita.fitBounds(geojsonLayer.getBounds(), { padding: [8, 8] });
+            setTimeout(function() { harita.invalidateSize(); }, 100);
+        })
+        .catch(function(err) {
+            console.error('Harita GeoJSON yüklenemedi:', err);
+        });
 });
 </script>
 <style>
