@@ -155,8 +155,8 @@ log_kaydet($db_baglanti, 'pdf_indir', 'PDF raporu indirildi (' . count($uyeler) 
                 ?>
                 <tr <?= $satir_stili; ?>>
                     <td class="fw-bold"><?= htmlspecialchars($u['adi_soyadi'] ?: '-'); ?></td>
-                    <td><?= htmlspecialchars($u['telefon'] ?: '-'); ?></td>
-                    <td><?= htmlspecialchars($u['eposta'] ?: '-'); ?></td>
+                    <td><?= kisi_bilgisi_gorebilir() ? htmlspecialchars($u['telefon'] ?: '-') : '—'; ?></td>
+                    <td><?= kisi_bilgisi_gorebilir() ? htmlspecialchars($u['eposta'] ?: '-') : '—'; ?></td>
                     <td class="text-center fw-bold" style="color: #b30000;"><?= htmlspecialchars($kan); ?></td>
                     <td class="text-center"><?= htmlspecialchars($dogum); ?></td>
                     <td><?= htmlspecialchars($u['ikamet_ili'] ?: '-'); ?></td>

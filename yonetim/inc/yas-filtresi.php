@@ -318,8 +318,8 @@ $pdf_url = '/yonetim/inc/yas-filtresi-pdf.php?' . $pdf_params;
                                     <?= $yas > 0 ? $yas : '?'; ?>
                                 </span>
                             </td>
-                            <td><?= htmlspecialchars($u['telefon'] ?: '-'); ?></td>
-                            <td class="text-muted" style="font-size:0.82rem;"><?= htmlspecialchars($u['eposta'] ?: '-'); ?></td>
+                            <td><?= gizli_alan(htmlspecialchars($u['telefon'] ?: '')); ?></td>
+                            <td class="text-muted" style="font-size:0.82rem;"><?= gizli_alan(htmlspecialchars($u['eposta'] ?: '')); ?></td>
                             <td>
                                 <div class="fw-semibold" style="font-size:0.82rem;"><?= htmlspecialchars($u['ikamet_ili'] ?: '-'); ?></div>
                                 <?php if (!empty($u['trabzon_ilcesi'])): ?>

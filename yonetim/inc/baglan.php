@@ -240,3 +240,56 @@ function csrf_hidden_alan(): string
         error_log("Migration hatası (duyurular tablosu): " . $e->getMessage());
     }
 })();
+
+// ─── KİŞİSEL İLETİŞİM BİLGİSİ YETKİ KONTROLÜ ──────────────────────────
+/**
+ * Mevcut oturumdaki kullanıcının üye telefon numarasını ve
+ * e-posta adresini görme yetkisine sahip olup olmadığını döner.
+ *
+ * İzinli hesaplar:
+ *   - Kullanıcı adı: admin61, yonetim_hk  (rol bağımsız)
+ *   - Rol: gelistirici
+ *
+ * Neden hesap adına da bakıyoruz: admin ve yonetim rolleri birden
+ * fazla kullanıcı tarafından kullanılabilir; kısıtlama bu iki
+ * spesifik hesaba özeldir.
+ *
+ * @return bool true ise görüntüleyebilir, false ise maskelenir
+ */
+function kisi_bilgisi_gorebilir(): bool
+{
+    static $sonuc = null;
+    if ($sonuc !== null) {
+        return $sonuc;
+    }
+
+    /** @var string[] İzin verilen kullanıcı adları (rol bağımsız) */
+    $izinli_kullanicilar = ['admin61', 'yonetim_hk'];
+
+    $rol   = $_SESSION['rol']           ?? '';
+    $kadi  = $_SESSION['kullanici_adi'] ?? '';
+
+    // Geliştirici hesap geçişi yapıyorsa gerçek rolünü kontrol et
+    $gercek_rol = $_SESSION['gercek_rol'] ?? $rol;
+
+    $sonuc = $gercek_rol === 'gelistirici'
+          || in_array($kadi, $izinli_kullanicilar, true);
+
+    return $sonuc;
+}
+
+/**
+ * Maskeleme yardımcısı: Yetkisi olmayan kullanıcılara
+ * telefon/e-posta yerine gizleme simgesi döner.
+ *
+ * @param string $deger Gerçek değer
+ * @return string Yetkiye göre gerçek değer veya '—'
+ */
+function gizli_alan(string $deger): string
+{
+    if (kisi_bilgisi_gorebilir()) {
+        return $deger;
+    }
+    return '<span class="text-muted" title="Bu bilgiyi görüntüleme yetkiniz yok.">'
+         . '<i class="fa-solid fa-lock fa-xs me-1"></i>Gizli</span>';
+}

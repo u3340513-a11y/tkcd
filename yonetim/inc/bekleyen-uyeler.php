@@ -180,8 +180,8 @@ try {
                                         <i class="fa-solid <?= $ikon_sekil; ?> me-2" style="<?= $ikon_style; ?>"></i>
                                         <?= htmlspecialchars($b['adi_soyadi']); ?>
                                     </td>
-                                    <td style="white-space: nowrap; font-weight: 500;"><?= htmlspecialchars($b['telefon'] ?: '-'); ?></td>
-                                    <td><small><?= htmlspecialchars($b['eposta'] ?: '-'); ?></small></td>
+                                    <td style="white-space: nowrap; font-weight: 500;"><?= gizli_alan(htmlspecialchars($b['telefon'] ?: '')); ?></td>
+                                    <td><small><?= gizli_alan(htmlspecialchars($b['eposta'] ?: '')); ?></small></td>
                                     <td><span class="badge bg-danger text-white"><?= htmlspecialchars($kan); ?></span></td>
                                     <td><small><?= htmlspecialchars($dogum); ?></small></td>
                                     <td>

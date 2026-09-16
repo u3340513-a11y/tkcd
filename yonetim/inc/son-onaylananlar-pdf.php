@@ -212,8 +212,8 @@ $rapor_baslik = implode(' / ', $baslik_parcalari) ?: 'Tüm Onaylı Üyeler';
         </td>
         <td style="text-align:center;"><?= $cinsiyet_kslt ?: '<span style="color:#ccc;">—</span>'; ?></td>
         <td style="text-align:center;font-weight:bold;color:#b30000;"><?= htmlspecialchars($u['kan_grubu'] ?: '-'); ?></td>
-        <td><?= htmlspecialchars($u['telefon'] ?: '-'); ?></td>
-        <td><?= htmlspecialchars($u['eposta'] ?: '-'); ?></td>
+        <td><?= kisi_bilgisi_gorebilir() ? htmlspecialchars($u['telefon'] ?: '-') : '—'; ?></td>
+        <td><?= kisi_bilgisi_gorebilir() ? htmlspecialchars($u['eposta'] ?: '-') : '—'; ?></td>
         <td><?= htmlspecialchars($u['ikamet_ili'] ?: '-'); ?></td>
         <td><?= htmlspecialchars($u['trabzon_ilcesi'] ?: '-'); ?></td>
         <td><?= htmlspecialchars($u['kurum'] ?: '-'); ?></td>

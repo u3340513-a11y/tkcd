@@ -131,8 +131,8 @@ echo "\xEF\xBB\xBF";
                 ?>
                 <tr <?= $satir_stili; ?>>
                     <td style="font-weight: bold; border: 1px solid #dee2e6;"><?= htmlspecialchars($u['adi_soyadi'] ?: '-'); ?></td>
-                    <td style="border: 1px solid #dee2e6; mso-number-format:'\@';"><?= htmlspecialchars($u['telefon'] ?: '-'); ?></td>
-                    <td><?= htmlspecialchars($u['eposta'] ?: '-'); ?></td>
+                    <td style="border: 1px solid #dee2e6; mso-number-format:'\@';"><?= kisi_bilgisi_gorebilir() ? htmlspecialchars($u['telefon'] ?: '-') : '—'; ?></td>
+                    <td><?= kisi_bilgisi_gorebilir() ? htmlspecialchars($u['eposta'] ?: '-') : '—'; ?></td>
                     <td style="text-align: center;"><?= htmlspecialchars($kan); ?></td>
                     <td style="text-align: center;"><?= htmlspecialchars($dogum); ?></td>
                     <td><?= htmlspecialchars($u['ikamet_ili'] ?: '-'); ?></td>

@@ -418,8 +418,8 @@ try {
                                             </div>
                                         </a>
                                     </td>
-                                    <td style="white-space: nowrap; font-weight: 500; font-size: 0.9rem;"><?= htmlspecialchars($uye['telefon'] ?: '-'); ?></td>
-                                    <td><small class="text-truncate d-inline-block" style="max-width: 140px;"><?= htmlspecialchars($uye['eposta'] ?: '-'); ?></small></td>
+                                    <td style="white-space: nowrap; font-weight: 500; font-size: 0.9rem;"><?= gizli_alan(htmlspecialchars($uye['telefon'] ?: '')); ?></td>
+                                    <td><small class="text-truncate d-inline-block" style="max-width: 140px;"><?= gizli_alan(htmlspecialchars($uye['eposta'] ?: '')); ?></small></td>
                                     <td class="text-center"><span class="badge bg-danger text-white"><?= htmlspecialchars($kan ?: '-'); ?></span></td>
                                     <td class="text-center"><small><?= htmlspecialchars($dogum); ?></small></td>
                                     <td>

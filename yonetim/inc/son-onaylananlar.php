@@ -333,7 +333,7 @@ $pdf_url = '/yonetim/inc/son-onaylananlar-pdf.php?' . $pdf_params;
                                 </span>
                                 <?php endif; ?>
                             </td>
-                            <td><?= htmlspecialchars($u['telefon'] ?: '-'); ?></td>
+                            <td><?= gizli_alan(htmlspecialchars($u['telefon'] ?: '')); ?></td>
                             <td>
                                 <div class="fw-semibold" style="font-size:0.82rem;"><?= htmlspecialchars($u['ikamet_ili'] ?: '-'); ?></div>
                                 <?php if (!empty($u['trabzon_ilcesi'])): ?>
