@@ -385,36 +385,76 @@ $bolge_degerler  = array_values($bolge_sayilari);
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════
-     C (devam): İL DAĞILIMI  +  D: KAN GRUBU  +  E: KURUMLAR
+     C: TÜRKİYE HARİTASI — İl Bazlı Üye Dağılımı
      ═══════════════════════════════════════════════════════════════ -->
 <div class="row g-4 mb-4">
-
-    <!-- İllere Göre Üye Dağılımı -->
-    <div class="col-lg-4">
-        <div class="dash-card h-100">
+    <div class="col-12">
+        <div class="dash-card">
             <div class="dash-card__header">
-                <h5 class="dash-card__title"><i class="fa-solid fa-map text-danger"></i> İllere Göre Dağılım</h5>
-                <a href="index.php?sayfa=uyeler" class="dash-card__action">Tümü →</a>
+                <h5 class="dash-card__title">
+                    <i class="fa-solid fa-location-dot text-danger"></i> Üyelerin İllere Göre Dağılımı
+                </h5>
+                <span class="dash-card__action">Canlı Veri</span>
             </div>
-            <div class="dash-card__body" style="max-height:360px; overflow-y:auto;">
-                <table class="dash-kurum-table">
-                    <thead><tr><th>#</th><th>İl</th><th>Üye</th></tr></thead>
-                    <tbody>
-                    <?php foreach (array_slice($il_verileri, 0, 10) as $i => $il): ?>
-                    <tr>
-                        <td class="kurum-rank"><?= $i + 1 ?></td>
-                        <td><?= htmlspecialchars($il['ikamet_ili']) ?></td>
-                        <td><strong><?= $il['adet'] ?></strong></td>
-                    </tr>
-                    <?php endforeach; ?>
-                    </tbody>
-                </table>
+            <div class="dash-card__body">
+                <div class="row g-4 align-items-center">
+                    <!-- Sol: Türkiye Haritası -->
+                    <div class="col-lg-7">
+                        <div id="turkiyeHaritasi" style="height: 380px; width: 100%;"></div>
+                    </div>
+                    <!-- Sağ: Top İller Listesi -->
+                    <div class="col-lg-5">
+                        <div class="p-3 rounded-3" style="background: #f8fafc;">
+                            <h6 class="fw-bold mb-3" style="font-size:0.85rem; color:#1e293b;">
+                                <i class="fa-solid fa-trophy text-warning me-1"></i> En Çok Üye Olan İller
+                            </h6>
+                            <div class="d-flex flex-column gap-2">
+                            <?php foreach (array_slice($il_verileri, 0, 5) as $si => $il):
+                                $il_max = (int)($il_verileri[0]['adet'] ?? 1);
+                                $il_adet = (int)$il['adet'];
+                                $il_yuzde = $il_max > 0 ? round(($il_adet / $il_max) * 100) : 0;
+                                $rank_renkler = ['#c0392b','#e74c3c','#e67e22','#f39c12','#2980b9'];
+                                $rank_renk = $rank_renkler[$si] ?? '#6b7280';
+                            ?>
+                            <div class="d-flex align-items-center gap-3 py-2 px-2 rounded-2 hover-bg"
+                                 style="transition:background 0.15s;">
+                                <span class="fw-bold d-flex align-items-center justify-content-center rounded-circle flex-shrink-0"
+                                      style="width:28px;height:28px;background:<?= $rank_renk ?>;color:#fff;font-size:0.75rem;">
+                                    <?= $si + 1 ?>
+                                </span>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="fw-semibold" style="font-size:0.88rem;"><?= htmlspecialchars($il['ikamet_ili']) ?></span>
+                                        <span class="fw-bold" style="color:<?= $rank_renk ?>;font-size:0.88rem;"><?= $il_adet ?></span>
+                                    </div>
+                                    <div style="height:4px;background:#e2e8f0;border-radius:2px;overflow:hidden;">
+                                        <div style="height:100%;width:<?= $il_yuzde ?>%;background:<?= $rank_renk ?>;border-radius:2px;transition:width 0.6s ease;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php endforeach; ?>
+                            </div>
+                            <?php if (count($il_verileri) > 5): ?>
+                            <a href="index.php?sayfa=uyeler" class="d-block text-center mt-4 py-2 px-4 rounded-2 fw-semibold text-decoration-none"
+                               style="background:#eef2ff;color:#3b82f6;font-size:0.85rem;">
+                                Tüm İlleri Gör <i class="fa-solid fa-arrow-right ms-1"></i>
+                            </a>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Kan Grubu Dağılımı (Tasarım 1 — donut + yüzde) -->
-    <div class="col-lg-4">
+<!-- ═══════════════════════════════════════════════════════════════
+     D: KAN GRUBU  +  E: KURUMLAR
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="row g-4 mb-4">
+
+    <!-- Kan Grubu Dağılımı -->
+    <div class="col-lg-6">
         <div class="dash-card h-100">
             <div class="dash-card__header">
                 <h5 class="dash-card__title"><i class="fa-solid fa-droplet text-danger"></i> Kan Grubu Dağılımı</h5>
@@ -442,8 +482,8 @@ $bolge_degerler  = array_values($bolge_sayilari);
         </div>
     </div>
 
-    <!-- En Çok Üye Olan Kurumlar (Tasarım 1 — tablo) -->
-    <div class="col-lg-4">
+    <!-- En Çok Üye Olan Kurumlar -->
+    <div class="col-lg-6">
         <div class="dash-card h-100">
             <div class="dash-card__header">
                 <h5 class="dash-card__title"><i class="fa-solid fa-building text-info"></i> En Çok Üye Olan Kurumlar</h5>
@@ -728,6 +768,101 @@ $bolge_degerler  = array_values($bolge_sayilari);
 <!-- ═══════════════════════════════════════════════════════════════
      CHART.JS GRAFİKLER
      ═══════════════════════════════════════════════════════════════ -->
+<!-- jsvectormap — Türkiye Haritası -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/css/jsvectormap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/js/jsvectormap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/maps/turkey.js"></script>
+<script>
+(function () {
+    'use strict';
+
+    // PHP'den gelen il verileri — il adı → üye sayısı
+    var ilVerileri = <?php
+        $il_map = [];
+        foreach ($il_verileri as $iv) {
+            if (!empty($iv['ikamet_ili'])) {
+                $il_map[trim($iv['ikamet_ili'])] = (int) $iv['adet'];
+            }
+        }
+        echo json_encode($il_map, JSON_UNESCAPED_UNICODE);
+    ?>;
+
+    // Türkiye plaka kodu → il adı eşlemesi (81 il)
+    var plakaIlHaritasi = {
+        'TR-01':'Adana','TR-02':'Adıyaman','TR-03':'Afyonkarahisar','TR-04':'Ağrı',
+        'TR-05':'Amasya','TR-06':'Ankara','TR-07':'Antalya','TR-08':'Artvin',
+        'TR-09':'Aydın','TR-10':'Balıkesir','TR-11':'Bilecik','TR-12':'Bingöl',
+        'TR-13':'Bitlis','TR-14':'Bolu','TR-15':'Burdur','TR-16':'Bursa',
+        'TR-17':'Çanakkale','TR-18':'Çankırı','TR-19':'Çorum','TR-20':'Denizli',
+        'TR-21':'Diyarbakır','TR-22':'Edirne','TR-23':'Elazığ','TR-24':'Erzincan',
+        'TR-25':'Erzurum','TR-26':'Eskişehir','TR-27':'Gaziantep','TR-28':'Giresun',
+        'TR-29':'Gümüşhane','TR-30':'Hakkari','TR-31':'Hatay','TR-32':'Isparta',
+        'TR-33':'Mersin','TR-34':'İstanbul','TR-35':'İzmir','TR-36':'Kars',
+        'TR-37':'Kastamonu','TR-38':'Kayseri','TR-39':'Kırklareli','TR-40':'Kırşehir',
+        'TR-41':'Kocaeli','TR-42':'Konya','TR-43':'Kütahya','TR-44':'Malatya',
+        'TR-45':'Manisa','TR-46':'Kahramanmaraş','TR-47':'Mardin','TR-48':'Muğla',
+        'TR-49':'Muş','TR-50':'Nevşehir','TR-51':'Niğde','TR-52':'Ordu',
+        'TR-53':'Rize','TR-54':'Sakarya','TR-55':'Samsun','TR-56':'Siirt',
+        'TR-57':'Sinop','TR-58':'Sivas','TR-59':'Tekirdağ','TR-60':'Tokat',
+        'TR-61':'Trabzon','TR-62':'Tunceli','TR-63':'Şanlıurfa','TR-64':'Uşak',
+        'TR-65':'Van','TR-66':'Yozgat','TR-67':'Zonguldak','TR-68':'Aksaray',
+        'TR-69':'Bayburt','TR-70':'Karaman','TR-71':'Kırıkkale','TR-72':'Batman',
+        'TR-73':'Şırnak','TR-74':'Bartın','TR-75':'Ardahan','TR-76':'Iğdır',
+        'TR-77':'Yalova','TR-78':'Karabük','TR-79':'Kilis','TR-80':'Osmaniye',
+        'TR-81':'Düzce'
+    };
+
+    // Plaka kodunu → üye sayısı değerine çevir
+    var haritaVerisi = {};
+    Object.keys(plakaIlHaritasi).forEach(function (kod) {
+        var il = plakaIlHaritasi[kod];
+        haritaVerisi[kod] = ilVerileri[il] || 0;
+    });
+
+    var maksUye = Math.max.apply(null, Object.values(haritaVerisi).filter(function(v){ return v > 0; })) || 1;
+
+    var haritaEl = document.getElementById('turkiyeHaritasi');
+    if (!haritaEl) return;
+
+    new jsVectorMap({
+        selector: '#turkiyeHaritasi',
+        map: 'turkey',
+        zoomButtons: false,
+        zoomOnScroll: false,
+        regionStyle: {
+            initial: {
+                fill: '#fce4ec',
+                stroke: '#fff',
+                strokeWidth: 0.8,
+            },
+            hover: {
+                fill: '#b71c1c',
+                cursor: 'pointer',
+            }
+        },
+        series: {
+            regions: [{
+                attribute: 'fill',
+                scale: ['#fce4ec', '#c62828'],
+                values: haritaVerisi,
+                min: 0,
+                max: maksUye,
+                normalizeFunction: 'polynomial',
+            }]
+        },
+        onRegionTooltipShow: function (event, tooltip, code) {
+            var ilAdi = plakaIlHaritasi[code] || code;
+            var sayi  = haritaVerisi[code] || 0;
+            tooltip.text(
+                '<strong>' + ilAdi + '</strong><br>' +
+                '<span style="color:#ef9a9a;">' + sayi + ' üye</span>',
+                true
+            );
+        },
+    });
+})();
+</script>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
 (function() {
