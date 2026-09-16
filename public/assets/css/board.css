@@ -161,12 +161,7 @@
   }
 }
 
-/* Başlık bandı varsa kartların üst köşelerini kesmeyiz */
-.yk-grup__baslik-bant + .yk-grup-izgara .yk-karti:first-child,
-.yk-grup__baslik-bant + .yk-grup-izgara .yk-karti:nth-child(2) {
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-}
+
 
 /* 4'lü grid kartlarında isim daha küçük → tek satır sığar */
 .yk-grup-izgara--dortlu .yk-karti__ad {
