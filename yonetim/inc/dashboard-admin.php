@@ -399,11 +399,11 @@ $bolge_degerler  = array_values($bolge_sayilari);
             <div class="dash-card__body">
                 <div class="row g-4 align-items-center">
                     <!-- Sol: Türkiye Haritası -->
-                    <div class="col-lg-7">
-                        <div id="turkiyeHaritasi" style="height: 380px; width: 100%;"></div>
+                    <div class="col-lg-8">
+                        <div id="turkiyeHaritasi" style="height: 520px; width: 100%;"></div>
                     </div>
                     <!-- Sağ: Top İller Listesi -->
-                    <div class="col-lg-5">
+                    <div class="col-lg-4">
                         <div class="p-3 rounded-3" style="background: #f8fafc;">
                             <h6 class="fw-bold mb-3" style="font-size:0.85rem; color:#1e293b;">
                                 <i class="fa-solid fa-trophy text-warning me-1"></i> En Çok Üye Olan İller
