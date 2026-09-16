@@ -173,7 +173,20 @@ try {
                                 }
 
                                 $kan = !empty($b['kan_grubu']) ? $b['kan_grubu'] : '-';
-                                $dogum = !empty($b['dogum_tarihi']) ? $b['dogum_tarihi'] : (!empty($b['dogum_yili']) ? $b['dogum_yili'] : '-');
+                                $dogum_raw = !empty($b['dogum_tarihi']) ? $b['dogum_tarihi'] : (!empty($b['dogum_yili']) ? $b['dogum_yili'] : '');
+                                if ($dogum_raw !== '' && $dogum_raw !== '0000-00-00') {
+                                    if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $dogum_raw, $m)) {
+                                        // YYYY-MM-DD → GG/AA/YYYY
+                                        $dogum = $m[3] . '/' . $m[2] . '/' . $m[1];
+                                    } elseif (preg_match('/^(\d{2})[\/.](\d{2})[\/.](\d{4})$/', $dogum_raw)) {
+                                        // Zaten GG/AA/YYYY veya GG.AA.YYYY formatında
+                                        $dogum = str_replace('.', '/', $dogum_raw);
+                                    } else {
+                                        $dogum = htmlspecialchars($dogum_raw);
+                                    }
+                                } else {
+                                    $dogum = '-';
+                                }
                                 ?>
                                 <tr>
                                     <td class="ps-4 fw-bold">
