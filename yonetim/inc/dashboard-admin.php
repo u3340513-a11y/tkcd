@@ -823,16 +823,48 @@ window.addEventListener('load', function () {
 
     var geojsonLayer;
 
+    // Highcharts GeoJSON'daki İngilizce/transkript adları → DB Türkçe adları
+    var ilEsleme = {
+        'Adana':'Adana','Adiyaman':'Adıyaman','Afyonkarahisar':'Afyonkarahisar',
+        'Agri':'Ağrı','Aksaray':'Aksaray','Amasya':'Amasya','Ankara':'Ankara',
+        'Antalya':'Antalya','Ardahan':'Ardahan','Artvin':'Artvin','Aydin':'Aydın',
+        'Balikesir':'Balıkesir','Bartın':'Bartın','Batman':'Batman','Bayburt':'Bayburt',
+        'Bilecik':'Bilecik','Bingöl':'Bingöl','Bitlis':'Bitlis','Bolu':'Bolu',
+        'Burdur':'Burdur','Bursa':'Bursa','Denizli':'Denizli','Diyarbakir':'Diyarbakır',
+        'Düzce':'Düzce','Edirne':'Edirne','Elazig':'Elazığ','Erzincan':'Erzincan',
+        'Erzurum':'Erzurum','Eskisehir':'Eskişehir','Gaziantep':'Gaziantep',
+        'Giresun':'Giresun','Gümüshane':'Gümüşhane','Hakkari':'Hakkari',
+        'Hatay':'Hatay','Isparta':'Isparta','Istanbul':'İstanbul','Izmir':'İzmir',
+        'Iğdır':'Iğdır','K. Maras':'Kahramanmaraş','Karabük':'Karabük',
+        'Karaman':'Karaman','Kars':'Kars','Kastamonu':'Kastamonu','Kayseri':'Kayseri',
+        'Kilis':'Kilis','Kinkkale':'Kırıkkale','Kirklareli':'Kırklareli',
+        'Kirsehir':'Kırşehir','Kocaeli':'Kocaeli','Konya':'Konya','Kütahya':'Kütahya',
+        'Malatya':'Malatya','Manisa':'Manisa','Mardin':'Mardin','Mersin':'Mersin',
+        'Mugla':'Muğla','Mus':'Muş','Nevsehir':'Nevşehir','Nigde':'Niğde',
+        'Ordu':'Ordu','Osmaniye':'Osmaniye','Rize':'Rize','Sakarya':'Sakarya',
+        'Samsun':'Samsun','Sanliurfa':'Şanlıurfa','Siirt':'Siirt','Sinop':'Sinop',
+        'Sirnak':'Şırnak','Sivas':'Sivas','Tekirdag':'Tekirdağ','Tokat':'Tokat',
+        'Trabzon':'Trabzon','Tunceli':'Tunceli','Usak':'Uşak','Van':'Van',
+        'Yalova':'Yalova','Yozgat':'Yozgat','Zinguldak':'Zonguldak',
+        'Çanakkale':'Çanakkale','Çankiri':'Çankırı','Çorum':'Çorum'
+    };
+
+    function turkceAd(feature) {
+        var eng = (feature.properties && feature.properties.name) ? feature.properties.name : '';
+        return ilEsleme[eng] || eng;
+    }
+
     function stilFonksiyonu(feature) {
-        var sayi = ilVerileri[feature.properties.name] || 0;
-        return { fillColor: uyeRengi(sayi), weight: 0.8, opacity: 1, color: '#fff', fillOpacity: 0.95 };
+        var tr = turkceAd(feature);
+        var sayi = ilVerileri[tr] || 0;
+        return { fillColor: uyeRengi(sayi), weight: 0.6, opacity: 1, color: '#fff', fillOpacity: 0.92 };
     }
 
     function onEachFeature(feature, layer) {
-        var ilAdi = feature.properties.name;
-        var sayi  = ilVerileri[ilAdi] || 0;
+        var tr   = turkceAd(feature);
+        var sayi = ilVerileri[tr] || 0;
         layer.bindTooltip(
-            '<strong style="font-size:13px;">' + ilAdi + '</strong>' +
+            '<strong style="font-size:13px;">' + tr + '</strong>' +
             '<br><span style="color:#c62828;font-weight:600;">' + sayi + ' üye</span>',
             { sticky: true, className: 'il-tooltip' }
         );
