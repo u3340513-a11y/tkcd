@@ -769,8 +769,8 @@ $bolge_degerler  = array_values($bolge_sayilari);
      CHART.JS GRAFİKLER
      ═══════════════════════════════════════════════════════════════ -->
 <!-- Leaflet.js — Yerel kurulum -->
-<link rel="stylesheet" href="../assets/leaflet/leaflet.min.css">
-<script src="../assets/leaflet/leaflet.min.js"></script>
+<link rel="stylesheet" href="/yonetim/assets/leaflet/leaflet.min.css">
+<script src="/yonetim/assets/leaflet/leaflet.min.js"></script>
 <script>
 window.addEventListener('load', function () {
 
