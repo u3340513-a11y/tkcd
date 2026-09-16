@@ -772,13 +772,12 @@ $bolge_degerler  = array_values($bolge_sayilari);
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-(function () {
-    'use strict';
+document.addEventListener('DOMContentLoaded', function () {
 
     var haritaEl = document.getElementById('turkiyeHaritasi');
-    if (!haritaEl) return;
+    if (!haritaEl || typeof L === 'undefined') return;
 
-    // PHP'den gelen il verileri: { "İstanbul": 235, "Ankara": 52, ... }
+    // PHP'den gelen il verileri: { "İstanbul": 235, ... }
     var ilVerileri = <?php
         $il_map = [];
         foreach ($il_verileri as $iv) {
@@ -789,21 +788,22 @@ $bolge_degerler  = array_values($bolge_sayilari);
         echo json_encode($il_map, JSON_UNESCAPED_UNICODE);
     ?>;
 
+    // GeoJSON — PHP ile inline gömülü (fetch yok, CDN bağımlılığı yok)
+    var turkeyGeoJSON = <?php
+        $geojson_path = dirname(__DIR__, 2) . '/public/assets/data/turkey-provinces.geojson';
+        echo file_exists($geojson_path) ? file_get_contents($geojson_path) : '{"type":"FeatureCollection","features":[]}';
+    ?>;
+
     var maksUye = 0;
     Object.values(ilVerileri).forEach(function(v) { if (v > maksUye) maksUye = v; });
     if (maksUye < 1) maksUye = 1;
 
-    // Üye sayısına göre renk (açık pembe → koyu kırmızı)
     function uyeRengi(sayi) {
         if (!sayi || sayi === 0) return '#fce4ec';
-        var oran = Math.pow(sayi / maksUye, 0.4); // polynomial normalize
-        var r = Math.round(198 + (198 - 198) * oran); // 198 → 198
-        var g = Math.round(228 - 208 * oran);         // 228 → 20
-        var b = Math.round(236 - 196 * oran);         // 236 → 40
-        return 'rgb(' + Math.round(198) + ',' + Math.round(228 - 208 * oran) + ',' + Math.round(236 - 196 * oran) + ')';
+        var oran = Math.pow(sayi / maksUye, 0.4);
+        return 'rgb(198,' + Math.round(228 - 208 * oran) + ',' + Math.round(236 - 196 * oran) + ')';
     }
 
-    // Leaflet haritası — Türkiye koordinatlarına kilitle
     var harita = L.map('turkiyeHaritasi', {
         center: [39.0, 35.5],
         zoom: 5,
@@ -820,15 +820,8 @@ $bolge_degerler  = array_values($bolge_sayilari);
     var geojsonLayer;
 
     function stilFonksiyonu(feature) {
-        var ilAdi = feature.properties.name;
-        var sayi  = ilVerileri[ilAdi] || 0;
-        return {
-            fillColor: uyeRengi(sayi),
-            weight: 0.8,
-            opacity: 1,
-            color: '#fff',
-            fillOpacity: 0.95,
-        };
+        var sayi = ilVerileri[feature.properties.name] || 0;
+        return { fillColor: uyeRengi(sayi), weight: 0.8, opacity: 1, color: '#fff', fillOpacity: 0.95 };
     }
 
     function onEachFeature(feature, layer) {
@@ -840,43 +833,34 @@ $bolge_degerler  = array_values($bolge_sayilari);
             { sticky: true, className: 'il-tooltip' }
         );
         layer.on({
-            mouseover: function(e) {
-                e.target.setStyle({ weight: 2, color: '#c62828', fillOpacity: 1 });
-            },
-            mouseout: function(e) {
-                geojsonLayer.resetStyle(e.target);
-            }
+            mouseover: function(e) { e.target.setStyle({ weight: 2, color: '#c62828', fillOpacity: 1 }); },
+            mouseout:  function(e) { geojsonLayer.resetStyle(e.target); }
         });
     }
 
-    // GeoJSON dosyasını fetch et
-    fetch('/assets/data/turkey-provinces.geojson')
-        .then(function(r) { return r.json(); })
-        .then(function(data) {
-            geojsonLayer = L.geoJSON(data, {
-                style: stilFonksiyonu,
-                onEachFeature: onEachFeature,
-            }).addTo(harita);
-            harita.fitBounds(geojsonLayer.getBounds(), { padding: [10, 10] });
-        })
-        .catch(function(err) {
-            haritaEl.innerHTML = '<div class="text-center text-muted py-5"><i class="fa-solid fa-map fa-3x d-block mb-3" style="opacity:0.15;"></i><p class="small">Harita yüklenemedi.</p></div>';
-        });
-})();
+    if (turkeyGeoJSON.features && turkeyGeoJSON.features.length > 0) {
+        geojsonLayer = L.geoJSON(turkeyGeoJSON, {
+            style: stilFonksiyonu,
+            onEachFeature: onEachFeature,
+        }).addTo(harita);
+        harita.fitBounds(geojsonLayer.getBounds(), { padding: [8, 8] });
+    }
+
+    // Kapsayıcı boyutu değişirse haritayı yenile
+    setTimeout(function() { harita.invalidateSize(); }, 300);
+});
 </script>
 <style>
 .il-tooltip {
-    background: #fff;
-    border: none;
-    border-radius: 8px;
-    padding: 6px 10px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-    font-family: inherit;
+    background: #fff !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 6px 10px !important;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15) !important;
+    font-family: inherit !important;
 }
-#turkiyeHaritasi .leaflet-container {
-    background: transparent;
-    border-radius: 8px;
-}
+#turkiyeHaritasi { background: transparent !important; }
+#turkiyeHaritasi .leaflet-container { background: transparent !important; }
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
