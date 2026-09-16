@@ -115,5 +115,92 @@ foreach (array_slice($parcalar, 0, 2) as $p) {
             <i class="fa-solid fa-right-from-bracket"></i>
         </a>
         <?php endif; ?>
+
+        <!-- ── MÜZİK ÇALAR ── -->
+        <button id="muzikBtn" type="button" title="Müziği Durdur / Oynat"
+                style="
+                    background: linear-gradient(135deg,#c62828,#8b0000);
+                    border: none;
+                    border-radius: 50%;
+                    width: 36px;
+                    height: 36px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    box-shadow: 0 2px 8px rgba(198,40,40,0.4);
+                    transition: transform 0.2s, box-shadow 0.2s;
+                    flex-shrink: 0;
+                "
+                onmouseover="this.style.transform='scale(1.1)';this.style.boxShadow='0 4px 16px rgba(198,40,40,0.55)'"
+                onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 2px 8px rgba(198,40,40,0.4)'">
+            <i id="muzikIkon" class="fa-solid fa-music" style="color:#fff;font-size:0.85rem;"></i>
+        </button>
+
+        <audio id="panelMuzik" loop preload="auto">
+            <source src="/assets/video/skaso.mp3" type="audio/mpeg">
+        </audio>
     </div>
 </header>
+
+<script>
+(function () {
+    var audio  = document.getElementById('panelMuzik');
+    var btn    = document.getElementById('muzikBtn');
+    var ikon   = document.getElementById('muzikIkon');
+    var SK_KEY = 'tkcd_muzik_durumu'; // sessionStorage anahtarı
+
+    if (!audio || !btn) return;
+
+    /** Oynatılıyor mu durumuna göre ikon güncelle */
+    function ikonGuncelle(calıyor) {
+        ikon.className = calıyor
+            ? 'fa-solid fa-pause'
+            : 'fa-solid fa-music';
+        btn.title = calıyor ? 'Müziği Durdur' : 'Müziği Oynat';
+    }
+
+    /** Müziği başlat */
+    function baslat() {
+        audio.play().then(function () {
+            ikonGuncelle(true);
+            sessionStorage.setItem(SK_KEY, 'calıyor');
+        }).catch(function () {
+            // Tarayıcı autoplay'i engelledi — buton görünür bırak
+            ikonGuncelle(false);
+        });
+    }
+
+    /** Müziği durdur */
+    function durdur() {
+        audio.pause();
+        ikonGuncelle(false);
+        sessionStorage.setItem(SK_KEY, 'durdu');
+    }
+
+    // Buton tıklama
+    btn.addEventListener('click', function () {
+        if (audio.paused) {
+            baslat();
+        } else {
+            durdur();
+        }
+    });
+
+    // sessionStorage'da 'durdu' işaretli değilse otomatik başlat
+    var oncekiDurum = sessionStorage.getItem(SK_KEY);
+    if (oncekiDurum !== 'durdu') {
+        baslat();
+    } else {
+        ikonGuncelle(false);
+    }
+
+    // Tarayıcı autoplay engelini ilk etkileşimde aş
+    document.addEventListener('click', function ilkEtkilesim() {
+        if (oncekiDurum !== 'durdu' && audio.paused) {
+            baslat();
+        }
+        document.removeEventListener('click', ilkEtkilesim);
+    }, { once: true });
+})();
+</script>
