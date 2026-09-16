@@ -122,29 +122,62 @@ foreach ($aylik_artis as $a) {
     $artis_sayilar[]   = (int) $a['adet'];
 }
 
-// Bölge dağılımı (Trabzon ilçelerini 4 bölgeye ayır)
+// Türkiye'nin 7 coğrafi bölgesine göre ikamet_ili dağılımı
 $bolge_harita = [
-    'Doğu'  => ['Arsin','Araklı','Sürmene','Of','Çaykara','Hayrat','Dernekpazarı','Köprübaşı'],
-    'Batı'  => ['Akçaabat','Vakfıkebir','Çarşıbaşı','Beşikdüzü','Şalpazarı','Tonya','Eynesil','Görele'],
-    'Merkez'=> ['Ortahisar','Yomra'],
-    'Güney' => ['Maçka','Düzköy','Torul'],
+    'Marmara Bölgesi' => [
+        'İstanbul','Tekirdağ','Edirne','Kırklareli','Çanakkale',
+        'Balıkesir','Bursa','Yalova','Kocaeli','Sakarya',
+        'Düzce','Bolu','Bilecik',
+    ],
+    'Ege Bölgesi' => [
+        'İzmir','Manisa','Aydın','Denizli','Muğla',
+        'Uşak','Afyonkarahisar','Kütahya',
+    ],
+    'Akdeniz Bölgesi' => [
+        'Antalya','Isparta','Burdur','Mersin','Adana',
+        'Hatay','Osmaniye','Kahramanmaraş','Karaman',
+    ],
+    'İç Anadolu Bölgesi' => [
+        'Ankara','Konya','Eskişehir','Kırıkkale','Kırşehir',
+        'Nevşehir','Aksaray','Niğde','Kayseri','Sivas',
+        'Yozgat','Çankırı',
+    ],
+    'Karadeniz Bölgesi' => [
+        'Trabzon','Rize','Artvin','Giresun','Ordu','Samsun',
+        'Sinop','Kastamonu','Bartın','Zonguldak','Karabük',
+        'Amasya','Tokat','Gümüşhane','Bayburt',
+    ],
+    'Doğu Anadolu Bölgesi' => [
+        'Erzurum','Erzincan','Ağrı','Kars','Ardahan','Iğdır',
+        'Muş','Bitlis','Van','Hakkari','Elazığ','Malatya',
+        'Bingöl','Tunceli',
+    ],
+    'Güneydoğu Anadolu Bölgesi' => [
+        'Gaziantep','Şanlıurfa','Diyarbakır','Mardin',
+        'Batman','Şırnak','Siirt','Adıyaman','Kilis',
+    ],
 ];
-$bolge_sayilari = ['Doğu'=>0,'Batı'=>0,'Merkez'=>0,'Güney'=>0,'Diğer'=>0];
-foreach ($ilce_verileri as $iv) {
-    $ilce = $iv['trabzon_ilcesi'] ?? '';
+
+// il_verileri (ikamet_ili bazlı) üzerinden bölge toplamlarını hesapla
+$bolge_sayilari = array_fill_keys(array_keys($bolge_harita), 0);
+$bolge_sayilari['Diğer'] = 0;
+
+foreach ($il_verileri as $iv) {
+    $il = $iv['ikamet_ili'] ?? '';
     $bulunan = false;
-    foreach ($bolge_harita as $bolge => $ilceler) {
-        if (in_array($ilce, $ilceler, true)) {
-            $bolge_sayilari[$bolge] += (int)$iv['adet'];
+    foreach ($bolge_harita as $bolge => $iller) {
+        if (in_array($il, $iller, true)) {
+            $bolge_sayilari[$bolge] += (int) $iv['adet'];
             $bulunan = true;
             break;
         }
     }
-    if (!$bulunan) {
-        $bolge_sayilari['Diğer'] += (int)$iv['adet'];
+    if (!$bulunan && $il !== '') {
+        $bolge_sayilari['Diğer'] += (int) $iv['adet'];
     }
 }
-// Sıfır bölgeleri kaldır
+
+// Sıfır olan bölgeleri filtrele
 $bolge_sayilari = array_filter($bolge_sayilari, fn($v) => $v > 0);
 $bolge_etiketler = array_keys($bolge_sayilari);
 $bolge_degerler  = array_values($bolge_sayilari);
@@ -324,9 +357,24 @@ $bolge_degerler  = array_values($bolge_sayilari);
                 <div style="position:relative; height:220px; max-height:220px;">
                     <canvas id="bolgeDagilimi"></canvas>
                 </div>
+                <?php
+                $bolge_renk_harita = [
+                    'Marmara Bölgesi'           => '#3b82f6',
+                    'Ege Bölgesi'               => '#06b6d4',
+                    'Akdeniz Bölgesi'           => '#f97316',
+                    'İç Anadolu Bölgesi'        => '#f59e0b',
+                    'Karadeniz Bölgesi'         => '#10b981',
+                    'Doğu Anadolu Bölgesi'      => '#8b5cf6',
+                    'Güneydoğu Anadolu Bölgesi' => '#ef4444',
+                    'Diğer'                     => '#6b7280',
+                ];
+                ?>
                 <div class="mt-3 d-flex flex-wrap justify-content-center gap-2">
-                    <?php foreach ($bolge_sayilari as $bolge => $sayi): ?>
-                    <span class="badge bg-light text-dark border px-2 py-1" style="font-size:0.75rem;">
+                    <?php foreach ($bolge_sayilari as $bolge => $sayi):
+                        $renk = $bolge_renk_harita[$bolge] ?? '#6b7280';
+                    ?>
+                    <span class="d-flex align-items-center gap-1 px-2 py-1 rounded border bg-light" style="font-size:0.72rem;">
+                        <span style="width:8px;height:8px;border-radius:50%;background:<?= $renk ?>;flex-shrink:0;display:inline-block;"></span>
                         <?= htmlspecialchars($bolge) ?>: <strong><?= $sayi ?></strong>
                     </span>
                     <?php endforeach; ?>
@@ -731,18 +779,36 @@ $bolge_degerler  = array_values($bolge_sayilari);
         });
     }
 
-    // C: Bölge Dağılımı — donut
+    // C: Bölge Dağılımı — donut (Türkiye'nin 7 coğrafi bölgesi)
     var bolgeCtx = document.getElementById('bolgeDagilimi');
     if (bolgeCtx) {
+        // Her bölge için özgün renk — 7 bölge + Diğer
+        var bolgeRenkler = {
+            'Marmara Bölgesi':            '#3b82f6',
+            'Ege Bölgesi':                '#06b6d4',
+            'Akdeniz Bölgesi':            '#f97316',
+            'İç Anadolu Bölgesi':         '#f59e0b',
+            'Karadeniz Bölgesi':          '#10b981',
+            'Doğu Anadolu Bölgesi':       '#8b5cf6',
+            'Güneydoğu Anadolu Bölgesi':  '#ef4444',
+            'Diğer':                      '#6b7280',
+        };
+        var bolgeLabels = <?= json_encode($bolge_etiketler) ?>;
+        var bolgeBgRenkler = bolgeLabels.map(function(l) {
+            return bolgeRenkler[l] || '#6b7280';
+        });
+        var bolgeToplam = <?= json_encode($bolge_degerler) ?>.reduce(function(a, b) { return a + b; }, 0);
+
         new Chart(bolgeCtx, {
             type: 'doughnut',
             data: {
-                labels: <?= json_encode($bolge_etiketler) ?>,
+                labels: bolgeLabels,
                 datasets: [{
                     data: <?= json_encode($bolge_degerler) ?>,
-                    backgroundColor: ['#3b82f6','#f59e0b','#10b981','#8b5cf6','#6b7280'],
+                    backgroundColor: bolgeBgRenkler,
                     borderWidth: 2,
-                    borderColor: '#fff'
+                    borderColor: '#fff',
+                    hoverBorderWidth: 3
                 }]
             },
             options: Object.assign({}, chartDefaults, {
@@ -751,7 +817,20 @@ $bolge_degerler  = array_values($bolge_sayilari);
                     legend: {
                         display: true,
                         position: 'bottom',
-                        labels: { padding: 12, font: { size: 11 } }
+                        labels: {
+                            padding: 10,
+                            font: { size: 10.5 },
+                            usePointStyle: true,
+                            pointStyleWidth: 10
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(ctx) {
+                                var yuzde = ((ctx.raw / bolgeToplam) * 100).toFixed(1);
+                                return ' ' + ctx.raw + ' üye (%' + yuzde + ')';
+                            }
+                        }
                     }
                 }
             })
