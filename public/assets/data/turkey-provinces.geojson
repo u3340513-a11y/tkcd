@@ -79,5 +79,5 @@
 {"type":"Feature","properties":{"name":"Karabük","plate":78},"geometry":{"type":"Polygon","coordinates":[[[32.4,41.0],[33.0,40.9],[33.5,41.1],[33.4,41.5],[32.8,41.6],[32.3,41.3],[32.4,41.0]]]}},
 {"type":"Feature","properties":{"name":"Kilis","plate":79},"geometry":{"type":"Polygon","coordinates":[[[36.8,36.5],[37.3,36.4],[37.6,36.7],[37.5,36.9],[37.0,37.0],[36.7,36.8],[36.8,36.5]]]}},
 {"type":"Feature","properties":{"name":"Osmaniye","plate":80},"geometry":{"type":"Polygon","coordinates":[[[36.0,37.0],[36.7,36.9],[37.2,37.2],[37.1,37.6],[36.5,37.8],[36.0,37.4],[36.0,37.0]]]}},
-{"type":"Feature","properties":{"name":"Düzce","plate":81},"geometry":{"type":"Polygon","coordinates":[[[30.8,40.7],[31.4,40.6],[31.8,40.8],[31.7,41.1],[31.2,41.2],[30.7,41.0],[30.8,40.7]]}}
+{"type":"Feature","properties":{"name":"Düzce","plate":81},"geometry":{"type":"Polygon","coordinates":[[[30.8,40.7],[31.4,40.6],[31.8,40.8],[31.7,41.1],[31.2,41.2],[30.7,41.0],[30.8,40.7]]]}}
 ]}
