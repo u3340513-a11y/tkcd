@@ -189,42 +189,4 @@ $avatar_renk = static function (string $ad): string {
     </div>
     <?php endforeach; ?>
 
-    <!-- ── ÖZET SAYAÇLAR ── -->
-    <div class="row g-3 mt-4 pt-4" style="border-top:1px solid #e2e8f0;">
-        <?php
-        $toplam_asil  = 0;
-        $toplam_yedek = 0;
-        $board_members = require dirname(__DIR__, 2) . '/resources/data/board-members.php';
-        $toplam_asil  = count($board_members['asil']);
-        $toplam_yedek = count($board_members['yedek']);
-        $tum_kisi     = array_merge(...array_column($board_gruplar, 'uyeler'));
-        $eslesen_sayisi = 0;
-        foreach ($tum_kisi as $k) {
-            try {
-                $s = $db_baglanti->prepare("SELECT COUNT(*) FROM dernek_uyeler WHERE adi_soyadi = ? AND onay_durumu = 'onayli'");
-                $s->execute([$k['ad']]);
-                $eslesen_sayisi += (int) $s->fetchColumn();
-            } catch (\PDOException $e) {}
-        }
-        ?>
-        <div class="col-sm-4">
-            <div class="rounded-3 p-3 text-center" style="background:#fef2f2;border:1px solid #fecaca;">
-                <div class="fw-bold" style="font-size:1.8rem;color:#c62828;"><?= $toplam_asil ?></div>
-                <div class="small text-muted mt-1">Asil Üye</div>
-            </div>
-        </div>
-        <div class="col-sm-4">
-            <div class="rounded-3 p-3 text-center" style="background:#eff6ff;border:1px solid #bfdbfe;">
-                <div class="fw-bold" style="font-size:1.8rem;color:#1d4ed8;"><?= $toplam_yedek ?></div>
-                <div class="small text-muted mt-1">Yedek Üye</div>
-            </div>
-        </div>
-        <div class="col-sm-4">
-            <div class="rounded-3 p-3 text-center" style="background:#f0fdf4;border:1px solid #bbf7d0;">
-                <div class="fw-bold" style="font-size:1.8rem;color:#166534;"><?= $eslesen_sayisi ?></div>
-                <div class="small text-muted mt-1">Sistemde Kayıtlı</div>
-            </div>
-        </div>
-    </div>
-
 </div>
