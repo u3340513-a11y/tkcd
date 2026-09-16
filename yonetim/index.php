@@ -310,7 +310,9 @@ switch ($sayfa) {
         break;
 
     case 'bekleyen-uyeler':
-        if ($is_kisitli_rol) {
+        // kk_by özel istisna: kadin_kollari_baskani rolüne rağmen erişebilir
+        $kk_by_istisna = (($_SESSION['kullanici_adi'] ?? '') === 'kk_by');
+        if ($is_kisitli_rol && !$kk_by_istisna) {
             echo '<div class="container py-5"><div class="alert alert-danger text-center fw-bold"><i class="fa-solid fa-lock me-2"></i>Erişim Engellendi: Bu hesap türü ile bekleyen başvuruları görüntüleyemezsiniz.</div></div>';
         } else {
             include 'inc/bekleyen-uyeler.php';

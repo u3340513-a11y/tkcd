@@ -15,8 +15,9 @@ $is_kurum_temsilcisi = ($kullanici_rolu === 'kurum_temsilcisi');
 $is_kadin_kollari    = ($kullanici_rolu === 'kadin_kollari_baskani');
 $is_kisitli_rol      = ($is_il_baskani || $is_ilce_baskani || $is_kurum_temsilcisi || $is_kadin_kollari);
 
-// Sadece başvuru SAYISINI görebilen kullanıcılar (liste görememez)
-$yalnizca_sayim_kullanicilari = ['yonetim_ukk', 'yonetim_mh', 'yonetim_mb', 'yonetim_he', 'yonetim_hk'];
+// Bekleyen başvuru listesini görebilen ancak telefon/mail ile kısıtlı olan kullanıcılar
+// (tam liste + telefon görür, diğer sayfalarda kısıtlama devam eder)
+$yalnizca_sayim_kullanicilari = ['yonetim_ukk', 'yonetim_mh', 'yonetim_mb', 'yonetim_he', 'yonetim_hk', 'kk_by'];
 $is_yalnizca_sayim = in_array($oturum_kullanici_adi, $yalnizca_sayim_kullanicilari, true);
 
 // --- BAŞVURU ONAYLAMA MOTORU ---

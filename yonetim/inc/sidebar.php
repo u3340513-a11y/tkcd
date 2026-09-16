@@ -62,7 +62,7 @@ if (!$is_kisitli_rol) {
                 <span>Üyeler</span>
             </a>
 
-            <?php if (!$is_kisitli_rol): ?>
+            <?php if (!$is_kisitli_rol || ($_SESSION['kullanici_adi'] ?? '') === 'kk_by'): ?>
             <a class="sb-link <?= $sayfa === 'bekleyen-uyeler' ? 'sb-link--active' : '' ?>" href="index.php?sayfa=bekleyen-uyeler">
                 <i class="sb-link__icon fa-solid fa-user-clock"></i>
                 <span>Başvurular</span>
