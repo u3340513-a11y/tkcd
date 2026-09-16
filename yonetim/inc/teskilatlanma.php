@@ -9,11 +9,11 @@
 
 declare(strict_types=1);
 
-$board_gruplar = require dirname(__DIR__, 3) . '/resources/data/board.php';
+$board_gruplar = require dirname(__DIR__, 2) . '/resources/data/board.php';
 
 // Fotoğraf URL'si oluşturucu
 $foto_url = static function (string $fotograf): string {
-    $img_dir = dirname(__DIR__, 3) . '/public/assets/img/' . $fotograf;
+    $img_dir = dirname(__DIR__, 2) . '/public/assets/img/' . $fotograf;
     if ($fotograf === 'placeholder-kisi.svg' || !file_exists($img_dir)) {
         return '/assets/img/placeholder-kisi.svg';
     }
@@ -79,7 +79,7 @@ $avatar_renk = static function (string $ad): string {
             <div class="<?= $col ?>">
                 <?php
                     $fotoUrl    = $foto_url($uye['fotograf']);
-                    $isPlaceholder = ($uye['fotograf'] === 'placeholder-kisi.svg' || !file_exists(dirname(__DIR__, 3) . '/public/assets/img/' . $uye['fotograf']));
+                    $isPlaceholder = ($uye['fotograf'] === 'placeholder-kisi.svg' || !file_exists(dirname(__DIR__, 2) . '/public/assets/img/' . $uye['fotograf']));
                     $renk       = $avatar_renk($uye['ad']);
                     $initials   = implode('', array_map(
                         fn($p) => mb_substr($p, 0, 1, 'UTF-8'),
@@ -194,7 +194,7 @@ $avatar_renk = static function (string $ad): string {
         <?php
         $toplam_asil  = 0;
         $toplam_yedek = 0;
-        $board_members = require dirname(__DIR__, 3) . '/resources/data/board-members.php';
+        $board_members = require dirname(__DIR__, 2) . '/resources/data/board-members.php';
         $toplam_asil  = count($board_members['asil']);
         $toplam_yedek = count($board_members['yedek']);
         $tum_kisi     = array_merge(...array_column($board_gruplar, 'uyeler'));
