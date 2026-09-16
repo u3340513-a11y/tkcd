@@ -768,15 +768,17 @@ $bolge_degerler  = array_values($bolge_sayilari);
 <!-- ═══════════════════════════════════════════════════════════════
      CHART.JS GRAFİKLER
      ═══════════════════════════════════════════════════════════════ -->
-<!-- jsvectormap — Türkiye Haritası -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/css/jsvectormap.min.css">
-<script src="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/js/jsvectormap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/maps/turkey.js"></script>
+<!-- Leaflet.js — Türkiye Haritası -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 (function () {
     'use strict';
 
-    // PHP'den gelen il verileri — il adı → üye sayısı
+    var haritaEl = document.getElementById('turkiyeHaritasi');
+    if (!haritaEl) return;
+
+    // PHP'den gelen il verileri: { "İstanbul": 235, "Ankara": 52, ... }
     var ilVerileri = <?php
         $il_map = [];
         foreach ($il_verileri as $iv) {
@@ -787,81 +789,95 @@ $bolge_degerler  = array_values($bolge_sayilari);
         echo json_encode($il_map, JSON_UNESCAPED_UNICODE);
     ?>;
 
-    // Türkiye plaka kodu → il adı eşlemesi (81 il)
-    var plakaIlHaritasi = {
-        'TR-01':'Adana','TR-02':'Adıyaman','TR-03':'Afyonkarahisar','TR-04':'Ağrı',
-        'TR-05':'Amasya','TR-06':'Ankara','TR-07':'Antalya','TR-08':'Artvin',
-        'TR-09':'Aydın','TR-10':'Balıkesir','TR-11':'Bilecik','TR-12':'Bingöl',
-        'TR-13':'Bitlis','TR-14':'Bolu','TR-15':'Burdur','TR-16':'Bursa',
-        'TR-17':'Çanakkale','TR-18':'Çankırı','TR-19':'Çorum','TR-20':'Denizli',
-        'TR-21':'Diyarbakır','TR-22':'Edirne','TR-23':'Elazığ','TR-24':'Erzincan',
-        'TR-25':'Erzurum','TR-26':'Eskişehir','TR-27':'Gaziantep','TR-28':'Giresun',
-        'TR-29':'Gümüşhane','TR-30':'Hakkari','TR-31':'Hatay','TR-32':'Isparta',
-        'TR-33':'Mersin','TR-34':'İstanbul','TR-35':'İzmir','TR-36':'Kars',
-        'TR-37':'Kastamonu','TR-38':'Kayseri','TR-39':'Kırklareli','TR-40':'Kırşehir',
-        'TR-41':'Kocaeli','TR-42':'Konya','TR-43':'Kütahya','TR-44':'Malatya',
-        'TR-45':'Manisa','TR-46':'Kahramanmaraş','TR-47':'Mardin','TR-48':'Muğla',
-        'TR-49':'Muş','TR-50':'Nevşehir','TR-51':'Niğde','TR-52':'Ordu',
-        'TR-53':'Rize','TR-54':'Sakarya','TR-55':'Samsun','TR-56':'Siirt',
-        'TR-57':'Sinop','TR-58':'Sivas','TR-59':'Tekirdağ','TR-60':'Tokat',
-        'TR-61':'Trabzon','TR-62':'Tunceli','TR-63':'Şanlıurfa','TR-64':'Uşak',
-        'TR-65':'Van','TR-66':'Yozgat','TR-67':'Zonguldak','TR-68':'Aksaray',
-        'TR-69':'Bayburt','TR-70':'Karaman','TR-71':'Kırıkkale','TR-72':'Batman',
-        'TR-73':'Şırnak','TR-74':'Bartın','TR-75':'Ardahan','TR-76':'Iğdır',
-        'TR-77':'Yalova','TR-78':'Karabük','TR-79':'Kilis','TR-80':'Osmaniye',
-        'TR-81':'Düzce'
-    };
+    var maksUye = 0;
+    Object.values(ilVerileri).forEach(function(v) { if (v > maksUye) maksUye = v; });
+    if (maksUye < 1) maksUye = 1;
 
-    // Plaka kodunu → üye sayısı değerine çevir
-    var haritaVerisi = {};
-    Object.keys(plakaIlHaritasi).forEach(function (kod) {
-        var il = plakaIlHaritasi[kod];
-        haritaVerisi[kod] = ilVerileri[il] || 0;
+    // Üye sayısına göre renk (açık pembe → koyu kırmızı)
+    function uyeRengi(sayi) {
+        if (!sayi || sayi === 0) return '#fce4ec';
+        var oran = Math.pow(sayi / maksUye, 0.4); // polynomial normalize
+        var r = Math.round(198 + (198 - 198) * oran); // 198 → 198
+        var g = Math.round(228 - 208 * oran);         // 228 → 20
+        var b = Math.round(236 - 196 * oran);         // 236 → 40
+        return 'rgb(' + Math.round(198) + ',' + Math.round(228 - 208 * oran) + ',' + Math.round(236 - 196 * oran) + ')';
+    }
+
+    // Leaflet haritası — Türkiye koordinatlarına kilitle
+    var harita = L.map('turkiyeHaritasi', {
+        center: [39.0, 35.5],
+        zoom: 5,
+        zoomControl: false,
+        dragging: false,
+        scrollWheelZoom: false,
+        doubleClickZoom: false,
+        boxZoom: false,
+        keyboard: false,
+        touchZoom: false,
+        attributionControl: false,
     });
 
-    var maksUye = Math.max.apply(null, Object.values(haritaVerisi).filter(function(v){ return v > 0; })) || 1;
+    var geojsonLayer;
 
-    var haritaEl = document.getElementById('turkiyeHaritasi');
-    if (!haritaEl) return;
+    function stilFonksiyonu(feature) {
+        var ilAdi = feature.properties.name;
+        var sayi  = ilVerileri[ilAdi] || 0;
+        return {
+            fillColor: uyeRengi(sayi),
+            weight: 0.8,
+            opacity: 1,
+            color: '#fff',
+            fillOpacity: 0.95,
+        };
+    }
 
-    new jsVectorMap({
-        selector: '#turkiyeHaritasi',
-        map: 'turkey',
-        zoomButtons: false,
-        zoomOnScroll: false,
-        regionStyle: {
-            initial: {
-                fill: '#fce4ec',
-                stroke: '#fff',
-                strokeWidth: 0.8,
+    function onEachFeature(feature, layer) {
+        var ilAdi = feature.properties.name;
+        var sayi  = ilVerileri[ilAdi] || 0;
+        layer.bindTooltip(
+            '<strong style="font-size:13px;">' + ilAdi + '</strong>' +
+            '<br><span style="color:#c62828;font-weight:600;">' + sayi + ' üye</span>',
+            { sticky: true, className: 'il-tooltip' }
+        );
+        layer.on({
+            mouseover: function(e) {
+                e.target.setStyle({ weight: 2, color: '#c62828', fillOpacity: 1 });
             },
-            hover: {
-                fill: '#b71c1c',
-                cursor: 'pointer',
+            mouseout: function(e) {
+                geojsonLayer.resetStyle(e.target);
             }
-        },
-        series: {
-            regions: [{
-                attribute: 'fill',
-                scale: ['#fce4ec', '#c62828'],
-                values: haritaVerisi,
-                min: 0,
-                max: maksUye,
-                normalizeFunction: 'polynomial',
-            }]
-        },
-        onRegionTooltipShow: function (event, tooltip, code) {
-            var ilAdi = plakaIlHaritasi[code] || code;
-            var sayi  = haritaVerisi[code] || 0;
-            tooltip.text(
-                '<strong>' + ilAdi + '</strong><br>' +
-                '<span style="color:#ef9a9a;">' + sayi + ' üye</span>',
-                true
-            );
-        },
-    });
+        });
+    }
+
+    // GeoJSON dosyasını fetch et
+    fetch('/assets/data/turkey-provinces.geojson')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            geojsonLayer = L.geoJSON(data, {
+                style: stilFonksiyonu,
+                onEachFeature: onEachFeature,
+            }).addTo(harita);
+            harita.fitBounds(geojsonLayer.getBounds(), { padding: [10, 10] });
+        })
+        .catch(function(err) {
+            haritaEl.innerHTML = '<div class="text-center text-muted py-5"><i class="fa-solid fa-map fa-3x d-block mb-3" style="opacity:0.15;"></i><p class="small">Harita yüklenemedi.</p></div>';
+        });
 })();
 </script>
+<style>
+.il-tooltip {
+    background: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 10px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    font-family: inherit;
+}
+#turkiyeHaritasi .leaflet-container {
+    background: transparent;
+    border-radius: 8px;
+}
+</style>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
