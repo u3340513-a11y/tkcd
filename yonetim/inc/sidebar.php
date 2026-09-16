@@ -72,11 +72,17 @@ if (!$is_kisitli_rol) {
             </a>
             <?php endif; ?>
 
+            <?php if (!$is_kisitli_rol): ?>
+            <a class="sb-link <?= $sayfa === 'teskilatlanma' ? 'sb-link--active' : '' ?>" href="index.php?sayfa=teskilatlanma">
+                <i class="sb-link__icon fa-solid fa-sitemap"></i>
+                <span>Teşkilatlanma</span>
+            </a>
+            <?php else: ?>
             <a class="sb-link sb-link--disabled" href="#" aria-disabled="true" tabindex="-1">
                 <i class="sb-link__icon fa-solid fa-sitemap"></i>
                 <span>Teşkilatlanma</span>
-                <span class="sb-link__badge sb-link__badge--soon">Yakında</span>
             </a>
+            <?php endif; ?>
 
             <a class="sb-link sb-link--disabled" href="#" aria-disabled="true" tabindex="-1">
                 <i class="sb-link__icon fa-solid fa-building-columns"></i>

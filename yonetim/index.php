@@ -373,7 +373,16 @@ switch ($sayfa) {
             include 'inc/duyurular.php';
         }
         break;
-        
+
+    case 'teskilatlanma':
+        if ($is_kisitli_rol) {
+            echo '<div class="container py-5"><div class="alert alert-danger text-center fw-bold"><i class="fa-solid fa-lock me-2"></i>Erişim Engellendi: Bu hesap türü ile teşkilatlanma sayfasına erişilemez.</div></div>';
+        } else {
+            log_kaydet($db_baglanti, 'sayfa_goruntulem', 'Teşkilatlanma sayfası açıldı.');
+            include 'inc/teskilatlanma.php';
+        }
+        break;
+
     case 'dashboard':
     default:
         // ─── KISITLI ROLLER İÇİN ÖZEL DASHBOARD ─────────────────────────
