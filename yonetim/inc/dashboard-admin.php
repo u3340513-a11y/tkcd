@@ -333,7 +333,7 @@ $bolge_degerler  = array_values($bolge_sayilari);
      ═══════════════════════════════════════════════════════════════ -->
 <div class="row g-4 mb-4">
     <!-- Sol: Aylık Artış Trendi -->
-    <div class="col-lg-8">
+    <div class="col-lg-7">
         <div class="dash-card h-100">
             <div class="dash-card__header">
                 <h5 class="dash-card__title"><i class="fa-solid fa-chart-line text-primary"></i> Aylık Üye Artış Trendi</h5>
@@ -348,7 +348,7 @@ $bolge_degerler  = array_values($bolge_sayilari);
     </div>
 
     <!-- Sağ: Bölge Dağılımı -->
-    <div class="col-lg-4">
+    <div class="col-lg-5">
         <div class="dash-card">
             <div class="dash-card__header">
                 <h5 class="dash-card__title"><i class="fa-solid fa-pie-chart text-success"></i> Bölge Dağılımı</h5>
@@ -449,7 +449,70 @@ $bolge_degerler  = array_values($bolge_sayilari);
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════
-     D: KAN GRUBU  +  E: KURUMLAR
+     D: DOĞUM GÜNÜ
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="dash-card">
+            <div class="dash-card__header">
+                <h5 class="dash-card__title">
+                    <i class="fa-solid fa-cake-candles text-warning"></i> Bugünkü Doğum Günleri
+                </h5>
+                <span class="dash-card__action"><?= date('d F Y') ?></span>
+            </div>
+            <div class="dash-card__body">
+                <?php if (count($dogum_gunu_uyeleri) > 0): ?>
+                <div class="row g-3">
+                    <?php foreach ($dogum_gunu_uyeleri as $dg_uye): ?>
+                    <?php
+                        $dg_ad    = htmlspecialchars($dg_uye['adi_soyadi']);
+                        $dg_renk  = avatarRengi($dg_uye['adi_soyadi'], $avatar_renkleri);
+                        $dg_harf  = basHarfleri($dg_uye['adi_soyadi']);
+                        $dg_yas   = '';
+                        if (!empty($dg_uye['dogum_tarihi']) && $dg_uye['dogum_tarihi'] !== '0000-00-00') {
+                            $dogum = \DateTime::createFromFormat('Y-m-d', $dg_uye['dogum_tarihi']);
+                            if ($dogum) {
+                                $dg_yas = (int)(new \DateTime())->diff($dogum)->y . ' yaşında';
+                            }
+                        }
+                    ?>
+                    <div class="col-sm-6 col-md-4 col-lg-3">
+                        <div class="d-flex align-items-center gap-3 p-3 rounded-3 h-100"
+                             style="background:linear-gradient(135deg,<?= $dg_renk ?>12,<?= $dg_renk ?>06);border:1px solid <?= $dg_renk ?>30;">
+                            <!-- Avatar -->
+                            <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold flex-shrink-0"
+                                 style="width:48px;height:48px;background:<?= $dg_renk ?>;color:#fff;font-size:1rem;">
+                                <?= htmlspecialchars($dg_harf) ?>
+                            </div>
+                            <div class="flex-grow-1 min-width-0">
+                                <div class="fw-semibold text-dark" style="font-size:0.9rem;"><?= $dg_ad ?></div>
+                                <?php if ($dg_yas): ?>
+                                <div class="text-muted" style="font-size:0.78rem;"><?= $dg_yas ?></div>
+                                <?php endif; ?>
+                                <?php if (!empty($dg_uye['ikamet_ili'])): ?>
+                                <div style="font-size:0.75rem;color:<?= $dg_renk ?>;">
+                                    <i class="fa-solid fa-location-dot me-1"></i><?= htmlspecialchars($dg_uye['ikamet_ili']) ?>
+                                </div>
+                                <?php endif; ?>
+                            </div>
+                            <span style="font-size:1.4rem;">🎂</span>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+                <?php else: ?>
+                <div class="text-center py-5 text-muted">
+                    <i class="fa-regular fa-calendar-xmark fa-2x mb-2 d-block"></i>
+                    <span style="font-size:0.9rem;">Bugün doğum günü olan üye bulunmuyor.</span>
+                </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     E: KAN GRUBU  +  F: KURUMLAR
      ═══════════════════════════════════════════════════════════════ -->
 <div class="row g-4 mb-4">
 
