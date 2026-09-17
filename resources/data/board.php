@@ -94,7 +94,7 @@ return [
         'uyeler' => [
             kisi(slug: 'ilyas-demir',   ad: 'İlyas Demir',    unvan: 'Gençlik Kolları Başkanı', fotograf: 'ilyas-demir.png'),
             kisi(slug: 'umit-bolukbas', ad: 'Ümit Bölükbaş',  unvan: 'Başkan Yardımcısı'),
-            kisi(slug: 'samet-celik',   ad: 'Samet Çelik',    unvan: 'Başkan Yardımcısı'),
+            kisi(slug: 'samet-celik',   ad: 'Samet Çelik',    unvan: 'Başkan Yardımcısı', fotograf: 'samet-celik.png'),
             kisi(slug: 'berkay-soylu',  ad: 'Berkay Soylu',   unvan: 'Başkan Yardımcısı'),
         ],
     ],
