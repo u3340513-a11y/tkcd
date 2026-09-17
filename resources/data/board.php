@@ -105,7 +105,7 @@ return [
         'uyeler' => [
             kisi(slug: 'huseyin-koc',      ad: 'Hüseyin Koç',      unvan: 'Teşkilatlanmadan Sorumlu Başkan', fotograf: 'huseyin_koc.png'),
             kisi(slug: 'mert-hayrioglu',   ad: 'Mert Hayrioğlu',   unvan: 'Başkan Yardımcısı', fotograf: 'mert-hayrioglu.jpeg'),
-            kisi(slug: 'murat-bayraktar',  ad: 'Murat Bayraktar',  unvan: 'Başkan Yardımcısı'),
+            kisi(slug: 'murat-bayraktar',  ad: 'Murat Bayraktar',  unvan: 'Başkan Yardımcısı', fotograf: 'murat-bayraktar.png'),
             kisi(slug: 'ugur-kayazoglu',   ad: 'Uğur Kayazoğlu',   unvan: 'Başkan Yardımcısı', fotograf: 'ugur-kayazoglu.png'),
         ],
     ],
