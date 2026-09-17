@@ -16,22 +16,46 @@ if (!isset($_SESSION['csrf_token'])) {
 }
 $csrf_token = $_SESSION['csrf_token'];
 
-// Soruları yükle ve 8 tanesini rastgele seç
+// Soruları yükle, karıştır ve 8 tanesini rastgele seç
 $tum_sorular = require __DIR__ . '/quiz-sorulari.php';
 $toplam = count($tum_sorular);
-$secilen_indexler = array_rand($tum_sorular, 8);
-shuffle($secilen_indexler);
+
+// Tüm havuzu karıştır, ilk 8'i al
+$indexler = range(0, $toplam - 1);
+shuffle($indexler);
+shuffle($indexler); // Çift shuffle — daha iyi dağılım
+$secilen_indexler = array_slice($indexler, 0, 8);
 
 // JSON olarak hazırla (client'a sadece soru metni ve seçenekler gönderilir, cevap GÖNDERİLMEZ)
+// Şıklar da her soruda karışık sırada gelir
 $client_sorular = [];
 foreach ($secilen_indexler as $idx) {
     $s = $tum_sorular[$idx];
+    $dogru_cevap_text = $s['secenekler'][$s['cevap']];
+
+    // Şıkları karıştır
+    $karisik_secenekler = $s['secenekler'];
+    shuffle($karisik_secenekler);
+
+    // Doğru cevabın yeni index'ini bul ve sunucu tarafında sakla
+    $yeni_cevap_index = array_search($dogru_cevap_text, $karisik_secenekler, true);
+
+    // Sunucu tarafında doğru cevap index'ini güncelle (quiz-kaydet.php'de doğrulama için)
+    $tum_sorular[$idx]['cevap'] = $yeni_cevap_index;
+
     $client_sorular[] = [
         'index'      => $idx,
         'soru'       => $s['soru'],
-        'secenekler' => $s['secenekler'],
+        'secenekler' => $karisik_secenekler,
         'zorluk'     => $s['zorluk'],
     ];
+}
+
+// Karıştırılmış şıkların doğru cevap map'ini session'da sakla
+// quiz-kaydet.php sunucu tarafı doğrulamasında kullanılacak
+$_SESSION['quiz_cevap_map'] = [];
+foreach ($client_sorular as $cs) {
+    $_SESSION['quiz_cevap_map'][$cs['index']] = $tum_sorular[$cs['index']]['cevap'];
 }
 
 // Günlük oynama sayısı

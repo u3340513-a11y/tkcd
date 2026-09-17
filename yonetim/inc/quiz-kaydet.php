@@ -96,6 +96,9 @@ try {
 $sorular = require __DIR__ . '/quiz-sorulari.php';
 $toplam_soru = count($sorular);
 
+// Session'daki karıştırılmış cevap map'ini kullan (şıklar karışık geldiği için)
+$cevap_map = $_SESSION['quiz_cevap_map'] ?? [];
+
 $dogru_sayisi = 0;
 $puan_per_soru = 100; // Her doğru 100 puan
 
@@ -108,7 +111,11 @@ foreach ($soru_idleri as $i => $soru_index) {
     }
 
     $kullanici_cevap = (int) ($cevaplar[$i] ?? -1);
-    $dogru_cevap     = (int) $sorular[$soru_index]['cevap'];
+
+    // Session map varsa karıştırılmış index'i kullan, yoksa orijinal
+    $dogru_cevap = isset($cevap_map[$soru_index])
+        ? (int) $cevap_map[$soru_index]
+        : (int) $sorular[$soru_index]['cevap'];
 
     if ($kullanici_cevap === $dogru_cevap) {
         $dogru_sayisi++;
