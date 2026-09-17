@@ -919,6 +919,90 @@ switch ($sayfa) {
             </script>
             <?php endif; ?>
             <?php
+            // ── KISITLI DASHBOARD — HAFTALIK QUİZ LİDERLİK TABLOSU ──────
+            $quiz_hafta_kodu = date('Y-W');
+            $quiz_liderleri = [];
+            try {
+                $quiz_sorgu = $db_baglanti->prepare(
+                    "SELECT kullanici_adi, MAX(puan) as en_yuksek_puan, COUNT(*) as oynama_sayisi
+                       FROM quiz_sonuclari
+                      WHERE hafta_kodu = ?
+                      GROUP BY kullanici_adi
+                      ORDER BY en_yuksek_puan DESC
+                      LIMIT 5"
+                );
+                $quiz_sorgu->execute([$quiz_hafta_kodu]);
+                $quiz_liderleri = $quiz_sorgu->fetchAll(PDO::FETCH_ASSOC);
+            } catch (PDOException $e) {
+                $quiz_liderleri = [];
+            }
+            ?>
+
+            <!-- HAFTALIK QUIZ ŞAMPİYONLARI (Kısıtlı Dashboard) -->
+            <div class="row g-4 mb-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0 fw-bold" style="font-size:1rem;">
+                                <i class="fa-solid fa-trophy text-warning"></i> Haftanın TS Bilgi Yarışması Şampiyonlar Ligi
+                            </h5>
+                            <a href="index.php?sayfa=quiz" class="text-decoration-none fw-bold" style="color:#e94560; font-size:0.85rem;">
+                                <i class="fa-solid fa-futbol me-1"></i> Yarışmaya Katıl
+                            </a>
+                        </div>
+                        <div class="card-body">
+                            <?php if (empty($quiz_liderleri)): ?>
+                                <div class="text-center py-4">
+                                    <div style="font-size:2.5rem; margin-bottom:0.5rem;">⚽</div>
+                                    <p class="text-muted mb-1">Henüz bu hafta kimse yarışmaya katılmadı.</p>
+                                    <a href="index.php?sayfa=quiz" class="btn btn-sm px-3 py-1 fw-bold rounded-pill" style="background:linear-gradient(135deg,#e94560,#c72c41); color:#fff; border:none;">
+                                        İlk Sen Katıl!
+                                    </a>
+                                </div>
+                            <?php else: ?>
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0" style="font-size:0.9rem;">
+                                        <thead>
+                                            <tr style="border-bottom:2px solid #e94560;">
+                                                <th style="width:50px;">#</th>
+                                                <th>Kullanıcı</th>
+                                                <th class="text-center">En Yüksek Puan</th>
+                                                <th class="text-center">Oynama</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($quiz_liderleri as $qi => $ql): ?>
+                                            <tr>
+                                                <td>
+                                                    <?php if ($qi === 0): ?>
+                                                        <span style="font-size:1.3rem;">🥇</span>
+                                                    <?php elseif ($qi === 1): ?>
+                                                        <span style="font-size:1.3rem;">🥈</span>
+                                                    <?php elseif ($qi === 2): ?>
+                                                        <span style="font-size:1.3rem;">🥉</span>
+                                                    <?php else: ?>
+                                                        <span class="fw-bold text-muted"><?= $qi + 1 ?></span>
+                                                    <?php endif; ?>
+                                                </td>
+                                                <td class="fw-bold"><?= htmlspecialchars($ql['kullanici_adi'], ENT_QUOTES, 'UTF-8') ?></td>
+                                                <td class="text-center">
+                                                    <span class="badge rounded-pill px-3 py-1" style="background:linear-gradient(135deg,#e94560,#c72c41); font-size:0.85rem;">
+                                                        <?= (int)$ql['en_yuksek_puan'] ?> puan
+                                                    </span>
+                                                </td>
+                                                <td class="text-center text-muted"><?= (int)$ql['oynama_sayisi'] ?> kez</td>
+                                            </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <?php
             break;
         }
 
