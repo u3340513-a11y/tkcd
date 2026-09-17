@@ -247,7 +247,7 @@ function csrf_hidden_alan(): string
  * e-posta adresini görme yetkisine sahip olup olmadığını döner.
  *
  * İzinli hesaplar:
- *   - Kullanıcı adı: admin61, yonetim_hk  (rol bağımsız)
+ *   - Kullanıcı adı: admin61, yonetim_hk, kk_by  (rol bağımsız)
  *   - Rol: gelistirici
  *
  * Neden hesap adına da bakıyoruz: admin ve yonetim rolleri birden
@@ -264,7 +264,7 @@ function kisi_bilgisi_gorebilir(): bool
     }
 
     /** @var string[] İzin verilen kullanıcı adları (rol bağımsız) */
-    $izinli_kullanicilar = ['admin61'];
+    $izinli_kullanicilar = ['admin61', 'yonetim_hk', 'kk_by'];
 
     // Hesap geçişi (impersonation) modunda MEVCUT kullanıcının rolü kullanılır.
     // Geliştirici başka hesaba geçiş yaptığında, o hesabın kısıtlamaları geçerli olur.
