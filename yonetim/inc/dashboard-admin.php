@@ -454,7 +454,7 @@ $bolge_degerler  = array_values($bolge_sayilari);
                                 <tr style="border-bottom:2px solid #e94560;">
                                     <th style="width:50px;">#</th>
                                     <th>Kullanıcı</th>
-                                    <th class="text-center">En Yüksek Puan</th>
+                                    <th class="text-center">Toplam Puan</th>
                                     <th class="text-center">Oynama</th>
                                 </tr>
                             </thead>

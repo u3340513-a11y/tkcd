@@ -924,7 +924,7 @@ switch ($sayfa) {
             $quiz_liderleri = [];
             try {
                 $quiz_sorgu = $db_baglanti->prepare(
-                    "SELECT kullanici_adi, MAX(puan) as en_yuksek_puan, COUNT(*) as oynama_sayisi
+                    "SELECT kullanici_adi, SUM(puan) as en_yuksek_puan, COUNT(*) as oynama_sayisi
                        FROM quiz_sonuclari
                       WHERE hafta_kodu = ?
                       GROUP BY kullanici_adi
@@ -966,7 +966,7 @@ switch ($sayfa) {
                                             <tr style="border-bottom:2px solid #e94560;">
                                                 <th style="width:50px;">#</th>
                                                 <th>Kullanıcı</th>
-                                                <th class="text-center">En Yüksek Puan</th>
+                                                <th class="text-center">Toplam Puan</th>
                                                 <th class="text-center">Oynama</th>
                                             </tr>
                                         </thead>
@@ -1203,7 +1203,7 @@ switch ($sayfa) {
             $quiz_liderleri = [];
             try {
                 $quiz_sorgu = $db_baglanti->prepare(
-                    "SELECT kullanici_adi, MAX(puan) as en_yuksek_puan, COUNT(*) as oynama_sayisi
+                    "SELECT kullanici_adi, SUM(puan) as en_yuksek_puan, COUNT(*) as oynama_sayisi
                        FROM quiz_sonuclari
                       WHERE hafta_kodu = ?
                       GROUP BY kullanici_adi
