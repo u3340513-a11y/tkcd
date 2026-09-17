@@ -24,6 +24,9 @@ $is_kurum_temsilcisi = ($kullanici_rolu === 'kurum_temsilcisi');
 $is_kadin_kollari    = ($kullanici_rolu === 'kadin_kollari_baskani');
 $is_kisitli_rol      = ($is_il_baskani || $is_ilce_baskani || $is_kurum_temsilcisi || $is_kadin_kollari);
 
+// Not ekleme/silme yetkisi: kısıtlı rol olmayanlar VEYA kk_by hesabı
+$is_not_yetkili = !$is_kisitli_rol || (($_SESSION['kullanici_adi'] ?? '') === 'kk_by');
+
 // --- GÜNCELLEME: SORUMLU BÖLGE / İLÇE EL İLE GÜNCELLEME MOTORU (ADMİN + GELİŞTİRİCİ) ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bolge_guncelle'])) {
     if (!$is_admin && !$is_gelistirici) {
@@ -145,7 +148,7 @@ if (isset($_GET['ajax_islem']) && $_GET['ajax_islem'] === 'ajax_not_sil' && isse
 
 // --- NOT EKLEME MOTORU (DENETÇİYE KAPALI) ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['not_ekle'])) {
-    if ($is_kisitli_rol) {
+    if (!$is_not_yetkili) {
         die("Erişim Engellendi: Bu işlemi yapmaya yetkiniz yok!");
     }
     $not_icerik = trim($_POST['not_icerik']);
@@ -372,7 +375,7 @@ if (!empty($uye['uyelik_tarihi']) && $uye['uyelik_tarihi'] !== '0000-00-00') {
                 </div>
                 <div class="card-body p-4 d-flex flex-column flex-grow-1">
                     
-                    <?php if (!$is_kisitli_rol): ?>
+                    <?php if ($is_not_yetkili): ?>
                         <form action="index.php?sayfa=uye-detay&id=<?= $uye_id; ?>" method="POST" class="mb-4">
                             <div class="input-group">
                                 <textarea name="not_icerik" class="form-control" rows="2" placeholder="Üye hakkında bir not veya özel açıklama ekleyin..." required></textarea>
@@ -388,7 +391,7 @@ if (!empty($uye['uyelik_tarihi']) && $uye['uyelik_tarihi'] !== '0000-00-00') {
                             <?php foreach ($notlar as $not): ?>
                                 <div id="not-kapsayici-<?= $not['id']; ?>" class="bg-light p-3 rounded-3 border mb-3 shadow-sm position-relative transition-not">
                                     
-                                    <?php if (!$is_kisitli_rol): ?>
+                                    <?php if ($is_not_yetkili): ?>
                                         <a href="javascript:void(0);" onclick="notuGörünmezSil(<?= $not['id']; ?>)" class="position-absolute text-danger text-decoration-none btn-not-sil" title="Notu Sil" style="top: 10px; right: 15px; font-size: 1.4rem; font-weight: bold; line-height: 1; cursor: pointer;">
                                             &times;
                                         </a>
