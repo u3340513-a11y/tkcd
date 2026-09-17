@@ -83,7 +83,7 @@ return [
     [
         'baslik' => null,
         'uyeler' => [
-            kisi(slug: 'mustafa-sahin',      ad: 'Mustafa Şahin',     unvan: 'Sayman'),
+            kisi(slug: 'mustafa-sahin',      ad: 'Mustafa Şahin',     unvan: 'Sayman', fotograf: 'mustafa-sahin.png'),
             kisi(slug: 'zeynep-hilal-umur',  ad: 'Zeynep Hilal Umur', unvan: 'Hukuk İşleri Başkanı', biyografi: 'Dernek Avukatı', fotograf: 'zhu.png'),
         ],
     ],
