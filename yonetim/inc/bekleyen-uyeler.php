@@ -164,6 +164,7 @@ try {
                     <tbody>
                         <?php if (count($bekleyenler) > 0): ?>
                             <?php foreach ($bekleyenler as $b): ?>
+                                <?php
                                 // --- Cinsiyet tespiti: önce DB alanı, yoksa isim listesi fallback ---
                                 $cinsiyet_db = mb_strtolower(trim($b['cinsiyet'] ?? ''), 'UTF-8');
                                 if ($cinsiyet_db === 'kadın' || $cinsiyet_db === 'kadin' || $cinsiyet_db === 'female' || $cinsiyet_db === 'k') {
