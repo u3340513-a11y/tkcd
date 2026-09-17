@@ -432,7 +432,7 @@ $bolge_degerler  = array_values($bolge_sayilari);
         <div class="dash-card">
             <div class="dash-card__header">
                 <h5 class="dash-card__title">
-                    <i class="fa-solid fa-trophy text-warning"></i> Haftanın Quiz Şampiyonları
+                    <i class="fa-solid fa-trophy text-warning"></i> Haftanın TS Bilgi Yarışması Şampiyonları
                 </h5>
                 <a href="index.php?sayfa=quiz" class="dash-card__action" style="text-decoration:none; color:#e94560;">
                     <i class="fa-solid fa-futbol me-1"></i> Yarışmaya Katıl
