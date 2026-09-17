@@ -285,6 +285,12 @@ $is_yetki_var        = ($is_admin || $is_yonetim || $is_gelistirici);
 
 $sayfa = isset($_GET['sayfa']) ? trim($_GET['sayfa']) : 'dashboard';
 
+// ─── AJAX ENDPOINT'LERİ (HTML çıktısından önce işle) ─────────────────────
+if ($sayfa === 'quiz-kaydet' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    include 'inc/quiz-kaydet.php';
+    exit;
+}
+
 include 'inc/header.php';
 include 'inc/sidebar.php';
 echo '<div class="panel-content">';
