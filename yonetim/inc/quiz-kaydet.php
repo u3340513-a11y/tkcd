@@ -30,7 +30,6 @@ if (!isset($_SESSION['kullanici_adi'])) {
 }
 
 $kullanici_adi = $_SESSION['kullanici_adi'];
-$ad_soyad      = $_SESSION['ad_soyad'] ?? $kullanici_adi;
 
 // ─── CSRF KONTROLÜ ─────────────────────────────────────────────────────
 $csrf = $_POST['csrf_token'] ?? '';
@@ -132,7 +131,7 @@ try {
     );
     $kayit->execute([
         $kullanici_adi,
-        $ad_soyad,
+        $kullanici_adi,
         $toplam_puan,
         $dogru_sayisi,
         $hafta_kodu,

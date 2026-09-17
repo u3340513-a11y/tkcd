@@ -1119,10 +1119,10 @@ switch ($sayfa) {
             $quiz_liderleri = [];
             try {
                 $quiz_sorgu = $db_baglanti->prepare(
-                    "SELECT ad_soyad, MAX(puan) as en_yuksek_puan, COUNT(*) as oynama_sayisi
+                    "SELECT kullanici_adi, MAX(puan) as en_yuksek_puan, COUNT(*) as oynama_sayisi
                        FROM quiz_sonuclari
                       WHERE hafta_kodu = ?
-                      GROUP BY kullanici_adi, ad_soyad
+                      GROUP BY kullanici_adi
                       ORDER BY en_yuksek_puan DESC
                       LIMIT 5"
                 );

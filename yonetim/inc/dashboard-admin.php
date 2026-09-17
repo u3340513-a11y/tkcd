@@ -453,7 +453,7 @@ $bolge_degerler  = array_values($bolge_sayilari);
                             <thead>
                                 <tr style="border-bottom:2px solid #e94560;">
                                     <th style="width:50px;">#</th>
-                                    <th>Ad Soyad</th>
+                                    <th>Kullanıcı</th>
                                     <th class="text-center">En Yüksek Puan</th>
                                     <th class="text-center">Oynama</th>
                                 </tr>
@@ -472,7 +472,7 @@ $bolge_degerler  = array_values($bolge_sayilari);
                                             <span class="fw-bold text-muted"><?= $qi + 1 ?></span>
                                         <?php endif; ?>
                                     </td>
-                                    <td class="fw-bold"><?= htmlspecialchars($ql['ad_soyad'], ENT_QUOTES, 'UTF-8') ?></td>
+                                    <td class="fw-bold"><?= htmlspecialchars($ql['kullanici_adi'], ENT_QUOTES, 'UTF-8') ?></td>
                                     <td class="text-center">
                                         <span class="badge rounded-pill px-3 py-1" style="background:linear-gradient(135deg,#e94560,#c72c41); font-size:0.85rem;">
                                             <?= (int)$ql['en_yuksek_puan'] ?> puan
