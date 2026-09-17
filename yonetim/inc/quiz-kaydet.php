@@ -14,7 +14,13 @@
  * @var string $kullanici_adi  Session'dan
  */
 
+// Önceki çıktıları temizle (baglan.php vs. session mesajları)
+if (ob_get_level()) {
+    ob_end_clean();
+}
+
 header('Content-Type: application/json; charset=utf-8');
+header('Cache-Control: no-store, no-cache, must-revalidate');
 
 // ─── SESSION KONTROLÜ ──────────────────────────────────────────────────
 if (!isset($_SESSION['kullanici_adi'])) {

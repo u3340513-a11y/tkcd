@@ -664,18 +664,29 @@ try {
             method: 'POST',
             body: formData,
         })
-        .then(function(r) { return r.json(); })
-        .then(function(data) {
+        .then(function(r) {
+            return r.text();
+        })
+        .then(function(text) {
+            var data;
+            try {
+                data = JSON.parse(text);
+            } catch (e) {
+                document.getElementById('sonucMesaj').textContent = 'Sunucu yanıtı okunamadı.';
+                console.error('Quiz JSON parse hatası:', text);
+                return;
+            }
+
             if (data.ok) {
-                const dogru  = data.dogru_sayisi;
-                const yanlis = TOPLAM - dogru - bosKalan;
-                const puan   = data.toplam_puan;
+                var dogru  = data.dogru_sayisi;
+                var yanlis = TOPLAM - dogru - bosKalan;
+                var puan   = data.toplam_puan;
 
                 document.getElementById('sonucDogru').textContent  = dogru;
                 document.getElementById('sonucYanlis').textContent  = yanlis;
                 document.getElementById('sonucBos').textContent     = bosKalan;
 
-                const puanEl = document.getElementById('sonucPuan');
+                var puanEl = document.getElementById('sonucPuan');
                 puanEl.textContent = puan + ' Puan';
 
                 if (dogru >= 6) {
@@ -692,8 +703,9 @@ try {
                 document.getElementById('sonucMesaj').textContent = data.mesaj || 'Sonuç kaydedilemedi.';
             }
         })
-        .catch(function() {
+        .catch(function(err) {
             document.getElementById('sonucMesaj').textContent = 'Bağlantı hatası. Sonuç kaydedilemedi.';
+            console.error('Quiz fetch hatası:', err);
         });
     }
 
