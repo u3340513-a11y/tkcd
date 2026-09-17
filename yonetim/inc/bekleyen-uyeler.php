@@ -224,7 +224,7 @@ try {
                                             <a href="index.php?sayfa=bekleyen-uyeler&aksiyon=basvuru_onayla&id=<?= $b['id']; ?>" class="btn btn-success btn-sm fw-bold px-2.5 shadow-sm" onclick="return confirm('<?= htmlspecialchars($b['adi_soyadi']); ?> isimli adayı derneğe üye olarak onaylıyor musunuz?');">
                                                 <i class="fa-solid fa-user-check me-1"></i> Onayla
                                             </a>
-                                            <?php if (!$is_kisitli_rol): ?>
+                                            <?php if (!$is_kisitli_rol || $oturum_kullanici_adi === 'kk_by'): ?>
                                                 <a href="index.php?sayfa=bekleyen-uyeler&aksiyon=basvuru_reddet&id=<?= $b['id']; ?>" class="btn btn-outline-danger btn-sm fw-bold px-2.5 shadow-sm" onclick="return confirm('<?= htmlspecialchars($b['adi_soyadi']); ?> isimli başvuruyu tamamen silmek istediğinize emin misiniz?');">
                                                     <i class="fa-solid fa-user-xmark me-1"></i> Reddet
                                                 </a>
