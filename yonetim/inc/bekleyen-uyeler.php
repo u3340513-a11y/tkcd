@@ -164,20 +164,28 @@ try {
                     <tbody>
                         <?php if (count($bekleyenler) > 0): ?>
                             <?php foreach ($bekleyenler as $b): ?>
-                                <?php 
-                                // --- Gelişmiş Kadın İsim Filtreleme Motoru (Semra ve Diğer İsimler Eklendi) ---
-                                $parcalar = explode(' ', trim($b['adi_soyadi']));
-                                $ilk_isim = mb_strtoupper($parcalar[0], 'UTF-8');
-                                
-                                $kadin_isimleri = ['SEMRA', 'AYŞEGÜL', 'BEGÜM', 'HATİCE', 'FATMA', 'AYŞE', 'EMİNE', 'ZEYNEP', 'MERYEM', 'ELİF', 'HÜLYA', 'GAMZE', 'MERVE', 'BÜŞRA', 'ESRA', 'SEDA', 'DERYA', 'KÜBRA', 'ASLI', 'PELİN', 'TUĞBA', 'DEMET', 'ÖZLEM', 'SİNEM', 'GÜL', 'NUR', 'MELİS', 'DİLAN', 'BURCU', 'CANAN', 'SULTAN', 'MELİKE', 'YASEMİN', 'EDA', 'BERNA', 'SELEN', 'PINAR', 'BANU', 'YEŞİM', 'EBRU', 'FADİME', 'NURAN', 'SELMA', 'DİLEK', 'FİLİZ', 'ARZU', 'LEYLA', 'SİBEL', 'HALE', 'JALE', 'GONCA', 'MÜGE', 'NESLİHAN', 'NAZLI', 'MİNE', 'SELİN', 'ESMA', 'FAZİLET', 'NESRİN', 'REYHAN', 'AHSEN', 'İPEK', 'ÖZGE', 'GÜLAY', 'SÜREYYA', 'DİDEM', 'Handan', 'NURTEN', 'ŞERİFE', 'SABİHA', 'ZEHRA', 'ÜMMÜHAN', 'RABİA', 'BÜŞRANUR', 'FATMANUR', 'GÜLSÜM', 'KÜBRANUR', 'ŞEYMA', 'BETÜL', 'SÜMEYYE', 'KADRİYE', 'HAVVA', 'SONGÜL', 'DÖNDÜ', 'NURAY', 'FİRDEVS', 'AYTEN', 'AYSEL', 'GÜLER', 'NURSEL', 'NURCAN', 'MELEK', 'FİLİZ', 'NURHAN', 'PERİHAN', 'SUZAN', 'SUNA', 'ŞENNUR', 'İLKAY', 'GÜLDEN', 'İLK_NUR', 'GÜLŞAH', 'AŞKIN', 'SEVAL', 'SEVİL', 'SEVİM', 'NİHAL', 'NİLÜFER', 'NİLAY', 'NURSEl', 'MELTEM'];
-                                
-                                if (in_array($ilk_isim, $kadin_isimleri)) {
-                                    $ikon_style = 'color: #e83e8c !important;'; 
+                                // --- Cinsiyet tespiti: önce DB alanı, yoksa isim listesi fallback ---
+                                $cinsiyet_db = mb_strtolower(trim($b['cinsiyet'] ?? ''), 'UTF-8');
+                                if ($cinsiyet_db === 'kadın' || $cinsiyet_db === 'kadin' || $cinsiyet_db === 'female' || $cinsiyet_db === 'k') {
+                                    $is_kadin = true;
+                                } elseif ($cinsiyet_db === 'erkek' || $cinsiyet_db === 'male' || $cinsiyet_db === 'e') {
+                                    $is_kadin = false;
+                                } else {
+                                    // Fallback: isim listesi
+                                    $parcalar = explode(' ', trim($b['adi_soyadi']));
+                                    $ilk_isim = mb_strtoupper($parcalar[0], 'UTF-8');
+                                    $kadin_isimleri = ['SEMRA', 'AYŞEGÜL', 'BEGÜM', 'HATİCE', 'FATMA', 'AYŞE', 'EMİNE', 'ZEYNEP', 'MERYEM', 'ELİF', 'HÜLYA', 'GAMZE', 'MERVE', 'BÜŞRA', 'ESRA', 'SEDA', 'DERYA', 'KÜBRA', 'ASLI', 'PELİN', 'TUĞBA', 'DEMET', 'ÖZLEM', 'SİNEM', 'GÜL', 'NUR', 'MELİS', 'DİLAN', 'BURCU', 'CANAN', 'SULTAN', 'MELİKE', 'YASEMİN', 'EDA', 'BERNA', 'SELEN', 'PINAR', 'BANU', 'YEŞİM', 'EBRU', 'FADİME', 'NURAN', 'SELMA', 'DİLEK', 'FİLİZ', 'ARZU', 'LEYLA', 'SİBEL', 'HALE', 'JALE', 'GONCA', 'MÜGE', 'NESLİHAN', 'NAZLI', 'MİNE', 'SELİN', 'ESMA', 'FAZİLET', 'NESRİN', 'REYHAN', 'AHSEN', 'İPEK', 'ÖZGE', 'GÜLAY', 'SÜREYYA', 'DİDEM', 'HANDAN', 'NURTEN', 'ŞERİFE', 'SABİHA', 'ZEHRA', 'ÜMMÜHAN', 'RABİA', 'BÜŞRANUR', 'FATMANUR', 'GÜLSÜM', 'KÜBRANUR', 'ŞEYMA', 'BETÜL', 'SÜMEYYE', 'KADRİYE', 'HAVVA', 'SONGÜL', 'DÖNDÜ', 'NURAY', 'FİRDEVS', 'AYTEN', 'AYSEL', 'GÜLER', 'NURSEL', 'NURCAN', 'MELEK', 'NURHAN', 'PERİHAN', 'SUZAN', 'SUNA', 'ŞENNUR', 'İLKAY', 'GÜLDEN', 'GÜLŞAH', 'SEVAL', 'SEVİL', 'SEVİM', 'NİHAL', 'NİLÜFER', 'NİLAY', 'MELTEM', 'ÜLKÜ', 'ÜLKÜM'];
+                                    $is_kadin = in_array($ilk_isim, $kadin_isimleri, true);
+                                }
+
+                                if ($is_kadin) {
+                                    $ikon_style = 'color: #e83e8c !important;';
                                     $ikon_sekil = 'fa-user-nurse';
                                 } else {
-                                    $ikon_style = 'color: #007bff !important;'; 
+                                    $ikon_style = 'color: #007bff !important;';
                                     $ikon_sekil = 'fa-user';
                                 }
+
 
                                 $kan = !empty($b['kan_grubu']) ? $b['kan_grubu'] : '-';
                                 $dogum_raw = !empty($b['dogum_tarihi']) ? $b['dogum_tarihi'] : (!empty($b['dogum_yili']) ? $b['dogum_yili'] : '');
