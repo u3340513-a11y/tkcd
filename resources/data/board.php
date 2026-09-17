@@ -126,7 +126,7 @@ return [
         'baslik' => 'Yönetim Kurulu Üyeleri',
         'uyeler' => [
             kisi(slug: 'mehmet-volkan-yavuzturk', ad: 'Mehmet Volkan Yavuztürk', unvan: 'Yönetim Kurulu Üyesi'),
-            kisi(slug: 'enes-ustun',              ad: 'Enes Üstün',              unvan: 'Yönetim Kurulu Üyesi'),
+            kisi(slug: 'enes-ustun',              ad: 'Enes Üstün',              unvan: 'Yönetim Kurulu Üyesi', fotograf: 'enes-ustn.png'),
             kisi(slug: 'selim-sandikci',          ad: 'Selim Sandıkçı',          unvan: 'Yönetim Kurulu Üyesi', fotograf: 'selim-sandikci.png'),
             kisi(slug: 'muhammet-ali-topcu',      ad: 'Muhammet Ali Topçu',      unvan: 'Yönetim Kurulu Üyesi'),
             kisi(slug: 'yunus-okutan',            ad: 'Yunus Okutan',            unvan: 'Yönetim Kurulu Üyesi'),
