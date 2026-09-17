@@ -134,7 +134,7 @@ return [
             kisi(slug: 'ahmet-yilmaz',            ad: 'Ahmet Yılmaz',            unvan: 'Yönetim Kurulu Üyesi'),
             kisi(slug: 'mehmet-uzunoglu',         ad: 'Mehmet Uzunoğlu',         unvan: 'Yönetim Kurulu Üyesi'),
             kisi(slug: 'onur-yildiz',             ad: 'Onur Yıldız',             unvan: 'Yönetim Kurulu Üyesi'),
-            kisi(slug: 'yucel-alp',               ad: 'Yücel Alp',               unvan: 'Yönetim Kurulu Üyesi'),
+            kisi(slug: 'yucel-alp',               ad: 'Yücel Alp',               unvan: 'Yönetim Kurulu Üyesi', fotograf: 'yucel-alp.jpeg'),
             kisi(slug: 'ugur-okumus',             ad: 'Uğur Okumuş',             unvan: 'Yönetim Kurulu Üyesi'),
             kisi(slug: 'salim-suleymanogl',       ad: 'Salim Süleymanoğlu',      unvan: 'Yönetim Kurulu Üyesi'),
             kisi(slug: 'fatma-demir',             ad: 'Fatma Demir',             unvan: 'Yönetim Kurulu Üyesi', fotograf: 'fatma-demir.png'),
