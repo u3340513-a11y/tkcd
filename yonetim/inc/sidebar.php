@@ -101,6 +101,11 @@ if (!$is_kisitli_rol) {
         <div class="sb-section">
             <div class="sb-section__label">İçerik</div>
 
+            <a class="sb-link <?= $sayfa === 'quiz' ? 'sb-link--active' : '' ?>" href="index.php?sayfa=quiz">
+                <i class="sb-link__icon fa-solid fa-futbol"></i>
+                <span>TS Bilgi Yarışması</span>
+            </a>
+
             <a class="sb-link sb-link--disabled" href="#" aria-disabled="true" tabindex="-1">
                 <i class="sb-link__icon fa-solid fa-calendar-days"></i>
                 <span>Etkinlikler</span>

@@ -425,6 +425,72 @@ $bolge_degerler  = array_values($bolge_sayilari);
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════
+     HAFTALIK QUIZ ŞAMPİYONLARI
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="dash-card">
+            <div class="dash-card__header">
+                <h5 class="dash-card__title">
+                    <i class="fa-solid fa-trophy text-warning"></i> Haftanın Quiz Şampiyonları
+                </h5>
+                <a href="index.php?sayfa=quiz" class="dash-card__action" style="text-decoration:none; color:#e94560;">
+                    <i class="fa-solid fa-futbol me-1"></i> Yarışmaya Katıl
+                </a>
+            </div>
+            <div class="dash-card__body">
+                <?php if (empty($quiz_liderleri)): ?>
+                    <div class="text-center py-4">
+                        <div style="font-size:2.5rem; margin-bottom:0.5rem;">⚽</div>
+                        <p class="text-muted mb-1">Henüz bu hafta kimse yarışmaya katılmadı.</p>
+                        <a href="index.php?sayfa=quiz" class="btn btn-sm px-3 py-1 fw-bold rounded-pill" style="background:linear-gradient(135deg,#e94560,#c72c41); color:#fff; border:none;">
+                            İlk Sen Katıl!
+                        </a>
+                    </div>
+                <?php else: ?>
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0" style="font-size:0.9rem;">
+                            <thead>
+                                <tr style="border-bottom:2px solid #e94560;">
+                                    <th style="width:50px;">#</th>
+                                    <th>Ad Soyad</th>
+                                    <th class="text-center">En Yüksek Puan</th>
+                                    <th class="text-center">Oynama</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($quiz_liderleri as $qi => $ql): ?>
+                                <tr>
+                                    <td>
+                                        <?php if ($qi === 0): ?>
+                                            <span style="font-size:1.3rem;">🥇</span>
+                                        <?php elseif ($qi === 1): ?>
+                                            <span style="font-size:1.3rem;">🥈</span>
+                                        <?php elseif ($qi === 2): ?>
+                                            <span style="font-size:1.3rem;">🥉</span>
+                                        <?php else: ?>
+                                            <span class="fw-bold text-muted"><?= $qi + 1 ?></span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class="fw-bold"><?= htmlspecialchars($ql['ad_soyad'], ENT_QUOTES, 'UTF-8') ?></td>
+                                    <td class="text-center">
+                                        <span class="badge rounded-pill px-3 py-1" style="background:linear-gradient(135deg,#e94560,#c72c41); font-size:0.85rem;">
+                                            <?= (int)$ql['en_yuksek_puan'] ?> puan
+                                        </span>
+                                    </td>
+                                    <td class="text-center text-muted"><?= (int)$ql['oynama_sayisi'] ?> kez</td>
+                                </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
      C: TÜRKİYE HARİTASI — İl Bazlı Üye Dağılımı
      ═══════════════════════════════════════════════════════════════ -->
 <div class="row g-4 mb-4">

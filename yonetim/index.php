@@ -376,6 +376,11 @@ switch ($sayfa) {
         }
         break;
 
+    case 'quiz':
+        log_kaydet($db_baglanti, 'sayfa_goruntulem', 'Bilgi yarışması sayfası açıldı.');
+        include 'inc/quiz.php';
+        break;
+
     case 'teskilatlanma':
         if ($is_kisitli_rol) {
             echo '<div class="container py-5"><div class="alert alert-danger text-center fw-bold"><i class="fa-solid fa-lock me-2"></i>Erişim Engellendi: Bu hesap türü ile teşkilatlanma sayfasına erişilemez.</div></div>';
@@ -1097,6 +1102,26 @@ switch ($sayfa) {
                 }
             }
         }
+        ?>
+        <?php
+            // ── HAFTALIK QUİZ LİDERLİK TABLOSU ──────────────────
+            $quiz_hafta_kodu = date('Y-W');
+            $quiz_liderleri = [];
+            try {
+                $quiz_sorgu = $db_baglanti->prepare(
+                    "SELECT ad_soyad, MAX(puan) as en_yuksek_puan, COUNT(*) as oynama_sayisi
+                       FROM quiz_sonuclari
+                      WHERE hafta_kodu = ?
+                      GROUP BY kullanici_adi, ad_soyad
+                      ORDER BY en_yuksek_puan DESC
+                      LIMIT 5"
+                );
+                $quiz_sorgu->execute([$quiz_hafta_kodu]);
+                $quiz_liderleri = $quiz_sorgu->fetchAll(PDO::FETCH_ASSOC);
+            } catch (PDOException $e) {
+                // Tablo henüz oluşturulmadıysa boş kalır
+                $quiz_liderleri = [];
+            }
         ?>
         <?php include 'inc/dashboard-admin.php'; ?>
         <?php
