@@ -381,6 +381,10 @@ switch ($sayfa) {
         include 'inc/quiz.php';
         break;
 
+    case 'quiz-kaydet':
+        include 'inc/quiz-kaydet.php';
+        exit; // JSON döndüğü için footer include etme
+
     case 'teskilatlanma':
         if ($is_kisitli_rol) {
             echo '<div class="container py-5"><div class="alert alert-danger text-center fw-bold"><i class="fa-solid fa-lock me-2"></i>Erişim Engellendi: Bu hesap türü ile teşkilatlanma sayfasına erişilemez.</div></div>';

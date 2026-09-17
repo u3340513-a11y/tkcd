@@ -660,7 +660,7 @@ try {
         formData.append('cevaplar', JSON.stringify(cevaplar));
         formData.append('csrf_token', CSRF);
 
-        fetch('inc/quiz-kaydet.php', {
+        fetch('index.php?sayfa=quiz-kaydet', {
             method: 'POST',
             body: formData,
         })

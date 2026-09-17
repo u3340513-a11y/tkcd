@@ -2,28 +2,19 @@
 /**
  * TS Bilgi Yarışması — Quiz kayıt endpoint'i (AJAX).
  *
- * Session kontrolü, sunucu taraflı cevap doğrulama ve
- * günlük oynama limiti uygular.
+ * Bu dosya doğrudan çağrılmaz, index.php üzerinden include edilir.
+ * Tüm session/DB değişkenleri index.php'den miras alınır.
  *
  * POST parametreleri:
  *   - soru_idleri  : JSON encoded soru index dizisi
  *   - cevaplar     : JSON encoded kullanıcı cevap dizisi
  *   - csrf_token   : CSRF doğrulama token'ı
  *
- * @var PDO $db_baglanti baglan.php'den gelen bağlantı
+ * @var PDO    $db_baglanti  index.php → baglan.php'den gelen bağlantı
+ * @var string $kullanici_adi  Session'dan
  */
 
-require_once __DIR__ . '/baglan.php';
-require_once __DIR__ . '/log-kayit.php';
-
 header('Content-Type: application/json; charset=utf-8');
-
-// ─── SADECE POST KABUL ET ──────────────────────────────────────────────
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    echo json_encode(['ok' => false, 'mesaj' => 'Geçersiz istek metodu.']);
-    exit;
-}
 
 // ─── SESSION KONTROLÜ ──────────────────────────────────────────────────
 if (!isset($_SESSION['kullanici_adi'])) {
@@ -56,6 +47,26 @@ if (!is_array($soru_idleri) || !is_array($cevaplar) || count($soru_idleri) !== 8
     exit;
 }
 
+// ─── TABLO YOKSA OLUŞTUR ────────────────────────────────────────────────
+try {
+    $db_baglanti->exec("
+        CREATE TABLE IF NOT EXISTS quiz_sonuclari (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            kullanici_adi VARCHAR(100) NOT NULL,
+            ad_soyad VARCHAR(255) NOT NULL,
+            puan INT NOT NULL DEFAULT 0,
+            dogru_sayisi INT NOT NULL DEFAULT 0,
+            toplam_sure DECIMAL(5,2) NOT NULL DEFAULT 0,
+            oynama_tarihi DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            hafta_kodu VARCHAR(10) NOT NULL COMMENT 'YYYY-WW formatında hafta kodu',
+            INDEX idx_hafta (hafta_kodu),
+            INDEX idx_kullanici_hafta (kullanici_adi, hafta_kodu)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    ");
+} catch (PDOException $e) {
+    // Zaten varsa sessizce devam et
+}
+
 // ─── GÜNLÜK OYNAMA LİMİTİ (10 kez/gün) ─────────────────────────────────
 $bugun = date('Y-m-d');
 $hafta_kodu = date('Y-W');
@@ -72,7 +83,7 @@ try {
         exit;
     }
 } catch (PDOException $e) {
-    // Tablo yoksa devam et — ilk çalıştırmada sorun yaratmasın
+    // Devam et
 }
 
 // ─── SUNUCU TARAFINDA CEVAP DOĞRULAMA ────────────────────────────────────
@@ -83,7 +94,6 @@ $dogru_sayisi = 0;
 $puan_per_soru = 100; // Her doğru 100 puan
 
 foreach ($soru_idleri as $i => $soru_index) {
-    // Geçerlilik kontrolü
     $soru_index = (int) $soru_index;
     if ($soru_index < 0 || $soru_index >= $toplam_soru) {
         http_response_code(400);
@@ -115,8 +125,6 @@ try {
         $hafta_kodu,
     ]);
 
-    log_kaydet($db_baglanti, 'quiz_oynandi', "Bilgi yarışması: {$dogru_sayisi}/8 doğru, {$toplam_puan} puan.");
-
     echo json_encode([
         'ok'            => true,
         'dogru_sayisi'  => $dogru_sayisi,
@@ -125,5 +133,5 @@ try {
     ]);
 } catch (PDOException $e) {
     http_response_code(500);
-    echo json_encode(['ok' => false, 'mesaj' => 'Sonuç kaydedilemedi. Lütfen tekrar deneyin.']);
+    echo json_encode(['ok' => false, 'mesaj' => 'Sonuç kaydedilemedi: ' . $e->getMessage()]);
 }
