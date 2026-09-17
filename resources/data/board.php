@@ -145,7 +145,7 @@ return [
     [
         'baslik' => 'Dijital Projeler ve Teknoloji',
         'uyeler' => [
-            kisi(slug: 'ugur-kotbas', ad: 'Uğur Kotbaş', unvan: 'Koordinatör'),
+            kisi(slug: 'ugur-kotbas', ad: 'Uğur Kotbaş', unvan: 'Koordinatör', fotograf: 'ugur.kotbas.png'),
         ],
     ],
 ];
