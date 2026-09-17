@@ -399,13 +399,6 @@ $bolge_degerler  = array_values($bolge_sayilari);
                     <?php
                         $dg_renk = avatarRengi($dg_uye['adi_soyadi'], $avatar_renkleri);
                         $dg_harf = basHarfleri($dg_uye['adi_soyadi']);
-                        $dg_yas  = '';
-                        if (!empty($dg_uye['dogum_tarihi']) && $dg_uye['dogum_tarihi'] !== '0000-00-00') {
-                            $dogum_dt = \DateTime::createFromFormat('Y-m-d', $dg_uye['dogum_tarihi']);
-                            if ($dogum_dt) {
-                                $dg_yas = (int)(new \DateTime())->diff($dogum_dt)->y . ' yaş';
-                            }
-                        }
                     ?>
                     <div class="d-flex align-items-center gap-2 p-2 rounded-3"
                          style="background:<?= $dg_renk ?>10;border:1px solid <?= $dg_renk ?>28;">
@@ -415,9 +408,6 @@ $bolge_degerler  = array_values($bolge_sayilari);
                         </div>
                         <div class="flex-grow-1 min-width-0">
                             <div class="fw-semibold text-truncate" style="font-size:0.82rem;"><?= htmlspecialchars($dg_uye['adi_soyadi']) ?></div>
-                            <?php if ($dg_yas): ?>
-                            <div class="text-muted" style="font-size:0.72rem;"><?= $dg_yas ?></div>
-                            <?php endif; ?>
                         </div>
                         <span style="font-size:1.1rem;">🎂</span>
                     </div>
