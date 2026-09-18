@@ -379,6 +379,62 @@ $bolge_degerler  = array_values($bolge_sayilari);
                     </span>
                     <?php endforeach; ?>
                 </div>
+
+                <?php if ($is_gelistirici): ?>
+                <!-- PDF İndirme Bölümü — Sadece Geliştirici -->
+                <div class="mt-3 pt-3 border-top">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span style="font-size:0.75rem; font-weight:700; color:#555; text-transform:uppercase; letter-spacing:0.5px;">
+                            <i class="fa-solid fa-file-pdf text-danger me-1"></i> PDF Raporu
+                        </span>
+                        <div class="d-flex gap-1">
+                            <button type="button"
+                                class="btn btn-sm py-0 px-2 rounded-pill"
+                                style="font-size:0.7rem; background:#e8f5e9; color:#1b5e20; border:1px solid #a5d6a7;"
+                                onclick="bolgePdfAc('Tümü', 0)">
+                                <i class="fa-solid fa-globe me-1"></i>Tümü
+                            </button>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-column gap-1" style="max-height:180px; overflow-y:auto;">
+                        <?php foreach (array_keys($bolge_sayilari) as $bolge):
+                            $renk = $bolge_renk_harita[$bolge] ?? '#6b7280';
+                            $renk_bg = $renk . '15';
+                        ?>
+                        <div class="d-flex align-items-center justify-content-between px-2 py-1 rounded"
+                             style="background:<?= $renk_bg ?>; border:1px solid <?= $renk ?>30;">
+                            <span style="font-size:0.72rem; font-weight:600; color:#333;">
+                                <span style="width:7px;height:7px;border-radius:50%;background:<?= $renk ?>;display:inline-block;margin-right:4px;"></span>
+                                <?= htmlspecialchars($bolge) ?>
+                            </span>
+                            <div class="d-flex gap-1">
+                                <button type="button"
+                                    class="btn btn-sm py-0 px-2"
+                                    style="font-size:0.65rem; background:#dc3545; color:#fff; border:none; border-radius:20px;"
+                                    title="İletişim bilgileri açık PDF"
+                                    onclick="bolgePdfAc('<?= addslashes($bolge) ?>', 0)">
+                                    <i class="fa-solid fa-eye me-1"></i>Açık
+                                </button>
+                                <button type="button"
+                                    class="btn btn-sm py-0 px-2"
+                                    style="font-size:0.65rem; background:#6c757d; color:#fff; border:none; border-radius:20px;"
+                                    title="İletişim bilgileri gizli PDF"
+                                    onclick="bolgePdfAc('<?= addslashes($bolge) ?>', 1)">
+                                    <i class="fa-solid fa-eye-slash me-1"></i>Gizli
+                                </button>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+                <script>
+                function bolgePdfAc(bolge, gizli) {
+                    var url = 'inc/bolge-pdf.php?bolge=' + encodeURIComponent(bolge) + '&gizli=' + gizli;
+                    window.open(url, '_blank');
+                }
+                </script>
+                <?php endif; ?>
+
             </div>
         </div>
     </div>
