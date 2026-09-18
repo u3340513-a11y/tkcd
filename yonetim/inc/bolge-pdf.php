@@ -107,6 +107,11 @@ $bolge_renk_harita = [
 ];
 $baslik_renk = $bolge_renk_harita[$f_bolge] ?? '#1a1a2e';
 
+// Kurum temsilcisi sayısını hesapla
+$kurum_temsilcisi_sayisi = count(array_filter($uyeler, function($u) {
+    return ($u['temsilci_turu'] === 'Kurum Temsilcisi' || $u['ek_gorev'] === 'Kurum Temsilcisi');
+}));
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -138,6 +143,7 @@ $baslik_renk = $bolge_renk_harita[$f_bolge] ?? '#1a1a2e';
     .ozet-toplam  { background: #e8f5e9; color: #1b5e20; border: 1px solid #a5d6a7; }
     .ozet-bolge   { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
     .ozet-gizli   { background: #fff3e0; color: #e65100; border: 1px solid #ffcc80; }
+    .ozet-kurum   { background: #f3e5f5; color: #6a1b9a; border: 1px solid #ce93d8; }
 
     .il-baslik {
         background: <?= $baslik_renk ?>; color: #fff;
@@ -187,6 +193,7 @@ $baslik_renk = $bolge_renk_harita[$f_bolge] ?? '#1a1a2e';
     <div style="margin-top:8px;">
         <span class="ozet-kutu ozet-toplam">Toplam: <?= count($uyeler) ?> üye</span>
         <span class="ozet-kutu ozet-bolge"><?= htmlspecialchars($f_bolge) ?></span>
+        <span class="ozet-kutu ozet-kurum">Kurum Temsilcisi: <?= $kurum_temsilcisi_sayisi ?></span>
         <?php if ($f_gizli): ?>
         <span class="ozet-kutu ozet-gizli">İletişim: Gizli</span>
         <?php else: ?>
