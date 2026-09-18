@@ -49,5 +49,103 @@ $headScripts = $headScripts ?? [];
 <?php foreach ($scripts as $script): ?>
     <script src="<?= $view->e($view->asset('assets/js/' . $script)) ?>" defer></script>
 <?php endforeach; ?>
+
+<?php
+// GS-TS Popup: Oturumda yalnızca bir kez göster
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
+if (!isset($_SESSION['gs_ts_popup_gosterildi'])) {
+    $_SESSION['gs_ts_popup_gosterildi'] = true;
+    $goster_gs_ts_popup = true;
+} else {
+    $goster_gs_ts_popup = false;
+}
+?>
+<?php if ($goster_gs_ts_popup): ?>
+<!-- ── GS-TS Açılış Popup (Public) ── -->
+<div id="gsTsPopupOverlay" style="
+    position:fixed;inset:0;
+    background:rgba(0,0,0,0.65);
+    z-index:99999;
+    display:flex;align-items:center;justify-content:center;
+    padding:12px;
+    backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+    animation:gsTsFadeIn 0.4s ease;
+">
+    <div id="gsTsPopupBox" style="
+        position:relative;
+        max-width:720px;width:100%;
+        border-radius:16px;overflow:hidden;
+        box-shadow:0 28px 70px rgba(0,0,0,0.55);
+        animation:gsTsSlideUp 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    ">
+        <button onclick="kapatGsTsPopup()" style="
+            position:absolute;top:12px;right:12px;z-index:10;
+            width:36px;height:36px;border-radius:50%;border:none;
+            background:rgba(0,0,0,0.55);color:#fff;font-size:17px;
+            cursor:pointer;display:flex;align-items:center;justify-content:center;
+            transition:background 0.2s,transform 0.2s;
+        "
+        onmouseover="this.style.background='rgba(0,0,0,0.82)';this.style.transform='scale(1.1)'"
+        onmouseout="this.style.background='rgba(0,0,0,0.55)';this.style.transform='scale(1)'"
+        aria-label="Kapat">&#x2715;</button>
+
+        <img src="<?= $view->asset('assets/img/gs-ts.jpeg') ?>"
+             alt="Galatasaray - Trabzonspor"
+             style="display:block;width:100%;height:auto;max-height:78vh;object-fit:contain;background:#0a0a0a;">
+
+        <div style="background:#0a0a0a;padding:9px 16px;display:flex;align-items:center;gap:10px;">
+            <span id="gsTsCountdown" style="color:rgba(255,255,255,0.65);font-size:0.78rem;white-space:nowrap;flex-shrink:0;">
+                5 saniye içinde kapanıyor
+            </span>
+            <div style="flex:1;height:3px;background:rgba(255,255,255,0.12);border-radius:2px;overflow:hidden;">
+                <div id="gsTsBar" style="height:100%;width:100%;background:linear-gradient(90deg,#e8251e,#ffd700);border-radius:2px;transition:width linear;"></div>
+            </div>
+            <button onclick="kapatGsTsPopup()" style="
+                background:none;border:1px solid rgba(255,255,255,0.28);
+                color:rgba(255,255,255,0.65);font-size:0.72rem;
+                border-radius:6px;padding:3px 12px;cursor:pointer;
+                white-space:nowrap;flex-shrink:0;
+            ">Kapat</button>
+        </div>
+    </div>
+</div>
+<audio id="gsTsAudio" preload="auto" style="display:none;">
+    <source src="<?= $view->asset('assets/video/dalga-dalga.mp3') ?>" type="audio/mpeg">
+</audio>
+<style>
+@keyframes gsTsFadeIn { from{opacity:0} to{opacity:1} }
+@keyframes gsTsSlideUp {
+    from{transform:translateY(32px) scale(0.95);opacity:0}
+    to{transform:translateY(0) scale(1);opacity:1}
+}
+@media(max-width:480px){#gsTsPopupBox{border-radius:10px;}}
+</style>
+<script>
+(function(){
+    'use strict';
+    var SURE=5, kalan=SURE;
+    var ov=document.getElementById('gsTsPopupOverlay');
+    var bar=document.getElementById('gsTsBar');
+    var txt=document.getElementById('gsTsCountdown');
+    var aud=document.getElementById('gsTsAudio');
+    if(!ov) return;
+    if(aud){ aud.volume=0.6; var p=aud.play(); if(p) p.catch(function(){}); }
+    bar.style.transitionDuration=SURE+'s';
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){ bar.style.width='0%'; }); });
+    var iv=setInterval(function(){
+        kalan--;
+        if(txt) txt.textContent=kalan+' saniye içinde kapanıyor';
+        if(kalan<=0){ clearInterval(iv); kapatGsTsPopup(); }
+    },1000);
+    document.addEventListener('keydown',function(e){ if(e.key==='Escape') kapatGsTsPopup(); });
+    ov.addEventListener('click',function(e){ if(e.target===ov) kapatGsTsPopup(); });
+    window.kapatGsTsPopup=function(){
+        clearInterval(iv);
+        if(aud){ aud.pause(); aud.currentTime=0; }
+        if(ov){ ov.style.transition='opacity 0.3s ease'; ov.style.opacity='0'; setTimeout(function(){ ov.remove(); },320); }
+    };
+})();
+</script>
+<?php endif; ?>
 </body>
 </html>

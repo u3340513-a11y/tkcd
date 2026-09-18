@@ -18,94 +18,105 @@ if (!isset($_SESSION['hiyer_popup_gosterildi'])) {
 ?>
 
 <?php if ($goster_popup): ?>
-<!-- ── Duyuru Popup ── -->
-<div id="hiyerPopupOverlay" style="
+<!-- ── GS-TS Açılış Popup ── -->
+<div id="gsTsPopupOverlay" style="
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.55);
+    background: rgba(0,0,0,0.65);
     z-index: 9999;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 16px;
-    backdrop-filter: blur(3px);
-    animation: popupFadeIn 0.35s ease;
+    padding: 12px;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    animation: gsTsFadeIn 0.4s ease;
 ">
-    <div id="hiyerPopupBox" style="
+    <div id="gsTsPopupBox" style="
         position: relative;
-        max-width: 680px;
+        max-width: 720px;
         width: 100%;
-        border-radius: 14px;
+        border-radius: 16px;
         overflow: hidden;
-        box-shadow: 0 24px 60px rgba(0,0,0,0.4);
-        animation: popupSlideUp 0.35s ease;
+        box-shadow: 0 28px 70px rgba(0,0,0,0.55);
+        animation: gsTsSlideUp 0.4s cubic-bezier(0.34,1.56,0.64,1);
     ">
         <!-- Kapat butonu -->
-        <button id="hiyerCloseBtn" onclick="kapatHiyerPopup()" style="
+        <button id="gsTsCloseBtn" onclick="kapatGsTsPopup()" style="
             position: absolute;
-            top: 10px;
-            right: 10px;
+            top: 12px;
+            right: 12px;
             z-index: 10;
-            width: 34px;
-            height: 34px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             border: none;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.55);
             color: #fff;
-            font-size: 16px;
+            font-size: 17px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            line-height: 1;
-            transition: background 0.2s;
-        " onmouseover="this.style.background='rgba(0,0,0,0.75)'"
-           onmouseout="this.style.background='rgba(0,0,0,0.5)'"
-           aria-label="Kapat">
+            transition: background 0.2s, transform 0.2s;
+        "
+        onmouseover="this.style.background='rgba(0,0,0,0.82)';this.style.transform='scale(1.1)'"
+        onmouseout="this.style.background='rgba(0,0,0,0.55)';this.style.transform='scale(1)'"
+        aria-label="Kapat">
             <i class="fa-solid fa-xmark"></i>
         </button>
 
         <!-- Görsel -->
-        <img src="/assets/img/hiyer.jpeg"
-             alt="Duyuru"
-             style="display:block; width:100%; height:auto; max-height:80vh; object-fit:contain; background:#000;">
+        <img src="/assets/img/gs-ts.jpeg"
+             alt="Galatasaray - Trabzonspor"
+             style="display:block; width:100%; height:auto; max-height:78vh; object-fit:contain; background:#0a0a0a;">
 
         <!-- Countdown bar -->
-        <div style="background:#1a1a2e; padding:8px 16px; display:flex; align-items:center; gap:10px;">
-            <span id="hiyerCountdownText" style="color:rgba(255,255,255,0.7); font-size:0.78rem; white-space:nowrap;">
+        <div style="background:#0a0a0a; padding:9px 16px; display:flex; align-items:center; gap:10px;">
+            <span id="gsTsCountdownText" style="color:rgba(255,255,255,0.65); font-size:0.78rem; white-space:nowrap; flex-shrink:0;">
                 5 saniye içinde kapanıyor
             </span>
-            <div style="flex:1; height:3px; background:rgba(255,255,255,0.15); border-radius:2px; overflow:hidden;">
-                <div id="hiyerProgressBar" style="
+            <div style="flex:1; height:3px; background:rgba(255,255,255,0.12); border-radius:2px; overflow:hidden;">
+                <div id="gsTsProgressBar" style="
                     height:100%;
                     width:100%;
-                    background: linear-gradient(90deg, #3b82f6, #06b6d4);
+                    background: linear-gradient(90deg, #e8251e, #ffd700);
                     border-radius:2px;
                     transition: width linear;
                 "></div>
             </div>
-            <button onclick="kapatHiyerPopup()" style="
+            <button onclick="kapatGsTsPopup()" style="
                 background: none;
-                border: 1px solid rgba(255,255,255,0.3);
-                color: rgba(255,255,255,0.7);
+                border: 1px solid rgba(255,255,255,0.28);
+                color: rgba(255,255,255,0.65);
                 font-size: 0.72rem;
-                border-radius: 4px;
-                padding: 3px 10px;
+                border-radius: 6px;
+                padding: 3px 12px;
                 cursor: pointer;
                 white-space: nowrap;
+                transition: border-color 0.2s, color 0.2s;
+                flex-shrink: 0;
             ">Kapat</button>
         </div>
     </div>
 </div>
 
+<!-- Müzik -->
+<audio id="gsTsAudio" preload="auto" style="display:none;">
+    <source src="/assets/video/dalga-dalga.mp3" type="audio/mpeg">
+</audio>
+
 <style>
-@keyframes popupFadeIn {
+@keyframes gsTsFadeIn {
     from { opacity: 0; }
     to   { opacity: 1; }
 }
-@keyframes popupSlideUp {
-    from { transform: translateY(24px) scale(0.97); opacity: 0; }
+@keyframes gsTsSlideUp {
+    from { transform: translateY(32px) scale(0.95); opacity: 0; }
     to   { transform: translateY(0) scale(1);       opacity: 1; }
+}
+@media (max-width: 480px) {
+    #gsTsPopupBox { border-radius: 10px; }
 }
 </style>
 
@@ -113,19 +124,32 @@ if (!isset($_SESSION['hiyer_popup_gosterildi'])) {
 (function () {
     'use strict';
 
-    var SURE = 5; // saniye
+    var SURE = 5;
     var kalan = SURE;
-    var overlay = document.getElementById('hiyerPopupOverlay');
-    var bar     = document.getElementById('hiyerProgressBar');
-    var txt     = document.getElementById('hiyerCountdownText');
+    var overlay = document.getElementById('gsTsPopupOverlay');
+    var bar     = document.getElementById('gsTsProgressBar');
+    var txt     = document.getElementById('gsTsCountdownText');
+    var audio   = document.getElementById('gsTsAudio');
 
     if (!overlay) return;
 
-    // Countdown başlat
+    // Müziği çal (tarayıcı politikası gereği kullanıcı etkileşimi olmadan çalabilir)
+    function muzikCal() {
+        if (!audio) return;
+        audio.volume = 0.6;
+        var promise = audio.play();
+        if (promise !== undefined) {
+            promise.catch(function () {
+                // Autoplay engellendi — sessizce geç
+            });
+        }
+    }
+    muzikCal();
+
+    // Progress bar
     bar.style.transitionDuration = SURE + 's';
-    // rAF ile smooth başlat
-    requestAnimationFrame(function() {
-        requestAnimationFrame(function() {
+    requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
             bar.style.width = '0%';
         });
     });
@@ -135,28 +159,25 @@ if (!isset($_SESSION['hiyer_popup_gosterildi'])) {
         if (txt) txt.textContent = kalan + ' saniye içinde kapanıyor';
         if (kalan <= 0) {
             clearInterval(interval);
-            kapatHiyerPopup();
+            kapatGsTsPopup();
         }
     }, 1000);
 
-    // ESC ile kapat
     document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') kapatHiyerPopup();
+        if (e.key === 'Escape') kapatGsTsPopup();
     });
 
-    // Overlay dışına tıklayınca kapat
     overlay.addEventListener('click', function (e) {
-        if (e.target === overlay) kapatHiyerPopup();
+        if (e.target === overlay) kapatGsTsPopup();
     });
 
-    window.kapatHiyerPopup = function () {
+    window.kapatGsTsPopup = function () {
         clearInterval(interval);
+        if (audio) { audio.pause(); audio.currentTime = 0; }
         if (overlay) {
-            overlay.style.transition = 'opacity 0.25s ease';
+            overlay.style.transition = 'opacity 0.3s ease';
             overlay.style.opacity = '0';
-            setTimeout(function () {
-                overlay.remove();
-            }, 260);
+            setTimeout(function () { overlay.remove(); }, 320);
         }
     };
 })();
