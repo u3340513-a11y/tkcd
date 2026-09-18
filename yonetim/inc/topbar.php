@@ -138,7 +138,7 @@ foreach (array_slice($parcalar, 0, 2) as $p) {
         </button>
 
         <audio id="panelMuzik" loop preload="auto">
-            <source src="/assets/video/skaso.mp3" type="audio/mpeg">
+            <source src="/assets/video/dalga-dalga.mp3" type="audio/mpeg">
         </audio>
     </div>
 </header>

@@ -103,7 +103,7 @@ if (!isset($_SESSION['hiyer_popup_gosterildi'])) {
 
 <!-- Müzik -->
 <audio id="gsTsAudio" preload="auto" style="display:none;">
-    <source src="/assets/video/skaso.mp3" type="audio/mpeg">
+    <source src="/assets/video/dalga-dalga.mp3" type="audio/mpeg">
 </audio>
 
 <style>

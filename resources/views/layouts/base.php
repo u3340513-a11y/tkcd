@@ -132,29 +132,34 @@ $headScripts = $headScripts ?? [];
     ov.style.display = 'flex';
     ov.style.animation = 'gsTsFadeIn 0.4s ease';
 
-    // Müzik — ilk kullanıcı etkileşiminde çal (autoplay politikası)
-    var muzikCalindi = false;
-    function muzikCal() {
-        if (muzikCalindi || !aud) return;
-        muzikCalindi = true;
+    // Müzik — muted autoplay trick: sessiz başlat, kullanıcı tıklayınca sesl yap
+    var muzikBasladi = false;
+    function muzikBaslat() {
+        if (muzikBasladi || !aud) return;
+        muzikBasladi = true;
         aud.volume = 0.6;
+        aud.muted = false;
         aud.play().catch(function(){});
     }
-    // Autoplay dene (bazı tarayıcılarda izin var)
+
     if (aud) {
+        // Muted olarak başlat — tarayıcı bunu otomatik olarak kabul eder
+        aud.muted = true;
         aud.volume = 0.6;
-        var autoPromise = aud.play();
-        if (autoPromise !== undefined) {
-            autoPromise.then(function(){ muzikCalindi = true; }).catch(function(){
-                // Autoplay engellendi — ilk etkileşimde çal
-                var olaylar = ['click','touchstart','keydown','scroll'];
-                function ilkEtkilesim() {
-                    muzikCal();
-                    olaylar.forEach(function(o){ document.removeEventListener(o, ilkEtkilesim); });
-                }
-                olaylar.forEach(function(o){ document.addEventListener(o, ilkEtkilesim, {once:true}); });
+        aud.play().then(function(){
+            // Sessiz çalıyor — ilk etkileşimde unmute et
+            document.addEventListener('click',    function h(){ aud.muted=false; document.removeEventListener('click',h); }, {once:true});
+            document.addEventListener('touchstart',function h(){ aud.muted=false; document.removeEventListener('touchstart',h); }, {once:true});
+            document.addEventListener('keydown',  function h(){ aud.muted=false; document.removeEventListener('keydown',h); }, {once:true});
+        }).catch(function(){
+            // Tamamen engellendi — etkileşimde başlat
+            ['click','touchstart','keydown'].forEach(function(evt){
+                document.addEventListener(evt, function h(){
+                    muzikBaslat();
+                    document.removeEventListener(evt, h);
+                }, {once:true});
             });
-        }
+        });
     }
 
     // Progress bar
