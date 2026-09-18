@@ -133,18 +133,30 @@ if (!isset($_SESSION['hiyer_popup_gosterildi'])) {
 
     if (!overlay) return;
 
-    // Müziği çal (tarayıcı politikası gereği kullanıcı etkileşimi olmadan çalabilir)
+    // Müzik — ilk kullanıcı etkileşiminde çal (autoplay politikası)
+    var muzikCalindi = false;
     function muzikCal() {
-        if (!audio) return;
+        if (muzikCalindi || !audio) return;
+        muzikCalindi = true;
         audio.volume = 0.6;
-        var promise = audio.play();
-        if (promise !== undefined) {
-            promise.catch(function () {
-                // Autoplay engellendi — sessizce geç
+        audio.play().catch(function(){});
+    }
+    // Önce direkt autoplay dene
+    if (audio) {
+        audio.volume = 0.6;
+        var autoPromise = audio.play();
+        if (autoPromise !== undefined) {
+            autoPromise.then(function(){ muzikCalindi = true; }).catch(function(){
+                // Engellendi — ilk etkileşimde çal
+                var olaylar = ['click','touchstart','keydown','scroll'];
+                function ilkEtkilesim() {
+                    muzikCal();
+                    olaylar.forEach(function(o){ document.removeEventListener(o, ilkEtkilesim); });
+                }
+                olaylar.forEach(function(o){ document.addEventListener(o, ilkEtkilesim, {once:true}); });
             });
         }
     }
-    muzikCal();
 
     // Progress bar
     bar.style.transitionDuration = SURE + 's';

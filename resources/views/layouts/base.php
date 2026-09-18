@@ -132,11 +132,29 @@ $headScripts = $headScripts ?? [];
     ov.style.display = 'flex';
     ov.style.animation = 'gsTsFadeIn 0.4s ease';
 
-    // Müzik
+    // Müzik — ilk kullanıcı etkileşiminde çal (autoplay politikası)
+    var muzikCalindi = false;
+    function muzikCal() {
+        if (muzikCalindi || !aud) return;
+        muzikCalindi = true;
+        aud.volume = 0.6;
+        aud.play().catch(function(){});
+    }
+    // Autoplay dene (bazı tarayıcılarda izin var)
     if (aud) {
         aud.volume = 0.6;
-        var promise = aud.play();
-        if (promise !== undefined) { promise.catch(function(){}); }
+        var autoPromise = aud.play();
+        if (autoPromise !== undefined) {
+            autoPromise.then(function(){ muzikCalindi = true; }).catch(function(){
+                // Autoplay engellendi — ilk etkileşimde çal
+                var olaylar = ['click','touchstart','keydown','scroll'];
+                function ilkEtkilesim() {
+                    muzikCal();
+                    olaylar.forEach(function(o){ document.removeEventListener(o, ilkEtkilesim); });
+                }
+                olaylar.forEach(function(o){ document.addEventListener(o, ilkEtkilesim, {once:true}); });
+            });
+        }
     }
 
     // Progress bar
