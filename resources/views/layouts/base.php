@@ -50,26 +50,16 @@ $headScripts = $headScripts ?? [];
     <script src="<?= $view->e($view->asset('assets/js/' . $script)) ?>" defer></script>
 <?php endforeach; ?>
 
-<?php
-// GS-TS Popup: Oturumda yalnızca bir kez göster
-if (session_status() === PHP_SESSION_NONE) { session_start(); }
-if (!isset($_SESSION['gs_ts_popup_gosterildi'])) {
-    $_SESSION['gs_ts_popup_gosterildi'] = true;
-    $goster_gs_ts_popup = true;
-} else {
-    $goster_gs_ts_popup = false;
-}
-?>
-<?php if ($goster_gs_ts_popup): ?>
 <!-- ── GS-TS Açılış Popup (Public) ── -->
+<!-- Oturumda bir kez: sessionStorage ile JS tarafında kontrol edilir -->
 <div id="gsTsPopupOverlay" style="
+    display:none;
     position:fixed;inset:0;
     background:rgba(0,0,0,0.65);
     z-index:99999;
-    display:flex;align-items:center;justify-content:center;
+    align-items:center;justify-content:center;
     padding:12px;
     backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
-    animation:gsTsFadeIn 0.4s ease;
 ">
     <div id="gsTsPopupBox" style="
         position:relative;
@@ -112,6 +102,7 @@ if (!isset($_SESSION['gs_ts_popup_gosterildi'])) {
 <audio id="gsTsAudio" preload="auto" style="display:none;">
     <source src="<?= $view->asset('assets/video/dalga-dalga.mp3') ?>" type="audio/mpeg">
 </audio>
+
 <style>
 @keyframes gsTsFadeIn { from{opacity:0} to{opacity:1} }
 @keyframes gsTsSlideUp {
@@ -123,29 +114,57 @@ if (!isset($_SESSION['gs_ts_popup_gosterildi'])) {
 <script>
 (function(){
     'use strict';
-    var SURE=5, kalan=SURE;
-    var ov=document.getElementById('gsTsPopupOverlay');
-    var bar=document.getElementById('gsTsBar');
-    var txt=document.getElementById('gsTsCountdown');
-    var aud=document.getElementById('gsTsAudio');
-    if(!ov) return;
-    if(aud){ aud.volume=0.6; var p=aud.play(); if(p) p.catch(function(){}); }
-    bar.style.transitionDuration=SURE+'s';
-    requestAnimationFrame(function(){ requestAnimationFrame(function(){ bar.style.width='0%'; }); });
-    var iv=setInterval(function(){
+
+    // sessionStorage: tarayıcı sekmesi kapatılınca sıfırlanır — oturumda bir kez göster
+    var ANAHTAR = 'gsts_popup_gosterildi';
+    if (sessionStorage.getItem(ANAHTAR)) return; // zaten gösterildi
+    sessionStorage.setItem(ANAHTAR, '1');
+
+    var SURE = 5, kalan = SURE;
+    var ov  = document.getElementById('gsTsPopupOverlay');
+    var bar = document.getElementById('gsTsBar');
+    var txt = document.getElementById('gsTsCountdown');
+    var aud = document.getElementById('gsTsAudio');
+
+    if (!ov) return;
+
+    // Göster
+    ov.style.display = 'flex';
+    ov.style.animation = 'gsTsFadeIn 0.4s ease';
+
+    // Müzik
+    if (aud) {
+        aud.volume = 0.6;
+        var promise = aud.play();
+        if (promise !== undefined) { promise.catch(function(){}); }
+    }
+
+    // Progress bar
+    bar.style.transitionDuration = SURE + 's';
+    requestAnimationFrame(function(){
+        requestAnimationFrame(function(){ bar.style.width = '0%'; });
+    });
+
+    // Geri sayım
+    var iv = setInterval(function(){
         kalan--;
-        if(txt) txt.textContent=kalan+' saniye içinde kapanıyor';
-        if(kalan<=0){ clearInterval(iv); kapatGsTsPopup(); }
-    },1000);
-    document.addEventListener('keydown',function(e){ if(e.key==='Escape') kapatGsTsPopup(); });
-    ov.addEventListener('click',function(e){ if(e.target===ov) kapatGsTsPopup(); });
-    window.kapatGsTsPopup=function(){
+        if (txt) txt.textContent = kalan + ' saniye içinde kapanıyor';
+        if (kalan <= 0) { clearInterval(iv); kapatGsTsPopup(); }
+    }, 1000);
+
+    document.addEventListener('keydown', function(e){ if(e.key==='Escape') kapatGsTsPopup(); });
+    ov.addEventListener('click', function(e){ if(e.target===ov) kapatGsTsPopup(); });
+
+    window.kapatGsTsPopup = function(){
         clearInterval(iv);
-        if(aud){ aud.pause(); aud.currentTime=0; }
-        if(ov){ ov.style.transition='opacity 0.3s ease'; ov.style.opacity='0'; setTimeout(function(){ ov.remove(); },320); }
+        if (aud) { aud.pause(); aud.currentTime = 0; }
+        if (ov) {
+            ov.style.transition = 'opacity 0.3s ease';
+            ov.style.opacity = '0';
+            setTimeout(function(){ ov.style.display = 'none'; ov.style.opacity = ''; }, 320);
+        }
     };
 })();
 </script>
-<?php endif; ?>
 </body>
 </html>
