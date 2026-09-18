@@ -74,7 +74,7 @@ if (!isset($_SESSION['hiyer_popup_gosterildi'])) {
         <!-- Countdown bar -->
         <div style="background:#0a0a0a; padding:9px 16px; display:flex; align-items:center; gap:10px;">
             <span id="gsTsCountdownText" style="color:rgba(255,255,255,0.65); font-size:0.78rem; white-space:nowrap; flex-shrink:0;">
-                5 saniye içinde kapanıyor
+                7 saniye içinde kapanıyor
             </span>
             <div style="flex:1; height:3px; background:rgba(255,255,255,0.12); border-radius:2px; overflow:hidden;">
                 <div id="gsTsProgressBar" style="
@@ -103,7 +103,7 @@ if (!isset($_SESSION['hiyer_popup_gosterildi'])) {
 
 <!-- Müzik -->
 <audio id="gsTsAudio" preload="auto" style="display:none;">
-    <source src="/assets/video/dalga-dalga.mp3" type="audio/mpeg">
+    <source src="/assets/video/skaso.mp3" type="audio/mpeg">
 </audio>
 
 <style>
@@ -124,7 +124,7 @@ if (!isset($_SESSION['hiyer_popup_gosterildi'])) {
 (function () {
     'use strict';
 
-    var SURE = 5;
+    var SURE = 7;
     var kalan = SURE;
     var overlay = document.getElementById('gsTsPopupOverlay');
     var bar     = document.getElementById('gsTsProgressBar');

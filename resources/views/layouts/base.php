@@ -85,7 +85,7 @@ $headScripts = $headScripts ?? [];
 
         <div style="background:#0a0a0a;padding:9px 16px;display:flex;align-items:center;gap:10px;">
             <span id="gsTsCountdown" style="color:rgba(255,255,255,0.65);font-size:0.78rem;white-space:nowrap;flex-shrink:0;">
-                5 saniye içinde kapanıyor
+                7 saniye içinde kapanıyor
             </span>
             <div style="flex:1;height:3px;background:rgba(255,255,255,0.12);border-radius:2px;overflow:hidden;">
                 <div id="gsTsBar" style="height:100%;width:100%;background:linear-gradient(90deg,#e8251e,#ffd700);border-radius:2px;transition:width linear;"></div>
@@ -120,7 +120,7 @@ $headScripts = $headScripts ?? [];
     if (sessionStorage.getItem(ANAHTAR)) return; // zaten gösterildi
     sessionStorage.setItem(ANAHTAR, '1');
 
-    var SURE = 5, kalan = SURE;
+    var SURE = 7, kalan = SURE;
     var ov  = document.getElementById('gsTsPopupOverlay');
     var bar = document.getElementById('gsTsBar');
     var txt = document.getElementById('gsTsCountdown');
