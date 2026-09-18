@@ -132,35 +132,33 @@ $headScripts = $headScripts ?? [];
     ov.style.display = 'flex';
     ov.style.animation = 'gsTsFadeIn 0.4s ease';
 
-    // Müzik — muted autoplay trick: sessiz başlat, kullanıcı tıklayınca sesl yap
-    var muzikBasladi = false;
+    // ── MÜZİK ──────────────────────────────────────────────────────────────────
+    // Tarayıcı autoplay politikası: ses çalmak için kullanıcı etkileşimi ZORUNLU.
+    // Popup her zaman tıklanıyor (kapat, görsel, overlay) → müziği orada başlatıyoruz.
+    var muzikCalindi = false;
     function muzikBaslat() {
-        if (muzikBasladi || !aud) return;
-        muzikBasladi = true;
+        if (muzikCalindi || !aud) return;
+        muzikCalindi = true;
         aud.volume = 0.6;
-        aud.muted = false;
+        aud.muted  = false;
         aud.play().catch(function(){});
     }
 
-    if (aud) {
-        // Muted olarak başlat — tarayıcı bunu otomatik olarak kabul eder
-        aud.muted = true;
-        aud.volume = 0.6;
-        aud.play().then(function(){
-            // Sessiz çalıyor — ilk etkileşimde unmute et
-            document.addEventListener('click',    function h(){ aud.muted=false; document.removeEventListener('click',h); }, {once:true});
-            document.addEventListener('touchstart',function h(){ aud.muted=false; document.removeEventListener('touchstart',h); }, {once:true});
-            document.addEventListener('keydown',  function h(){ aud.muted=false; document.removeEventListener('keydown',h); }, {once:true});
-        }).catch(function(){
-            // Tamamen engellendi — etkileşimde başlat
-            ['click','touchstart','keydown'].forEach(function(evt){
-                document.addEventListener(evt, function h(){
-                    muzikBaslat();
-                    document.removeEventListener(evt, h);
-                }, {once:true});
-            });
-        });
-    }
+    // Popup elemanının tamamına tıklama = müzik başlasın
+    ov.addEventListener('click', muzikBaslat);
+
+    // Popup kapatma butonlarına da bağla
+    var kapatBtnler = ov.querySelectorAll('button');
+    kapatBtnler.forEach(function(b){ b.addEventListener('click', muzikBaslat); });
+
+    // Güvenlik: sayfada herhangi bir etkileşimde de çal
+    ['click','touchstart','keydown'].forEach(function(evt){
+        document.addEventListener(evt, function h(){
+            muzikBaslat();
+            document.removeEventListener(evt, h);
+        }, {once: true});
+    });
+    // ────────────────────────────────────────────────────────────────────────────
 
     // Progress bar
     bar.style.transitionDuration = SURE + 's';
