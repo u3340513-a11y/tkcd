@@ -20,9 +20,15 @@ $is_kisitli_rol      = ($is_il_baskani || $is_ilce_baskani || $is_kurum_temsilci
 $yalnizca_sayim_kullanicilari = ['yonetim_ukk', 'yonetim_mh', 'yonetim_mb', 'yonetim_he', 'yonetim_hk', 'kk_by'];
 $is_yalnizca_sayim = in_array($oturum_kullanici_adi, $yalnizca_sayim_kullanicilari, true);
 
+// Onayla / Reddet işlemi yapabilecek kullanıcı listesi
+// (Geliştirici rolü her zaman yetkilidir)
+$onay_yetkili_kullanicilar = ['yonetim_ukk', 'yonetim_mh', 'yonetim_hk', 'yonetim_mb', 'kk_by', 'admin61'];
+$is_onay_yetkili = ($kullanici_rolu === 'gelistirici')
+    || in_array($oturum_kullanici_adi, $onay_yetkili_kullanicilar, true);
+
 // --- BAŞVURU ONAYLAMA MOTORU ---
 if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'basvuru_onayla' && isset($_GET['id'])) {
-    if ($oturum_kullanici_adi === 'yonetim_kby') {
+    if (!$is_onay_yetkili) {
         die("Erişim Engellendi: Bu hesap ile başvuru onaylama işlemi yapılamaz!");
     }
     $uye_id = intval($_GET['id']);
@@ -71,7 +77,7 @@ if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'basvuru_onayla' && isset($_
 
 // --- BAŞVURU REDDETME / SİLME MOTORU ---
 if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'basvuru_reddet' && isset($_GET['id'])) {
-    if ($oturum_kullanici_adi === 'yonetim_kby') {
+    if (!$is_onay_yetkili) {
         die("Erişim Engellendi: Bu hesap ile başvuru reddetme işlemi yapılamaz!");
     }
     $uye_id = intval($_GET['id']);
@@ -224,8 +230,7 @@ try {
                                     <td><small><?= htmlspecialchars($b['calisma_sekli'] ?: '-'); ?></small></td>
                                     <td class="text-center pe-4">
                                         <?php
-                                        $is_yonetim_kby = ($oturum_kullanici_adi === 'yonetim_kby');
-                                        if ($is_yonetim_kby):
+                                        if (!$is_onay_yetkili):
                                         ?>
                                             <span class="badge bg-secondary text-white px-3 py-2"><i class="fa-solid fa-lock me-1"></i>İşlem Yetkiniz Yok</span>
                                         <?php else: ?>
@@ -233,11 +238,9 @@ try {
                                             <a href="index.php?sayfa=bekleyen-uyeler&aksiyon=basvuru_onayla&id=<?= $b['id']; ?>" class="btn btn-success btn-sm fw-bold px-2.5 shadow-sm" onclick="return confirm('<?= htmlspecialchars($b['adi_soyadi']); ?> isimli adayı derneğe üye olarak onaylıyor musunuz?');">
                                                 <i class="fa-solid fa-user-check me-1"></i> Onayla
                                             </a>
-                                            <?php if (!$is_kisitli_rol || $oturum_kullanici_adi === 'kk_by'): ?>
-                                                <a href="index.php?sayfa=bekleyen-uyeler&aksiyon=basvuru_reddet&id=<?= $b['id']; ?>" class="btn btn-outline-danger btn-sm fw-bold px-2.5 shadow-sm" onclick="return confirm('<?= htmlspecialchars($b['adi_soyadi']); ?> isimli başvuruyu tamamen silmek istediğinize emin misiniz?');">
-                                                    <i class="fa-solid fa-user-xmark me-1"></i> Reddet
-                                                </a>
-                                            <?php endif; ?>
+                                            <a href="index.php?sayfa=bekleyen-uyeler&aksiyon=basvuru_reddet&id=<?= $b['id']; ?>" class="btn btn-outline-danger btn-sm fw-bold px-2.5 shadow-sm" onclick="return confirm('<?= htmlspecialchars($b['adi_soyadi']); ?> isimli başvuruyu tamamen silmek istediğinize emin misiniz?');">
+                                                <i class="fa-solid fa-user-xmark me-1"></i> Reddet
+                                            </a>
                                         </div>
                                         <?php endif; ?>
                                     </td>
