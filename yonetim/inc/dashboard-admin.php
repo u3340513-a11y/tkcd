@@ -412,15 +412,22 @@ $bolge_degerler  = array_values($bolge_sayilari);
                                     class="btn btn-sm py-0 px-2"
                                     style="font-size:0.65rem; background:#dc3545; color:#fff; border:none; border-radius:20px;"
                                     title="İletişim bilgileri açık PDF"
-                                    onclick="bolgePdfAc('<?= addslashes($bolge) ?>', 0)">
+                                    onclick="bolgePdfAc('<?= addslashes($bolge) ?>', 0, 0)">
                                     <i class="fa-solid fa-eye me-1"></i>Açık
                                 </button>
                                 <button type="button"
                                     class="btn btn-sm py-0 px-2"
                                     style="font-size:0.65rem; background:#6c757d; color:#fff; border:none; border-radius:20px;"
                                     title="İletişim bilgileri gizli PDF"
-                                    onclick="bolgePdfAc('<?= addslashes($bolge) ?>', 1)">
+                                    onclick="bolgePdfAc('<?= addslashes($bolge) ?>', 1, 0)">
                                     <i class="fa-solid fa-eye-slash me-1"></i>Gizli
+                                </button>
+                                <button type="button"
+                                    class="btn btn-sm py-0 px-2"
+                                    style="font-size:0.65rem; background:#6a1b9a; color:#fff; border:none; border-radius:20px;"
+                                    title="Sadece kurum temsilcileri PDF"
+                                    onclick="bolgePdfAc('<?= addslashes($bolge) ?>', 0, 1)">
+                                    <i class="fa-solid fa-building-user me-1"></i>KT
                                 </button>
                             </div>
                         </div>
@@ -428,8 +435,10 @@ $bolge_degerler  = array_values($bolge_sayilari);
                     </div>
                 </div>
                 <script>
-                function bolgePdfAc(bolge, gizli) {
-                    var url = 'inc/bolge-pdf.php?bolge=' + encodeURIComponent(bolge) + '&gizli=' + gizli;
+                function bolgePdfAc(bolge, gizli, sadeceKt) {
+                    var url = 'inc/bolge-pdf.php?bolge=' + encodeURIComponent(bolge)
+                            + '&gizli=' + (gizli || 0)
+                            + '&sadece_kt=' + (sadeceKt || 0);
                     window.open(url, '_blank');
                 }
                 </script>

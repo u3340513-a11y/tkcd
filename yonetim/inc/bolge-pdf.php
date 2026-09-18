@@ -34,7 +34,8 @@ $bolge_harita = [
 
 // ─── PARAMETRELER ─────────────────────────────────────────────────────────────
 $f_bolge = trim($_GET['bolge'] ?? 'Tümü');
-$f_gizli = (int)($_GET['gizli'] ?? 0) === 1;
+$f_gizli   = (int)($_GET['gizli'] ?? 0) === 1;
+$f_sadece_kt = (int)($_GET['sadece_kt'] ?? 0) === 1;
 
 // Bölge adı doğrulama
 $gecerli_bolgeler = array_merge(['Tümü', 'Diğer'], array_keys($bolge_harita));
@@ -46,6 +47,11 @@ if (!in_array($f_bolge, $gecerli_bolgeler, true)) {
 try {
     $where  = ["onay_durumu = 'onayli'"];
     $params = [];
+
+    // Sadece kurum temsilcisi filtresi
+    if ($f_sadece_kt) {
+        $where[] = "(temsilci_turu = 'Kurum Temsilcisi' OR ek_gorev = 'Kurum Temsilcisi')";
+    }
 
     if ($f_bolge === 'Tümü') {
         // Tüm bölgeler — il bazında gruplama yapılacak
@@ -77,7 +83,10 @@ try {
     log_kaydet(
         $db_baglanti,
         'bolge_pdf_indir',
-        'Bölge PDF indirildi: ' . $f_bolge . ' — ' . ($f_gizli ? 'Gizli' : 'Açık') . ' — ' . count($uyeler) . ' üye.'
+        'Bölge PDF indirildi: ' . $f_bolge
+            . ($f_sadece_kt ? ' [Kurum Temsilcisi]' : '')
+            . ' — ' . ($f_gizli ? 'Gizli' : 'Açık')
+            . ' — ' . count($uyeler) . ' üye.'
     );
 
 } catch (\PDOException $e) {
@@ -188,12 +197,16 @@ $kurum_temsilcisi_sayisi = count(array_filter($uyeler, function($u) {
 <body onload="window.print();">
 
 <div class="rapor-baslik">
-    <h2>T.K.Ç.D. — BÖLGE ÜYE RAPORU</h2>
+    <h2>T.K.Ç.D. — BÖLGE ÜYE RAPORU<?= $f_sadece_kt ? ' / KURUM TEMSİLCİLERİ' : '' ?></h2>
     <p><?= htmlspecialchars($f_bolge) ?> &nbsp;|&nbsp; Tarih: <?= date('d.m.Y H:i') ?></p>
     <div style="margin-top:8px;">
-        <span class="ozet-kutu ozet-toplam">Toplam: <?= count($uyeler) ?> üye</span>
+        <span class="ozet-kutu ozet-toplam">Toplam: <?= count($uyeler) ?> <?= $f_sadece_kt ? 'kurum temsilcisi' : 'üye' ?></span>
         <span class="ozet-kutu ozet-bolge"><?= htmlspecialchars($f_bolge) ?></span>
+        <?php if ($f_sadece_kt): ?>
+        <span class="ozet-kutu ozet-kurum">Sadece: Kurum Temsilcisi</span>
+        <?php else: ?>
         <span class="ozet-kutu ozet-kurum">Kurum Temsilcisi: <?= $kurum_temsilcisi_sayisi ?></span>
+        <?php endif; ?>
         <?php if ($f_gizli): ?>
         <span class="ozet-kutu ozet-gizli">İletişim: Gizli</span>
         <?php else: ?>
