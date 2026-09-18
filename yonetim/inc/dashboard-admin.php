@@ -425,9 +425,16 @@ $bolge_degerler  = array_values($bolge_sayilari);
                                 <button type="button"
                                     class="btn btn-sm py-0 px-2"
                                     style="font-size:0.65rem; background:#6a1b9a; color:#fff; border:none; border-radius:20px;"
-                                    title="Sadece kurum temsilcileri PDF"
+                                    title="Sadece kurum temsilcileri — iletişim açık"
                                     onclick="bolgePdfAc('<?= addslashes($bolge) ?>', 0, 1)">
-                                    <i class="fa-solid fa-building-user me-1"></i>KT
+                                    <i class="fa-solid fa-building-user me-1"></i>KT Açık
+                                </button>
+                                <button type="button"
+                                    class="btn btn-sm py-0 px-2"
+                                    style="font-size:0.65rem; background:#4a148c; color:#fff; border:none; border-radius:20px;"
+                                    title="Sadece kurum temsilcileri — iletişim gizli"
+                                    onclick="bolgePdfAc('<?= addslashes($bolge) ?>', 1, 1)">
+                                    <i class="fa-solid fa-building-lock me-1"></i>KT Gizli
                                 </button>
                             </div>
                         </div>
