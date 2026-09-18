@@ -132,7 +132,7 @@ return [
             kisi(slug: 'yunus-okutan',            ad: 'Yunus Okutan',            unvan: 'Yönetim Kurulu Üyesi'),
             kisi(slug: 'dursun-ali-suleymanogl',  ad: 'Dursun Ali Süleymanoğlu', unvan: 'Yönetim Kurulu Üyesi'),
             kisi(slug: 'ahmet-yilmaz',            ad: 'Ahmet Yılmaz',            unvan: 'Yönetim Kurulu Üyesi', fotograf: 'ahmet-yilmaz.png'),
-            kisi(slug: 'mehmet-uzunoglu',         ad: 'Mehmet Uzunoğlu',         unvan: 'Yönetim Kurulu Üyesi'),
+            kisi(slug: 'mehmet-uzunoglu',         ad: 'Mehmet Uzunoğlu',         unvan: 'Yönetim Kurulu Üyesi', fotograf: 'mehmet-uzunoglu.jpeg'),
             kisi(slug: 'onur-yildiz',             ad: 'Onur Yıldız',             unvan: 'Yönetim Kurulu Üyesi', fotograf: 'onur-yildiz.png'),
             kisi(slug: 'yucel-alp',               ad: 'Yücel Alp',               unvan: 'Yönetim Kurulu Üyesi', fotograf: 'yucel-alp.jpeg'),
             kisi(slug: 'ugur-okumus',             ad: 'Uğur Okumuş',             unvan: 'Yönetim Kurulu Üyesi', fotograf: 'ugur-okumus.png'),
