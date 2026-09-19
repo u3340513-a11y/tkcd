@@ -146,6 +146,46 @@ if (isset($_GET['ajax_islem']) && $_GET['ajax_islem'] === 'ajax_not_sil' && isse
     exit;
 }
 
+// --- NOT GÜNCELLEME MOTORU (AJAX POST) ---
+if (isset($_GET['ajax_islem']) && $_GET['ajax_islem'] === 'ajax_not_guncelle' && isset($_GET['not_id'])) {
+    if (!$is_not_yetkili) {
+        if (ob_get_length()) ob_clean();
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['durum' => 'hata', 'mesaj' => 'Yetkiniz yok.']);
+        exit;
+    }
+    if (ob_get_length()) ob_clean();
+    header('Content-Type: application/json; charset=utf-8');
+
+    $not_id      = intval($_GET['not_id']);
+    $yeni_icerik = trim($_POST['not_icerik'] ?? '');
+
+    if ($yeni_icerik === '') {
+        echo json_encode(['durum' => 'hata', 'mesaj' => 'Not boş olamaz.']);
+        exit;
+    }
+
+    try {
+        $guncelle = $db_baglanti->prepare(
+            "UPDATE dernek_notlar SET not_icerik = ? WHERE id = ? AND uye_id = ?"
+        );
+        $basarili = $guncelle->execute([$yeni_icerik, $not_id, $uye_id]);
+
+        if ($basarili && $guncelle->rowCount() > 0) {
+            $uye_adi_sorgu = $db_baglanti->prepare("SELECT adi_soyadi FROM dernek_uyeler WHERE id = ?");
+            $uye_adi_sorgu->execute([$uye_id]);
+            $uye_adi = $uye_adi_sorgu->fetchColumn() ?: ('Bilinmeyen #' . $uye_id);
+            log_kaydet($db_baglanti, 'uye_duzenle', $uye_adi . ' — Not güncellendi (#' . $not_id . ')', 'dernek_notlar', $not_id);
+            echo json_encode(['durum' => 'ok', 'icerik' => $yeni_icerik]);
+        } else {
+            echo json_encode(['durum' => 'hata', 'mesaj' => 'Kayıt bulunamadı veya değişiklik yok.']);
+        }
+    } catch (\PDOException $e) {
+        echo json_encode(['durum' => 'hata', 'mesaj' => $e->getMessage()]);
+    }
+    exit;
+}
+
 // --- NOT EKLEME MOTORU (DENETÇİYE KAPALI) ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['not_ekle'])) {
     if (!$is_not_yetkili) {
@@ -392,12 +432,31 @@ if (!empty($uye['uyelik_tarihi']) && $uye['uyelik_tarihi'] !== '0000-00-00') {
                                 <div id="not-kapsayici-<?= $not['id']; ?>" class="bg-light p-3 rounded-3 border mb-3 shadow-sm position-relative transition-not">
                                     
                                     <?php if ($is_not_yetkili): ?>
+                                        <!-- Sil butonu -->
                                         <a href="javascript:void(0);" onclick="notuGörünmezSil(<?= $not['id']; ?>)" class="position-absolute text-danger text-decoration-none btn-not-sil" title="Notu Sil" style="top: 10px; right: 15px; font-size: 1.4rem; font-weight: bold; line-height: 1; cursor: pointer;">
                                             &times;
                                         </a>
+                                        <!-- Düzenle butonu -->
+                                        <a href="javascript:void(0);" onclick="notuDuzenle(<?= $not['id']; ?>)" class="position-absolute text-secondary text-decoration-none btn-not-duzenle" title="Notu Düzenle" style="top: 10px; right: 42px; font-size: 0.85rem; line-height: 1; cursor: pointer;">
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                        </a>
                                     <?php endif; ?>
                                     
-                                    <p class="text-dark mb-2 pe-4 fs-6" style="white-space: pre-line; word-break: break-all;"><?= htmlspecialchars($not['not_icerik']); ?></p>
+                                    <!-- Görüntüleme modu -->
+                                    <p id="not-metin-<?= $not['id']; ?>" class="text-dark mb-2 pe-5 fs-6" style="white-space: pre-line; word-break: break-all;"><?= htmlspecialchars($not['not_icerik']); ?></p>
+                                    
+                                    <!-- Düzenleme modu (gizli) -->
+                                    <div id="not-edit-<?= $not['id']; ?>" style="display:none;" class="mb-2">
+                                        <textarea id="not-textarea-<?= $not['id']; ?>" class="form-control form-control-sm" rows="3" style="resize:vertical;"><?= htmlspecialchars($not['not_icerik']); ?></textarea>
+                                        <div class="d-flex gap-2 mt-2">
+                                            <button onclick="notuKaydet(<?= $not['id']; ?>)" class="btn btn-sm btn-dark fw-bold px-3">
+                                                <i class="fa-solid fa-check me-1"></i>Kaydet
+                                            </button>
+                                            <button onclick="notuDuzenleIptal(<?= $not['id']; ?>)" class="btn btn-sm btn-outline-secondary px-3">
+                                                İptal
+                                            </button>
+                                        </div>
+                                    </div>
                                     
                                     <div class="text-end border-top pt-1">
                                         <small class="text-muted" style="font-size: 0.75rem;"><i class="fa-regular fa-clock me-1"></i><?= date('d.m.Y H:i', strtotime($not['kayit_tarihi'])); ?></small>
@@ -707,6 +766,54 @@ function notuGörünmezSil(notId) {
             });
     }
     <?php endif; ?>
+}
+</script>
+
+<script>
+// Not düzenleme fonksiyonları
+function notuDuzenle(notId) {
+    document.getElementById('not-metin-' + notId).style.display = 'none';
+    document.getElementById('not-edit-' + notId).style.display = 'block';
+    var ta = document.getElementById('not-textarea-' + notId);
+    ta.focus();
+    ta.selectionStart = ta.selectionEnd = ta.value.length;
+}
+
+function notuDuzenleIptal(notId) {
+    document.getElementById('not-edit-' + notId).style.display = 'none';
+    document.getElementById('not-metin-' + notId).style.display = '';
+}
+
+function notuKaydet(notId) {
+    var yeniIcerik = document.getElementById('not-textarea-' + notId).value.trim();
+    if (!yeniIcerik) {
+        alert('Not boş olamaz!');
+        return;
+    }
+
+    var url  = 'index.php?sayfa=uye-detay&id=<?= $uye_id; ?>&ajax_islem=ajax_not_guncelle&not_id=' + notId;
+    var form = new FormData();
+    form.append('not_icerik', yeniIcerik);
+
+    fetch(url, { method: 'POST', body: form })
+        .then(r => r.json())
+        .then(sonuc => {
+            if (sonuc.durum === 'ok') {
+                // Ekrandaki metni güncelle
+                var metin = document.getElementById('not-metin-' + notId);
+                metin.textContent = sonuc.icerik;
+                notuDuzenleIptal(notId);
+
+                // Kısa başarı animasyonu
+                var kap = document.getElementById('not-kapsayici-' + notId);
+                kap.style.transition = 'background 0.4s';
+                kap.style.background = '#d4edda';
+                setTimeout(() => { kap.style.background = ''; }, 1200);
+            } else {
+                alert('Güncelleme hatası: ' + (sonuc.mesaj || 'Bilinmeyen hata'));
+            }
+        })
+        .catch(() => alert('Bağlantı hatası oluştu!'));
 }
 </script>
 
