@@ -116,7 +116,7 @@ return [
         'uyeler' => [
             kisi(slug: 'busra-yilmaz',       ad: 'Büşra Yılmaz',       unvan: 'Kadın Kolları Başkanı', fotograf: 'büşra-bk.png'),
             kisi(slug: 'guluzar-aydogdu',    ad: 'Gülüzar Aydoğdu',    unvan: 'Başkan Yardımcısı', fotograf: 'guluzar-aydogdu.png'),
-            kisi(slug: 'nurcan-degermenci',  ad: 'Nurcan Değermenci',   unvan: 'Başkan Yardımcısı', fotograf: 'nurcan-degermenci.jpeg'),
+            kisi(slug: 'nurcan-degermenci',  ad: 'Nurcan Değermenci',   unvan: 'Başkan Yardımcısı', fotograf: 'nurcan-degermenci.png'),
             kisi(slug: 'emine-aydin',        ad: 'Emine Aydın',        unvan: 'Başkan Yardımcısı', fotograf: 'emine-aydin.png'),
         ],
     ],
