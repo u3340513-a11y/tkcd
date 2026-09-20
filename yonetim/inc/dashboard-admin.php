@@ -472,6 +472,11 @@ $bolge_degerler  = array_values($bolge_sayilari);
                         $dg_renk = avatarRengi($dg_uye['adi_soyadi'], $avatar_renkleri);
                         $dg_harf = basHarfleri($dg_uye['adi_soyadi']);
                     ?>
+                    <?php
+                        $dg_link_yetkili = $is_gelistirici
+                            || (($_SESSION['kullanici_adi'] ?? '') === 'admin61');
+                    ?>
+                    <?php if ($dg_link_yetkili): ?>
                     <a href="index.php?sayfa=uye-detay&id=<?= (int)$dg_uye['id'] ?>"
                        class="d-flex align-items-center gap-2 p-2 rounded-3 text-decoration-none dg-kart"
                        style="background:<?= $dg_renk ?>10;border:1px solid <?= $dg_renk ?>28;transition:background 0.18s,box-shadow 0.18s,transform 0.15s;display:block;"
@@ -485,6 +490,19 @@ $bolge_degerler  = array_values($bolge_sayilari);
                         </div>
                         <span style="font-size:1.1rem;">🎂</span>
                     </a>
+                    <?php else: ?>
+                    <div class="d-flex align-items-center gap-2 p-2 rounded-3"
+                         style="background:<?= $dg_renk ?>10;border:1px solid <?= $dg_renk ?>28;">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold flex-shrink-0"
+                             style="width:36px;height:36px;background:<?= $dg_renk ?>;color:#fff;font-size:0.8rem;">
+                            <?= htmlspecialchars($dg_harf) ?>
+                        </div>
+                        <div class="flex-grow-1 min-width-0">
+                            <div class="fw-semibold text-truncate" style="font-size:0.82rem;"><?= htmlspecialchars($dg_uye['adi_soyadi']) ?></div>
+                        </div>
+                        <span style="font-size:1.1rem;">🎂</span>
+                    </div>
+                    <?php endif; ?>
                     <?php endforeach; ?>
                 </div>
                 <?php else: ?>
