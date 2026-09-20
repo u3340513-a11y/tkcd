@@ -472,17 +472,19 @@ $bolge_degerler  = array_values($bolge_sayilari);
                         $dg_renk = avatarRengi($dg_uye['adi_soyadi'], $avatar_renkleri);
                         $dg_harf = basHarfleri($dg_uye['adi_soyadi']);
                     ?>
-                    <div class="d-flex align-items-center gap-2 p-2 rounded-3"
-                         style="background:<?= $dg_renk ?>10;border:1px solid <?= $dg_renk ?>28;">
+                    <a href="index.php?sayfa=uye-detay&id=<?= (int)$dg_uye['id'] ?>"
+                       class="d-flex align-items-center gap-2 p-2 rounded-3 text-decoration-none dg-kart"
+                       style="background:<?= $dg_renk ?>10;border:1px solid <?= $dg_renk ?>28;transition:background 0.18s,box-shadow 0.18s,transform 0.15s;display:block;"
+                       title="<?= htmlspecialchars($dg_uye['adi_soyadi']) ?> — Üye Kartına Git">
                         <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold flex-shrink-0"
                              style="width:36px;height:36px;background:<?= $dg_renk ?>;color:#fff;font-size:0.8rem;">
                             <?= htmlspecialchars($dg_harf) ?>
                         </div>
                         <div class="flex-grow-1 min-width-0">
-                            <div class="fw-semibold text-truncate" style="font-size:0.82rem;"><?= htmlspecialchars($dg_uye['adi_soyadi']) ?></div>
+                            <div class="fw-semibold text-truncate" style="font-size:0.82rem;color:#1a1a2e;"><?= htmlspecialchars($dg_uye['adi_soyadi']) ?></div>
                         </div>
                         <span style="font-size:1.1rem;">🎂</span>
-                    </div>
+                    </a>
                     <?php endforeach; ?>
                 </div>
                 <?php else: ?>
@@ -1077,6 +1079,13 @@ window.addEventListener('load', function () {
 }
 #turkiyeHaritasi { background: transparent !important; }
 #turkiyeHaritasi .leaflet-container { background: transparent !important; }
+/* Doğum günü kart hover */
+.dg-kart { cursor: pointer; }
+.dg-kart:hover {
+    background-color: rgba(0,0,0,0.04) !important;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    transform: translateY(-1px);
+}
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
