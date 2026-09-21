@@ -291,6 +291,19 @@ if ($sayfa === 'quiz-kaydet' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
+// Not güncelleme AJAX — header/sidebar HTML render edilmeden önce yakala
+if (
+    $sayfa === 'uye-detay'
+    && isset($_GET['ajax_islem'])
+    && $_GET['ajax_islem'] === 'ajax_not_guncelle'
+    && isset($_GET['not_id'])
+    && $_SERVER['REQUEST_METHOD'] === 'POST'
+) {
+    // uye-detay.php'nin başındaki AJAX handler'ına düşmesi için include et
+    include 'inc/uye-detay.php';
+    exit;
+}
+
 include 'inc/header.php';
 include 'inc/sidebar.php';
 echo '<div class="panel-content">';
