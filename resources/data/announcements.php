@@ -17,6 +17,18 @@ declare(strict_types=1);
  */
 return [
     [
+        'slug'         => 'sakarya-teskilatlanma-toplantisi-eylul-2026',
+        'title'        => 'Sakarya Teşkilatlanma Toplantımız — 24 Eylül 2026',
+        'summary'      => 'Bu ayki Sakarya teşkilatlanma toplantımız Adapazarı İlçe Başkanlığı ev sahipliğinde '
+            . 'gerçekleştirilecektir. 📅 Tarih: 24 Eylül 2026 Perşembe | ⏰ Saat: 19.30 | '
+            . '📍 Yer: Elegante Cafe Restorant — Semerciler Mah. Atatürk Bulvarı Pasaj 2000 Çatı Katı 2/202, '
+            . '54100 Adapazarı, Sakarya. Tüm üyelerimiz davetlidir! '
+            . '📞 İletişim: 0 505 357 88 82 — İlhan Balcı (Adapazarı İlçe Başkanı).',
+        'category'     => 'etkinlik',
+        'published_at' => '2026-09-21',
+        'highlighted'  => true,
+    ],
+    [
         'slug'         => 'eskisehir-il-baskanligi-toplantisi-agustos-2026',
         'title'        => 'Eskişehir İl Başkanlığı Toplantısı',
         'summary'      => '27 Ağustos Perşembe günü saat 18.30\'da Choco Gusto Eczacılık Şubesi\'nde '
