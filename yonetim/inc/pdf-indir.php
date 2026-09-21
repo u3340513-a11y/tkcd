@@ -107,16 +107,17 @@ log_kaydet($db_baglanti, 'pdf_indir', 'PDF raporu indirildi (' . count($uyeler) 
     <table>
         <thead>
             <tr>
-                <th style="width: 14%;">Adı Soyadı</th>
-                <th style="width: 11%;">Telefon</th>
-                <th style="width: 15%;">E-Posta</th>
-                <th style="width: 5%; text-align: center;">Kan</th>
-                <th style="width: 9%; text-align: center;">D.Tarihi</th>
-                <th style="width: 7%;">İkamet</th>
-                <th style="width: 8%;">İlçe</th>
+                <th style="width: 12%;">Adı Soyadı</th>
+                <th style="width: 9%;">Telefon</th>
+                <th style="width: 13%;">E-Posta</th>
+                <th style="width: 4%; text-align: center;">Kan</th>
+                <th style="width: 7%; text-align: center;">D.Tarihi</th>
+                <th style="width: 6%;">İkamet İli</th>
+                <th style="width: 6%;">İkamet İlçesi</th>
+                <th style="width: 7%;">Trabzon İlçesi</th>
                 <th style="width: 11%;">Kurum</th>
-                <th style="width: 10%;">Ünvan</th>
-                <th style="width: 10%;">Statü</th>
+                <th style="width: 9%;">Ünvan</th>
+                <th style="width: 9%;">Statü</th>
             </tr>
         </thead>
         <tbody>
@@ -160,6 +161,7 @@ log_kaydet($db_baglanti, 'pdf_indir', 'PDF raporu indirildi (' . count($uyeler) 
                     <td class="text-center fw-bold" style="color: #b30000;"><?= htmlspecialchars($kan); ?></td>
                     <td class="text-center"><?= htmlspecialchars($dogum); ?></td>
                     <td><?= htmlspecialchars($u['ikamet_ili'] ?: '-'); ?></td>
+                    <td><?= htmlspecialchars($u['ikamet_ilcesi'] ?: '-'); ?></td>
                     <td><?= htmlspecialchars($u['trabzon_ilcesi'] ?: '-'); ?></td>
                     <td><?= htmlspecialchars($u['kurum'] ?: '-'); ?></td>
                     <td><?= htmlspecialchars($u['gorev_unvan'] ?: '-'); ?></td>

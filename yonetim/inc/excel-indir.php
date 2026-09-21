@@ -88,6 +88,7 @@ echo "\xEF\xBB\xBF";
                 <th>Kan Grubu</th>
                 <th>Doğum Tarihi / Yılı</th>
                 <th>İkamet İli</th>
+                <th>İkamet İlçesi</th>
                 <th>Trabzon İlçesi</th>
                 <th>Kurum</th>
                 <th>Ünvan</th>
@@ -136,6 +137,7 @@ echo "\xEF\xBB\xBF";
                     <td style="text-align: center;"><?= htmlspecialchars($kan); ?></td>
                     <td style="text-align: center;"><?= htmlspecialchars($dogum); ?></td>
                     <td><?= htmlspecialchars($u['ikamet_ili'] ?: '-'); ?></td>
+                    <td><?= htmlspecialchars($u['ikamet_ilcesi'] ?: '-'); ?></td>
                     <td><?= htmlspecialchars($u['trabzon_ilcesi'] ?: '-'); ?></td>
                     <td><?= htmlspecialchars($u['kurum'] ?: '-'); ?></td>
                     <td><?= htmlspecialchars($u['gorev_unvan'] ?: '-'); ?></td>
