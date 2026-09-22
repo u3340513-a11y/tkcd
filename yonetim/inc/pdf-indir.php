@@ -15,10 +15,19 @@ if ($rol !== 'admin' && $rol !== 'gelistirici') {
 
 $arama_kelimesi = isset($_GET['arama']) ? trim($_GET['arama']) : '';
 $aktif_filtre   = isset($_GET['filtre']) ? trim($_GET['filtre']) : '';
+$f_cinsiyet     = isset($_GET['cinsiyet']) ? trim($_GET['cinsiyet']) : '';
+if (!in_array($f_cinsiyet, ['Erkek', 'Kadın', ''], true)) {
+    $f_cinsiyet = '';
+}
 
 try {
     $where_sartlari = ["onay_durumu = 'onayli'"];
     $parametreler   = [];
+
+    if ($f_cinsiyet !== '') {
+        $where_sartlari[] = "cinsiyet = ?";
+        $parametreler[]   = $f_cinsiyet;
+    }
 
     if ($aktif_filtre === 'kurum_temsilcisi') {
         $where_sartlari[] = "(temsilci_turu = 'Kurum Temsilcisi' OR ek_gorev = 'Kurum Temsilcisi')";
@@ -96,6 +105,9 @@ log_kaydet($db_baglanti, 'pdf_indir', 'PDF raporu indirildi (' . count($uyeler) 
             <?php 
             if(!empty($aktif_filtre)) {
                 echo ' | Kart: "' . htmlspecialchars(str_replace('_', ' ', $aktif_filtre)) . '"';
+            }
+            if(!empty($f_cinsiyet)) {
+                echo ' | Cinsiyet: "' . htmlspecialchars($f_cinsiyet) . '"';
             }
             if(!empty($arama_kelimesi)) {
                 echo ' | Filtre: "' . htmlspecialchars($arama_kelimesi) . '"'; 

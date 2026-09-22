@@ -250,6 +250,11 @@ try {
                     <input type="text" id="tabloCanliAra" readonly onfocus="this.removeAttribute('readonly');" <?= $iller_modu ? 'disabled placeholder="İl modunda arama devre dışı..."' : 'oninput="canliVeritabanıArama(this.value)" placeholder="Arama..."'; ?> class="form-control rounded-start px-3" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
                     
                     <?php if(!$iller_modu && !$is_kisitli_rol && !$is_yonetim): ?>
+                    <select id="indirCinsiyetFiltre" class="form-select form-select-sm" style="max-width: 110px; flex: 0 0 auto;" title="İndirilecek listeyi cinsiyete göre filtrele">
+                        <option value="">Tümü (K/E)</option>
+                        <option value="Erkek">Erkek</option>
+                        <option value="Kadın">Kadın</option>
+                    </select>
                     <button type="button" onclick="dosyaYonlendir('excel')" class="btn btn-success fw-bold px-2 px-sm-3 d-flex align-items-center justify-content-center btn-sm">
                         <i class="fa-solid fa-file-excel me-1"></i> Excel
                     </button>
@@ -638,6 +643,8 @@ function dosyaYonlendir(tur) {
     let aramaKutusu = document.getElementById('tabloCanliAra');
     let aramaKelimesi = aramaKutusu ? aramaKutusu.value.trim() : '';
     let aktifFiltre = '<?= $aktif_filtre; ?>';
+    let cinsiyetKutusu = document.getElementById('indirCinsiyetFiltre');
+    let cinsiyetSecimi = cinsiyetKutusu ? cinsiyetKutusu.value : '';
     let temelUrl = (tur === 'excel') ? "inc/excel-indir.php" : "inc/pdf-indir.php";
     
     let queryParams = [];
@@ -647,6 +654,9 @@ function dosyaYonlendir(tur) {
     }
     if (aktifFiltre !== "") {
         queryParams.push("filtre=" + encodeURIComponent(aktifFiltre));
+    }
+    if (cinsiyetSecimi !== "") {
+        queryParams.push("cinsiyet=" + encodeURIComponent(cinsiyetSecimi));
     }
     
     let nihaiUrl = temelUrl;

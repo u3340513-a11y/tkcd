@@ -15,10 +15,19 @@ if ($rol !== 'admin' && $rol !== 'gelistirici') {
 
 $arama_kelimesi = isset($_GET['arama']) ? trim($_GET['arama']) : '';
 $aktif_filtre   = isset($_GET['filtre']) ? trim($_GET['filtre']) : '';
+$f_cinsiyet     = isset($_GET['cinsiyet']) ? trim($_GET['cinsiyet']) : '';
+if (!in_array($f_cinsiyet, ['Erkek', 'Kadın', ''], true)) {
+    $f_cinsiyet = '';
+}
 
 try {
     $where_sartlari = ["onay_durumu = 'onayli'"];
     $parametreler   = [];
+
+    if ($f_cinsiyet !== '') {
+        $where_sartlari[] = "cinsiyet = ?";
+        $parametreler[]   = $f_cinsiyet;
+    }
 
     if ($aktif_filtre === 'kurum_temsilcisi') {
         $where_sartlari[] = "(temsilci_turu = 'Kurum Temsilcisi' OR ek_gorev = 'Kurum Temsilcisi')";
@@ -58,7 +67,7 @@ try {
 }
 
 $bugun = date('Y-m-d');
-$dosya_adi = "Dernek_Uye_Listesi_" . $bugun . ".xls";
+$dosya_adi = "Dernek_Uye_Listesi" . ($f_cinsiyet !== '' ? "_" . $f_cinsiyet : '') . "_" . $bugun . ".xls";
 
 log_kaydet($db_baglanti, 'excel_indir', 'Excel dosyası indirildi (' . count($uyeler) . ' üye)', 'dernek_uyeler');
 
