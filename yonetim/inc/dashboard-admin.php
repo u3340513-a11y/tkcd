@@ -648,37 +648,12 @@ $bolge_degerler  = array_values($bolge_sayilari);
 
 
 <!-- ═══════════════════════════════════════════════════════════════
-     D2: TRABZON İLÇELERİNE GÖRE ÜYE DAĞILIMI
-     ═══════════════════════════════════════════════════════════════ -->
-<div class="row g-4 mb-4">
-    <div class="col-12">
-        <div class="dash-card">
-            <div class="dash-card__header">
-                <h5 class="dash-card__title">
-                    <i class="fa-solid fa-map text-success"></i> Trabzon İlçelerine Göre Üye Dağılımı
-                </h5>
-                <span class="dash-card__action"><?= count($grafik_ekseni) ?> ilçe</span>
-            </div>
-            <div class="dash-card__body">
-                <?php if (!empty($grafik_ekseni)): ?>
-                <div style="position:relative; height:320px; max-height:320px;">
-                    <canvas id="ilceDagilimi"></canvas>
-                </div>
-                <?php else: ?>
-                <p class="text-muted small py-4 text-center">Trabzon ilçesi verisi bulunamadı.</p>
-                <?php endif; ?>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════════
-     E: KAN GRUBU  +  F: KURUMLAR
+     E: KAN GRUBU  +  TRABZON İLÇELERİ  +  F: KURUMLAR
      ═══════════════════════════════════════════════════════════════ -->
 <div class="row g-4 mb-4">
 
     <!-- Kan Grubu Dağılımı -->
-    <div class="col-lg-6">
+    <div class="col-lg-4">
         <div class="dash-card h-100">
             <div class="dash-card__header">
                 <h5 class="dash-card__title"><i class="fa-solid fa-droplet text-danger"></i> Kan Grubu Dağılımı</h5>
@@ -706,8 +681,37 @@ $bolge_degerler  = array_values($bolge_sayilari);
         </div>
     </div>
 
+    <!-- Trabzon İlçelerine Göre Üye Dağılımı -->
+    <div class="col-lg-4">
+        <div class="dash-card h-100">
+            <div class="dash-card__header">
+                <h5 class="dash-card__title"><i class="fa-solid fa-map text-success"></i> Trabzon İlçe Dağılımı</h5>
+            </div>
+            <div class="dash-card__body text-center">
+                <?php if (!empty($grafik_ekseni)): ?>
+                <div style="position:relative; height:200px; max-height:200px;">
+                    <canvas id="ilceDagilimi"></canvas>
+                </div>
+                <div class="mt-3 d-flex flex-wrap justify-content-center gap-2" style="max-height:90px; overflow-y:auto;">
+                    <?php
+                    $ilce_toplam = array_sum($grafik_sayilari);
+                    foreach ($grafik_ekseni as $gi => $etiket):
+                        $yuzde = $ilce_toplam > 0 ? round(($grafik_sayilari[$gi] / $ilce_toplam) * 100) : 0;
+                    ?>
+                    <span class="badge bg-light text-dark border px-2 py-1" style="font-size:0.7rem;">
+                        <?= htmlspecialchars($etiket) ?>: %<?= $yuzde ?>
+                    </span>
+                    <?php endforeach; ?>
+                </div>
+                <?php else: ?>
+                <p class="text-muted small py-4">Trabzon ilçesi verisi bulunamadı.</p>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+
     <!-- En Çok Üye Olan Kurumlar -->
-    <div class="col-lg-6">
+    <div class="col-lg-4">
         <div class="dash-card h-100">
             <div class="dash-card__header">
                 <h5 class="dash-card__title"><i class="fa-solid fa-building text-info"></i> En Çok Üye Olan Kurumlar</h5>
@@ -1240,40 +1244,32 @@ window.addEventListener('load', function () {
         });
     }
 
-    // D2: Trabzon İlçelerine Göre Üye Dağılımı — yatay çubuk
+    // D2: Trabzon İlçelerine Göre Üye Dağılımı — donut
     var ilceCtx = document.getElementById('ilceDagilimi');
     if (ilceCtx) {
+        var ilceRenkPaleti = ['#10b981','#3b82f6','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f97316','#ec4899','#6366f1','#14b8a6','#84cc16','#a855f7'];
+        var ilceToplam = <?= json_encode($grafik_sayilari) ?>.reduce(function(a, b) { return a + b; }, 0);
+
         new Chart(ilceCtx, {
-            type: 'bar',
+            type: 'doughnut',
             data: {
                 labels: <?= json_encode($grafik_ekseni, JSON_UNESCAPED_UNICODE) ?>,
                 datasets: [{
-                    label: 'Üye Sayısı',
                     data: <?= json_encode($grafik_sayilari) ?>,
-                    backgroundColor: '#10b981',
-                    borderRadius: 4,
-                    barThickness: 14
+                    backgroundColor: ilceRenkPaleti,
+                    borderWidth: 2,
+                    borderColor: '#fff'
                 }]
             },
             options: Object.assign({}, chartDefaults, {
-                indexAxis: 'y',
-                scales: {
-                    x: {
-                        beginAtZero: true,
-                        grid: { color: 'rgba(0,0,0,0.04)' },
-                        ticks: { precision: 0, font: { size: 11 } }
-                    },
-                    y: {
-                        grid: { display: false },
-                        ticks: { font: { size: 11 } }
-                    }
-                },
+                cutout: '55%',
                 plugins: {
                     legend: { display: false },
                     tooltip: {
                         callbacks: {
                             label: function(ctx) {
-                                return ' ' + ctx.raw + ' üye';
+                                var yuzde = ilceToplam > 0 ? ((ctx.raw / ilceToplam) * 100).toFixed(1) : 0;
+                                return ' ' + ctx.label + ': ' + ctx.raw + ' üye (%' + yuzde + ')';
                             }
                         }
                     }
