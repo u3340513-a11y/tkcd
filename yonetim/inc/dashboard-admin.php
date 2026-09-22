@@ -736,12 +736,12 @@ $bolge_degerler  = array_values($bolge_sayilari);
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════
-     F: SON EKLENEN ÜYELER  +  G: YAKLAŞAN ETKİNLİKLER  +  J: HIZLI İŞLEMLER
+     F: SON EKLENEN ÜYELER  +  J: HIZLI İŞLEMLER
      ═══════════════════════════════════════════════════════════════ -->
 <div class="row g-4 mb-4">
 
     <!-- Son Eklenen Üyeler (Tasarım 1) -->
-    <div class="col-lg-4">
+    <div class="col-lg-6">
         <div class="dash-card h-100">
             <div class="dash-card__header">
                 <h5 class="dash-card__title"><i class="fa-solid fa-user-plus text-primary"></i> Son Eklenen Üyeler</h5>
@@ -770,22 +770,8 @@ $bolge_degerler  = array_values($bolge_sayilari);
         </div>
     </div>
 
-    <!-- Yaklaşan Etkinlikler (Tasarım 2 — placeholder) -->
-    <div class="col-lg-4">
-        <div class="dash-card h-100">
-            <div class="dash-card__header">
-                <h5 class="dash-card__title"><i class="fa-solid fa-calendar-days text-warning"></i> Yaklaşan Etkinlikler</h5>
-            </div>
-            <div class="dash-card__body text-center py-5">
-                <i class="fa-solid fa-calendar-plus fa-3x text-muted mb-3 d-block" style="opacity:0.2;"></i>
-                <p class="text-muted small mb-1">Etkinlik modülü yakında aktif olacak.</p>
-                <span class="badge bg-warning bg-opacity-10 text-warning">Geliştirme Aşamasında</span>
-            </div>
-        </div>
-    </div>
-
     <!-- Hızlı İşlemler (Tasarım 1) -->
-    <div class="col-lg-4">
+    <div class="col-lg-6">
         <div class="dash-card h-100">
             <div class="dash-card__header">
                 <h5 class="dash-card__title"><i class="fa-solid fa-bolt text-warning"></i> Hızlı İşlemler</h5>
@@ -833,12 +819,12 @@ $bolge_degerler  = array_values($bolge_sayilari);
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════
-     H: DUYURULAR  +  I: SON FAALİYETLER  +  L: DİKKAT UYARILARI
+     H: DUYURULAR  +  L: DİKKAT UYARILARI
      ═══════════════════════════════════════════════════════════════ -->
 <div class="row g-4 mb-4">
 
     <!-- Duyurular (Tasarım 1 — geliştirici CRUD) -->
-    <div class="col-lg-4">
+    <div class="col-lg-6">
         <div class="dash-card h-100">
             <div class="dash-card__header">
                 <h5 class="dash-card__title"><i class="fa-solid fa-bullhorn text-info"></i> Duyurular</h5>
@@ -861,38 +847,8 @@ $bolge_degerler  = array_values($bolge_sayilari);
         </div>
     </div>
 
-    <!-- Son Faaliyetler (Log) -->
-    <div class="col-lg-4">
-        <div class="dash-card h-100">
-            <div class="dash-card__header">
-                <h5 class="dash-card__title"><i class="fa-solid fa-clock-rotate-left text-secondary"></i> Son Faaliyetler</h5>
-                <?php if ($is_gelistirici): ?>
-                <a href="index.php?sayfa=loglar" class="dash-card__action">Tümünü Gör →</a>
-                <?php endif; ?>
-            </div>
-            <div class="dash-card__body" style="max-height:360px; overflow-y:auto;">
-                <?php if (!empty($son_faaliyetler)): ?>
-                <?php foreach ($son_faaliyetler as $fa): ?>
-                <div class="dash-activity-item">
-                    <div class="dash-activity-item__avatar" style="background: <?= avatarRengi($fa['kullanici_adi'], $avatar_renkleri) ?>">
-                        <?= basHarfleri($fa['kullanici_adi']) ?>
-                    </div>
-                    <div class="dash-activity-item__info">
-                        <div class="dash-activity-item__user"><?= htmlspecialchars($fa['kullanici_adi']) ?></div>
-                        <div class="dash-activity-item__action"><?= htmlspecialchars(mb_strimwidth($fa['aciklama'] ?? $fa['islem_turu'], 0, 60, '…')) ?></div>
-                    </div>
-                    <span class="dash-activity-item__time"><?= $fa['tarih'] ? date('d.m H:i', strtotime($fa['tarih'])) : '' ?></span>
-                </div>
-                <?php endforeach; ?>
-                <?php else: ?>
-                <p class="text-muted small text-center py-3">Faaliyet kaydı bulunamadı.</p>
-                <?php endif; ?>
-            </div>
-        </div>
-    </div>
-
     <!-- Dikkat Gerektiren Uyarılar (Tasarım 2) -->
-    <div class="col-lg-4">
+    <div class="col-lg-6">
         <div class="dash-alert-card h-100">
             <div class="dash-alert-card__title">
                 <i class="fa-solid fa-triangle-exclamation me-2"></i>Dikkat Gerektirenler
