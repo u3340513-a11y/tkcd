@@ -648,6 +648,31 @@ $bolge_degerler  = array_values($bolge_sayilari);
 
 
 <!-- ═══════════════════════════════════════════════════════════════
+     D2: TRABZON İLÇELERİNE GÖRE ÜYE DAĞILIMI
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="dash-card">
+            <div class="dash-card__header">
+                <h5 class="dash-card__title">
+                    <i class="fa-solid fa-map text-success"></i> Trabzon İlçelerine Göre Üye Dağılımı
+                </h5>
+                <span class="dash-card__action"><?= count($grafik_ekseni) ?> ilçe</span>
+            </div>
+            <div class="dash-card__body">
+                <?php if (!empty($grafik_ekseni)): ?>
+                <div style="position:relative; height:320px; max-height:320px;">
+                    <canvas id="ilceDagilimi"></canvas>
+                </div>
+                <?php else: ?>
+                <p class="text-muted small py-4 text-center">Trabzon ilçesi verisi bulunamadı.</p>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
      E: KAN GRUBU  +  F: KURUMLAR
      ═══════════════════════════════════════════════════════════════ -->
 <div class="row g-4 mb-4">
@@ -1207,6 +1232,48 @@ window.addEventListener('load', function () {
                             label: function(ctx) {
                                 var yuzde = ((ctx.raw / bolgeToplam) * 100).toFixed(1);
                                 return ' ' + ctx.raw + ' üye (%' + yuzde + ')';
+                            }
+                        }
+                    }
+                }
+            })
+        });
+    }
+
+    // D2: Trabzon İlçelerine Göre Üye Dağılımı — yatay çubuk
+    var ilceCtx = document.getElementById('ilceDagilimi');
+    if (ilceCtx) {
+        new Chart(ilceCtx, {
+            type: 'bar',
+            data: {
+                labels: <?= json_encode($grafik_ekseni, JSON_UNESCAPED_UNICODE) ?>,
+                datasets: [{
+                    label: 'Üye Sayısı',
+                    data: <?= json_encode($grafik_sayilari) ?>,
+                    backgroundColor: '#10b981',
+                    borderRadius: 4,
+                    barThickness: 14
+                }]
+            },
+            options: Object.assign({}, chartDefaults, {
+                indexAxis: 'y',
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(0,0,0,0.04)' },
+                        ticks: { precision: 0, font: { size: 11 } }
+                    },
+                    y: {
+                        grid: { display: false },
+                        ticks: { font: { size: 11 } }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(ctx) {
+                                return ' ' + ctx.raw + ' üye';
                             }
                         }
                     }
