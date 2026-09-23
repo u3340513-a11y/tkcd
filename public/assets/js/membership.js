@@ -28,10 +28,15 @@
   // Hata mesajları
   // -----------------------------------------------------------------------
   const HATALAR = {
-    adSoyad: {
-      bos:      'Adı Soyadı alanı zorunludur.',
-      kisaMin:  'En az 3 karakter giriniz.',
-      gecersiz: 'Yalnızca harf ve boşluk kullanılabilir (rakam ve özel karakter kabul edilmez).',
+    ad: {
+      bos:      'Ad alanı zorunludur.',
+      kisaMin:  'En az 2 karakter giriniz.',
+      gecersiz: 'Yalnızca harf kullanılabilir (rakam ve özel karakter kabul edilmez).',
+    },
+    soyad: {
+      bos:      'Soyad alanı zorunludur.',
+      kisaMin:  'En az 2 karakter giriniz.',
+      gecersiz: 'Yalnızca harf kullanılabilir (rakam ve özel karakter kabul edilmez).',
     },
     telefon: {
       bos:      'Telefon numarası zorunludur.',
@@ -71,7 +76,8 @@
   const form        = document.getElementById('uyelik-basvuru-formu');
   if (!form) return;
 
-  const elAdSoyad     = document.getElementById('ub-ad-soyad');
+  const elAd          = document.getElementById('ub-ad');
+  const elSoyad       = document.getElementById('ub-soyad');
   const elTelefon     = document.getElementById('ub-telefon');
   const elEposta      = document.getElementById('ub-eposta');
   const elDogum       = document.getElementById('ub-dogum-tarihi');
@@ -131,22 +137,43 @@
   // Doğrulama fonksiyonları — her biri true döndürürse alan geçerlidir
   // -----------------------------------------------------------------------
 
-  function dogrulaAdSoyad() {
-    const deger = elAdSoyad.value.trim();
+  function dogrulaAd() {
+    if (!elAd) return true;
+    const deger = elAd.value.trim();
 
     if (deger === '') {
-      hataGoster(elAdSoyad, HATALAR.adSoyad.bos);
+      hataGoster(elAd, HATALAR.ad.bos);
       return false;
     }
-    if (deger.length < 3) {
-      hataGoster(elAdSoyad, HATALAR.adSoyad.kisaMin);
+    if (deger.length < 2) {
+      hataGoster(elAd, HATALAR.ad.kisaMin);
       return false;
     }
     if (!HARF_REGEX.test(deger)) {
-      hataGoster(elAdSoyad, HATALAR.adSoyad.gecersiz);
+      hataGoster(elAd, HATALAR.ad.gecersiz);
       return false;
     }
-    hataSil(elAdSoyad);
+    hataSil(elAd);
+    return true;
+  }
+
+  function dogrulaSoyad() {
+    if (!elSoyad) return true;
+    const deger = elSoyad.value.trim();
+
+    if (deger === '') {
+      hataGoster(elSoyad, HATALAR.soyad.bos);
+      return false;
+    }
+    if (deger.length < 2) {
+      hataGoster(elSoyad, HATALAR.soyad.kisaMin);
+      return false;
+    }
+    if (!HARF_REGEX.test(deger)) {
+      hataGoster(elSoyad, HATALAR.soyad.gecersiz);
+      return false;
+    }
+    hataSil(elSoyad);
     return true;
   }
 
@@ -284,20 +311,34 @@
    * Ad Soyad — rakam ve özel karakterleri anlık olarak engeller.
    * Türkçe karakterler (Ç,ğ,İ,ı,Ö,Ş,Ü vb.) geçerlidir.
    */
-  if (elAdSoyad) {
-    elAdSoyad.addEventListener('input', function () {
+  if (elAd) {
+    elAd.addEventListener('input', function () {
       const onceki = this.selectionStart ?? this.value.length;
       const temiz  = this.value.replace(/[^A-Za-zÇçĞğİıÖöŞşÜü\s]/g, '');
 
       if (this.value !== temiz) {
         this.value = temiz;
-        // İmleç konumunu koru
         const konum = Math.max(0, onceki - (this.value.length - temiz.length + 1));
         this.setSelectionRange(konum, konum);
       }
     });
 
-    elAdSoyad.addEventListener('blur', dogrulaAdSoyad);
+    elAd.addEventListener('blur', dogrulaAd);
+  }
+
+  if (elSoyad) {
+    elSoyad.addEventListener('input', function () {
+      const onceki = this.selectionStart ?? this.value.length;
+      const temiz  = this.value.replace(/[^A-Za-zÇçĞğİıÖöŞşÜü\s]/g, '');
+
+      if (this.value !== temiz) {
+        this.value = temiz;
+        const konum = Math.max(0, onceki - (this.value.length - temiz.length + 1));
+        this.setSelectionRange(konum, konum);
+      }
+    });
+
+    elSoyad.addEventListener('blur', dogrulaSoyad);
   }
 
   /**
@@ -471,7 +512,8 @@
     e.preventDefault();
 
     var sonuclar = [
-      dogrulaAdSoyad(),
+      dogrulaAd(),
+      dogrulaSoyad(),
       dogrulaTelefon(),
       dogrulaEposta(),
       dogrulaDogumTarihi(),
