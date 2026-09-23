@@ -174,6 +174,19 @@
   gap: var(--bosluk-2, 0.5rem);
 }
 
+/* Ad ve Soyad: desktop'ta yan yana, mobilde alt alta */
+.ub-form__ad-soyad-grup {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--bosluk-4, 1rem);
+}
+
+@media (max-width: 540px) {
+  .ub-form__ad-soyad-grup {
+    grid-template-columns: 1fr;
+  }
+}
+
 .ub-form__etiket {
   font-size: var(--olcek-sm);
   font-weight: 600;

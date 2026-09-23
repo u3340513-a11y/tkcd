@@ -160,94 +160,7 @@ $calismaSekilleri = ['Kadrolu', 'Yarı Zamanlı', 'Sözleşmeli', 'Emekli Kamu �
             <?php endif; ?>
 
             <?php if ($durum !== 'basarili'): ?>
-            <!-- ⚠ DOLDURMA UYARISI -->
-            <div class="ub-doldurma-uyarisi" role="note" aria-label="Önemli form uyarıları">
-                <div class="ub-doldurma-uyarisi__baslik">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
-                         stroke-linejoin="round" aria-hidden="true">
-                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-                        <line x1="12" y1="9" x2="12" y2="13"/>
-                        <line x1="12" y1="17" x2="12.01" y2="17"/>
-                    </svg>
-                    <strong>Formu doldurmadan önce lütfen okuyun!</strong>
-                </div>
-                <ul class="ub-doldurma-uyarisi__liste">
-                    <li>
-                        <span class="ub-doldurma-uyarisi__ikon">✗</span>
-                        <span><strong>Eksik bilgi bırakmayın</strong> — Tüm zorunlu alanlar (<span style="color:#c0392b;font-weight:700">*</span>) eksiksiz doldurulmalıdır.</span>
-                    </li>
-                    <li>
-                        <span class="ub-doldurma-uyarisi__ikon">✗</span>
-                        <span><strong>Kısaltma kullanmayın</strong> — "Meh. Yılmaz", "M. Yılmaz" gibi kısaltmalı isimler <u>kabul edilmez</u>.</span>
-                    </li>
-                    <li>
-                        <span class="ub-doldurma-uyarisi__ikon">✗</span>
-                        <span><strong>Sadece adınızı yazmayın</strong> — Ad ve soyadınızın <u>tamamını</u> yazın. Örnek: <em>Mehmet Yılmaz</em></span>
-                    </li>
-                    <li>
-                        <span class="ub-doldurma-uyarisi__ikon">✗</span>
-                        <span><strong>Hatalı bilgi girmeyin</strong> — Telefon, e-posta ve kurum bilgilerinizin doğru olduğundan emin olun; onay sürecinde bu bilgiler üzerinden iletişim kurulacaktır.</span>
-                    </li>
-                </ul>
-            </div>
-            <style>
-            .ub-doldurma-uyarisi {
-                background: linear-gradient(135deg, #fff5f5 0%, #fff0f0 100%);
-                border: 2px solid #e74c3c;
-                border-left: 5px solid #c0392b;
-                border-radius: 10px;
-                padding: 1rem 1.25rem 1rem 1.1rem;
-                margin-bottom: 1.6rem;
-                box-shadow: 0 3px 12px rgba(231,76,60,0.12);
-            }
-            .ub-doldurma-uyarisi__baslik {
-                display: flex;
-                align-items: center;
-                gap: 0.55rem;
-                color: #c0392b;
-                font-size: 1rem;
-                margin-bottom: 0.75rem;
-            }
-            .ub-doldurma-uyarisi__baslik svg { flex-shrink: 0; }
-            .ub-doldurma-uyarisi__liste {
-                list-style: none;
-                margin: 0;
-                padding: 0;
-                display: flex;
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-            .ub-doldurma-uyarisi__liste li {
-                display: flex;
-                align-items: flex-start;
-                gap: 0.5rem;
-                font-size: 0.88rem;
-                color: #4a1010;
-                line-height: 1.5;
-            }
-            .ub-doldurma-uyarisi__ikon {
-                flex-shrink: 0;
-                width: 18px;
-                height: 18px;
-                background: #c0392b;
-                color: #fff;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 0.68rem;
-                font-weight: 900;
-                margin-top: 1px;
-                line-height: 1;
-                text-align: center;
-            }
-            @media (max-width: 480px) {
-                .ub-doldurma-uyarisi { padding: 0.85rem 0.9rem; }
-                .ub-doldurma-uyarisi__baslik { font-size: 0.92rem; }
-                .ub-doldurma-uyarisi__liste li { font-size: 0.82rem; }
-            }
-            </style>
+
 
             <form
                 class="ub-form"
@@ -257,29 +170,54 @@ $calismaSekilleri = ['Kadrolu', 'Yarı Zamanlı', 'Sözleşmeli', 'Emekli Kamu �
                 novalidate
                 aria-label="Üyelik başvuru formu"
             >
-                <!-- Adı Soyadı -->
-                <div class="ub-form__alan">
-                    <label class="ub-form__etiket" for="ub-ad-soyad">
-                        Adı Soyadı <span class="ub-form__zorunlu" aria-label="zorunlu">*</span>
-                    </label>
-                    <input
-                        class="ub-form__girdi"
-                        type="text"
-                        id="ub-ad-soyad"
-                        name="ad_soyad"
-                        placeholder="Ad Soyad"
-                        autocomplete="name"
-                        minlength="3"
-                        maxlength="120"
-                        pattern="[A-Za-z\u00c7\u00e7\u011e\u011f\u0130\u0131\u00d6\u00f6\u015e\u015f\u00dc\u00fc\s]+"
-                        required
-                        aria-required="true"
-                        aria-describedby="ub-ad-soyad-ipucu"
-                        spellcheck="false"
-                    >
-                    <span id="ub-ad-soyad-ipucu" class="gorsel-gizli">
-                        Yalnızca harf ve boşluk kullanabilirsiniz; rakam ve özel karakter kabul edilmez.
-                    </span>
+                <!-- Adı / Soyadı -->
+                <div class="ub-form__ad-soyad-grup">
+                    <div class="ub-form__alan">
+                        <label class="ub-form__etiket" for="ub-ad">
+                            Adı <span class="ub-form__zorunlu" aria-label="zorunlu">*</span>
+                        </label>
+                        <input
+                            class="ub-form__girdi"
+                            type="text"
+                            id="ub-ad"
+                            name="ad"
+                            placeholder="Adınız"
+                            autocomplete="given-name"
+                            minlength="2"
+                            maxlength="60"
+                            pattern="[A-Za-z\u00c7\u00e7\u011e\u011f\u0130\u0131\u00d6\u00f6\u015e\u015f\u00dc\u00fc\s]+"
+                            required
+                            aria-required="true"
+                            aria-describedby="ub-ad-ipucu"
+                            spellcheck="false"
+                        >
+                        <span id="ub-ad-ipucu" class="gorsel-gizli">
+                            Yalnızca harf kullanabilirsiniz; rakam ve özel karakter kabul edilmez.
+                        </span>
+                    </div>
+                    <div class="ub-form__alan">
+                        <label class="ub-form__etiket" for="ub-soyad">
+                            Soyadı <span class="ub-form__zorunlu" aria-label="zorunlu">*</span>
+                        </label>
+                        <input
+                            class="ub-form__girdi"
+                            type="text"
+                            id="ub-soyad"
+                            name="soyad"
+                            placeholder="Soyadınız"
+                            autocomplete="family-name"
+                            minlength="2"
+                            maxlength="60"
+                            pattern="[A-Za-z\u00c7\u00e7\u011e\u011f\u0130\u0131\u00d6\u00f6\u015e\u015f\u00dc\u00fc\s]+"
+                            required
+                            aria-required="true"
+                            aria-describedby="ub-soyad-ipucu"
+                            spellcheck="false"
+                        >
+                        <span id="ub-soyad-ipucu" class="gorsel-gizli">
+                            Yalnızca harf kullanabilirsiniz; rakam ve özel karakter kabul edilmez.
+                        </span>
+                    </div>
                 </div>
 
                 <!-- Telefon Numarası -->

@@ -15,7 +15,8 @@ use App\Domain\Membership\MembershipRepositoryInterface;
  * yalnızca HTTP girdisini alıp servise iletmekle sorumludur.
  *
  * Doğrulama:
- *  - Ad Soyad zorunlu, 3–120 karakter
+ *  - Ad zorunlu, 2–60 karakter
+ *  - Soyad zorunlu, 2–60 karakter (DB'de "Ad Soyad" olarak birleştirilerek saklanır)
  *  - Telefon zorunlu; "05" prefix + 9 rakam → normalize edilip tam numaray verir
  *  - E-posta zorunlu; filter_var ile RFC-5321 uyumluluğu
  *  - İkamet ili zorunlu
@@ -37,7 +38,8 @@ final class MembershipService
      */
     public function apply(array $post): int
     {
-        $adiSoyadi = trim((string) ($post['ad_soyad'] ?? ''));
+        $ad          = trim((string) ($post['ad'] ?? ''));
+        $soyad       = trim((string) ($post['soyad'] ?? ''));
         $telefonSuffix = trim((string) ($post['telefon'] ?? ''));
         $eposta    = trim((string) ($post['eposta'] ?? ''));
         $kanGrubu  = trim((string) ($post['kan_grubu'] ?? ''));
@@ -55,10 +57,18 @@ final class MembershipService
             $cinsiyet = '';
         }
 
-        // Zorunlu alan kontrolleri
-        if (mb_strlen($adiSoyadi) < 3 || mb_strlen($adiSoyadi) > 120) {
-            throw new \InvalidArgumentException('Adı Soyadı 3 ile 120 karakter arasında olmalıdır.');
+        // Zorunlu alan kontrolleri — Ad
+        if (mb_strlen($ad) < 2 || mb_strlen($ad) > 60) {
+            throw new \InvalidArgumentException('Adı 2 ile 60 karakter arasında olmalıdır.');
         }
+
+        // Zorunlu alan kontrolleri — Soyad
+        if (mb_strlen($soyad) < 2 || mb_strlen($soyad) > 60) {
+            throw new \InvalidArgumentException('Soyadı 2 ile 60 karakter arasında olmalıdır.');
+        }
+
+        // Ad + Soyad birleştirilerek kaydedilir
+        $adiSoyadi = $ad . ' ' . $soyad;
 
         if ($telefonSuffix === '' || !preg_match('/^[0-9]{9}$/', $telefonSuffix)) {
             throw new \InvalidArgumentException('Telefon numarası geçersiz.');
