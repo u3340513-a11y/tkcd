@@ -24,7 +24,7 @@ use App\Domain\Content\Repository\MilestoneRepositoryInterface;
 use App\Domain\Content\Repository\StatisticRepositoryInterface;
 use App\Domain\Membership\MembershipRepositoryInterface;
 use App\Infrastructure\Content\PhpFileActivityAreaRepository;
-use App\Infrastructure\Content\PhpFileAnnouncementRepository;
+use App\Infrastructure\Content\PdoAnnouncementRepository;
 use App\Infrastructure\Content\PhpFileDistrictRepository;
 use App\Infrastructure\Content\PhpFileEventRepository;
 use App\Infrastructure\Content\PhpFileMilestoneRepository;
@@ -128,9 +128,30 @@ final class Application
         $this->container->bind(LoggerInterface::class, FileLogger::class);
         $this->container->bind(ViewRendererInterface::class, PhpViewRenderer::class);
 
-        // Şu an içerik PHP veri dosyalarından okunuyor. Admin panel fazında
-        // yalnızca aşağıdaki bağlamalar PDO tabanlı sınıflarla değiştirilecek.
-        $this->container->bind(AnnouncementRepositoryInterface::class, PhpFileAnnouncementRepository::class);
+        // Duyurular: DB'den aktif kayıtlar okunur (yönetim paneli ile entegre)
+        $this->container->factory(
+            AnnouncementRepositoryInterface::class,
+            static function (): PdoAnnouncementRepository {
+                $pdoFactory = static function (): PDO {
+                    $host    = Env::string('DB_HOST',     '127.0.0.1');
+                    $port    = Env::string('DB_PORT',     '3306');
+                    $dbname  = Env::string('DB_DATABASE', '');
+                    $user    = Env::string('DB_USERNAME', '');
+                    $pass    = Env::string('DB_PASSWORD', '');
+                    $charset = Env::string('DB_CHARSET',  'utf8mb4');
+
+                    $dsn = "mysql:host={$host};port={$port};dbname={$dbname};charset={$charset}";
+
+                    return new PDO($dsn, $user, $pass, [
+                        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+                        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                        PDO::ATTR_EMULATE_PREPARES   => false,
+                    ]);
+                };
+
+                return new PdoAnnouncementRepository($pdoFactory);
+            }
+        );
         $this->container->bind(EventRepositoryInterface::class, PhpFileEventRepository::class);
         $this->container->bind(StatisticRepositoryInterface::class, PhpFileStatisticRepository::class);
         $this->container->bind(ActivityAreaRepositoryInterface::class, PhpFileActivityAreaRepository::class);
