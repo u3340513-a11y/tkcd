@@ -3,20 +3,16 @@
 declare(strict_types=1);
 
 use App\Core\View\PhpViewRenderer;
-use App\Domain\Content\Entity\Announcement;
 use App\Domain\Content\Entity\Event;
 
 /**
  * Etkinlikler ve haberler bölümü.
  *
- * @var PhpViewRenderer      $view
- * @var list<Event>          $events
- * @var list<Announcement>   $announcements
+ * @var PhpViewRenderer $view
+ * @var list<Event> $events
  */
 
-$announcements ??= [];
-
-if ($events === [] && $announcements === []) {
+if ($events === []) {
     return;
 }
 ?>
@@ -61,32 +57,6 @@ if ($events === [] && $announcements === []) {
                             <?= $view->icon('arrow-right') ?>
                         </a>
                     </div>
-                </div>
-            </article>
-<?php endforeach; ?>
-
-<?php foreach ($announcements as $announcement): ?>
-            <article class="duyuru-kart belirme">
-                <div class="duyuru-kart__ust">
-                    <span class="duyuru-kart__rozet">Duyuru</span>
-                    <span class="duyuru-kart__tarih">
-                        <?= $view->icon('calendar') ?>
-                        <time datetime="<?= $view->e($announcement->publishedAt) ?>">
-                            <?= $view->e($view->date($announcement->publishedAt)) ?>
-                        </time>
-                    </span>
-                </div>
-
-                <div class="duyuru-kart__govde">
-                    <h3><?= $view->e($announcement->title) ?></h3>
-                    <p><?= $view->e(mb_strimwidth($announcement->summary, 0, 160, '…')) ?></p>
-                </div>
-
-                <div class="duyuru-kart__alt">
-                    <a class="ok-baglanti" href="<?= $view->link('/duyurular') ?>">
-                        Tüm Duyurular
-                        <?= $view->icon('arrow-right') ?>
-                    </a>
                 </div>
             </article>
 <?php endforeach; ?>

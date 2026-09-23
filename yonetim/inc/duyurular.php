@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['duyuru_ekle'])) {
         } else {
             try {
                 $ekle = $db_baglanti->prepare(
-                    "INSERT INTO duyurular (baslik, icerik, olusturan, aktif) VALUES (?, ?, ?, 1)"
+                    "INSERT INTO duyurular (baslik, icerik, olusturan) VALUES (?, ?, ?)"
                 );
                 $ekle->execute([$baslik, $icerik, $_SESSION['kullanici_adi'] ?? '']);
                 $mesaj = 'Duyuru başarıyla eklendi.';

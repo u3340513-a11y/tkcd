@@ -32,7 +32,7 @@ $tanitimVideoId = (string) ($site['promo_video_id'] ?? '');
 <?= $view->partial('pages/home/medya', ['youtubeUrl' => $youtubeUrl, 'videoId' => $tanitimVideoId]) ?>
 <?= $view->partial('pages/home/hakkinda') ?>
 <?= $view->partial('pages/home/faaliyet', ['activityAreas' => $model->activityAreas]) ?>
-<?= $view->partial('pages/home/etkinlikler', ['events' => $model->events, 'announcements' => $model->announcements]) ?>
+<?= $view->partial('pages/home/etkinlikler', ['events' => $model->events]) ?>
 <?= $view->partial('pages/home/ilceler', ['districts' => $model->districts]) ?>
 <?= $view->partial('pages/home/tarihce', ['milestones' => $model->milestones]) ?>
 <?= $view->partial('pages/home/uyelik', ['uyelikUrl' => $uyelikUrl]) ?>
