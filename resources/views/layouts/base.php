@@ -118,24 +118,22 @@ $headScripts = $headScripts ?? [];
 <script>
 (function () {
     'use strict';
-    var KEY    = 'tkp_shown_v2';
-    var popup  = document.getElementById('turkiye-popup');
+    var KEY      = 'tkp_shown_v3';
+    var popup    = document.getElementById('turkiye-popup');
     var kapatBtn = document.getElementById('tkp-kapat-btn');
     if (!popup) return;
+
+    function kapat() { popup.setAttribute('hidden', ''); }
 
     if (!sessionStorage.getItem(KEY)) {
         popup.removeAttribute('hidden');
         sessionStorage.setItem(KEY, '1');
+        setTimeout(kapat, 5000);
     }
-
-    function kapat() { popup.setAttribute('hidden', ''); }
 
     kapatBtn.addEventListener('click', kapat);
     popup.addEventListener('click', function (e) {
         if (e.target === popup) kapat();
-    });
-    document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') kapat();
     });
 })();
 </script>

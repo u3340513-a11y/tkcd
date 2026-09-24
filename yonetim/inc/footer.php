@@ -76,14 +76,17 @@
     /* ── Popup ── */
     var tkpOverlay = document.getElementById('tkp-overlay');
     var tkpKapat   = document.getElementById('tkp-kapat');
-    var TKP_KEY    = 'tkp_panel_v2';
+    var TKP_KEY    = 'tkp_panel_v3';
 
     if (tkpOverlay && tkpKapat) {
+        function kapatPopup() { tkpOverlay.style.display = 'none'; }
+
         if (!sessionStorage.getItem(TKP_KEY)) {
             tkpOverlay.style.display = 'flex';
             sessionStorage.setItem(TKP_KEY, '1');
+            setTimeout(kapatPopup, 5000);
         }
-        function kapatPopup() { tkpOverlay.style.display = 'none'; }
+
         tkpKapat.addEventListener('click', kapatPopup);
         tkpOverlay.addEventListener('click', function (e) {
             if (e.target === tkpOverlay) kapatPopup();
