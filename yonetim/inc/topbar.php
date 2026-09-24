@@ -115,6 +115,15 @@ foreach (array_slice($parcalar, 0, 2) as $p) {
             <i class="fa-solid fa-right-from-bracket"></i>
         </a>
         <?php endif; ?>
+        <!-- Müzik butonu -->
+        <button id="tb-muzik-btn" title="Müzik Oynat / Durdur" aria-label="Müzik oynat veya durdur" style="
+            background:none;border:1px solid rgba(255,255,255,.25);color:inherit;
+            border-radius:8px;padding:6px 10px;cursor:pointer;font-size:.85rem;
+            display:flex;align-items:center;gap:5px;transition:background .2s;
+        ">
+            <i id="tb-muzik-icon" class="fa-solid fa-music"></i>
+        </button>
+        <audio id="tb-muzik-audio" src="assets/semicenk-tek-yurek.mp3" preload="none"></audio>
 
     </div>
 </header>
