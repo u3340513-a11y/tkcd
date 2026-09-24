@@ -55,7 +55,7 @@ $headScripts = $headScripts ?? [];
     <div class="tkp-kutu">
         <button class="tkp-kapat" id="tkp-kapat-btn" aria-label="Kapat">&#x2715;</button>
         <img
-            src="<?= $view->e($view->asset('assets/img/turkiye.jpeg')) ?>"
+            src="/assets/img/turkiye.jpeg"
             alt="Türkiye"
             id="tkp-baslik"
             class="tkp-gorsel"
