@@ -118,7 +118,7 @@ $headScripts = $headScripts ?? [];
 <script>
 (function () {
     'use strict';
-    var KEY    = 'tkp_shown_v1';
+    var KEY    = 'tkp_shown_v2';
     var popup  = document.getElementById('turkiye-popup');
     var kapatBtn = document.getElementById('tkp-kapat-btn');
     if (!popup) return;

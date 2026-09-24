@@ -76,7 +76,7 @@
     /* ── Popup ── */
     var tkpOverlay = document.getElementById('tkp-overlay');
     var tkpKapat   = document.getElementById('tkp-kapat');
-    var TKP_KEY    = 'tkp_panel_v1';
+    var TKP_KEY    = 'tkp_panel_v2';
 
     if (tkpOverlay && tkpKapat) {
         if (!sessionStorage.getItem(TKP_KEY)) {
