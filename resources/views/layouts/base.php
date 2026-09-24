@@ -51,87 +51,61 @@ $headScripts = $headScripts ?? [];
 <?php endforeach; ?>
 
 <!-- ── Türkiye Görseli Popup ─────────────────────────────────── -->
-<div id="turkiye-popup" class="tkp-overlay" role="dialog" aria-modal="true" aria-labelledby="tkp-baslik" hidden>
-    <div class="tkp-kutu">
-        <button class="tkp-kapat" id="tkp-kapat-btn" aria-label="Kapat">&#x2715;</button>
-        <img
-            src="/assets/img/turkiye.jpeg"
-            alt="Türkiye"
-            id="tkp-baslik"
-            class="tkp-gorsel"
-            loading="eager"
-        >
+<div id="turkiye-popup" role="dialog" aria-modal="true" aria-label="Türkiye" style="
+    display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);
+    align-items:center;justify-content:center;z-index:99999;
+    padding:16px;box-sizing:border-box;
+">
+    <div style="position:relative;width:100%;max-width:680px;border-radius:14px;overflow:hidden;
+                box-shadow:0 24px 60px rgba(0,0,0,.6);">
+
+        <!-- Geri sayım + kapat çubuğu -->
+        <div style="position:absolute;top:0;left:0;right:0;display:flex;align-items:center;
+                    justify-content:space-between;padding:10px 12px;
+                    background:linear-gradient(to bottom,rgba(0,0,0,.65),transparent);z-index:2;">
+            <span id="tkp-sayac" style="
+                background:rgba(0,0,0,.55);color:#fff;font-size:.85rem;font-weight:700;
+                padding:4px 12px;border-radius:20px;letter-spacing:.04em;
+            ">5</span>
+            <button id="tkp-kapat-btn" aria-label="Kapat" style="
+                background:rgba(0,0,0,.55);border:none;color:#fff;
+                font-size:1.2rem;width:36px;height:36px;border-radius:50%;cursor:pointer;
+                display:flex;align-items:center;justify-content:center;
+            ">&#x2715;</button>
+        </div>
+
+        <img src="/assets/img/turkiye.jpeg" alt="Türkiye" style="
+            display:block;width:100%;height:auto;
+            max-height:calc(100svh - 80px);object-fit:contain;vertical-align:top;
+        ">
     </div>
 </div>
-
-<style>
-.tkp-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,.72);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    backdrop-filter: blur(3px);
-    animation: tkpFadeIn .3s ease;
-}
-.tkp-overlay[hidden] { display: none !important; }
-.tkp-kutu {
-    position: relative;
-    max-width: min(92vw, 720px);
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 24px 60px rgba(0,0,0,.55);
-    animation: tkpSlideUp .35s ease;
-}
-.tkp-gorsel {
-    display: block;
-    width: 100%;
-    height: auto;
-    max-height: 85vh;
-    object-fit: contain;
-}
-.tkp-kapat {
-    position: absolute;
-    top: 10px;
-    right: 12px;
-    background: rgba(0,0,0,.55);
-    border: none;
-    color: #fff;
-    font-size: 1.1rem;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background .2s;
-    z-index: 1;
-}
-.tkp-kapat:hover { background: rgba(0,0,0,.85); }
-@keyframes tkpFadeIn  { from { opacity: 0; } to { opacity: 1; } }
-@keyframes tkpSlideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-</style>
 
 <script>
 (function () {
     'use strict';
-    var KEY      = 'tkp_shown_v3';
+    var KEY      = 'tkp_shown_v4';
     var popup    = document.getElementById('turkiye-popup');
     var kapatBtn = document.getElementById('tkp-kapat-btn');
+    var sayacEl  = document.getElementById('tkp-sayac');
     if (!popup) return;
 
-    function kapat() { popup.setAttribute('hidden', ''); }
+    function kapat() { popup.style.display = 'none'; clearInterval(timer); }
 
+    var timer;
     if (!sessionStorage.getItem(KEY)) {
-        popup.removeAttribute('hidden');
+        popup.style.display = 'flex';
         sessionStorage.setItem(KEY, '1');
-        setTimeout(kapat, 5000);
+
+        var kalan = 5;
+        timer = setInterval(function () {
+            kalan--;
+            if (sayacEl) sayacEl.textContent = kalan;
+            if (kalan <= 0) kapat();
+        }, 1000);
     }
 
-    kapatBtn.addEventListener('click', kapat);
+    if (kapatBtn) kapatBtn.addEventListener('click', kapat);
     popup.addEventListener('click', function (e) {
         if (e.target === popup) kapat();
     });
@@ -140,3 +114,4 @@ $headScripts = $headScripts ?? [];
 
 </body>
 </html>
+
