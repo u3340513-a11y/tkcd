@@ -48,6 +48,18 @@ $siteName = (string) ($site['name'] ?? '');
     <link rel="icon" href="<?= $view->e($view->asset('assets/img/logo.webp')) ?>" type="image/webp">
     <link rel="apple-touch-icon" href="<?= $view->e($view->asset('assets/img/logo.png')) ?>">
 
+    <!-- Google Analytics -->
+    <link rel="preconnect" href="https://www.googletagmanager.com">
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYE9P28XZ6"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-PYE9P28XZ6');
+    </script>
+    <!-- /Google Analytics -->
+
     <link rel="preconnect" href="https://www.youtube-nocookie.com">
     <link rel="dns-prefetch" href="https://www.youtube-nocookie.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
