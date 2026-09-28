@@ -598,7 +598,9 @@ $bolge_degerler  = array_values($bolge_sayilari);
                 <div class="row g-4 align-items-center">
                     <!-- Sol: Türkiye Haritası -->
                     <div class="col-lg-8">
-                        <div id="turkiyeHaritasi" style="height: 520px; width: 100%;"></div>
+                        <div style="position:relative; width:100%; padding-bottom:40%; min-height:260px;">
+                            <div id="turkiyeHaritasi" style="position:absolute; inset:0;"></div>
+                        </div>
                     </div>
                     <!-- Sağ: Top İller Listesi -->
                     <div class="col-lg-4">
@@ -1063,8 +1065,9 @@ window.addEventListener('load', function () {
                 style: stilFonksiyonu,
                 onEachFeature: onEachFeature,
             }).addTo(harita);
-            harita.fitBounds(geojsonLayer.getBounds(), { padding: [8, 8] });
-            setTimeout(function() { harita.invalidateSize(); }, 100);
+            harita.fitBounds(geojsonLayer.getBounds(), { padding: [4, 4] });
+            // invalidateSize: kısa gecikme layout'un tamamlanmasını bekler
+            setTimeout(function() { harita.invalidateSize(); harita.fitBounds(geojsonLayer.getBounds(), { padding: [4, 4] }); }, 50);
         })
         .catch(function(err) {
             console.error('Harita GeoJSON yüklenemedi:', err);
