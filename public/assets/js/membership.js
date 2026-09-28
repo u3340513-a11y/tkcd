@@ -25,6 +25,55 @@
   const EPOSTA_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
   // -----------------------------------------------------------------------
+  // Yardımcı: Türkçe farkında title case
+  //
+  // Neden: JS'in varsayılan toUpperCase() fonksiyonu Türkçe 'i' harfini
+  // yanlış büyütür ('i' → 'I' yerine 'İ' olmalıdır). Bu fonksiyon
+  // Türkçe locale kurallarını uygular.
+  //
+  // @param {string} metin - Dönüştürülecek metin
+  // @returns {string}     - Her kelimenin ilk harfi büyük metin
+  // -----------------------------------------------------------------------
+  function turkceBasHarfYap(metin) {
+    return metin.replace(/\S+/g, function (kelime) {
+      var ilkHarf = kelime.charAt(0);
+      var buyuk;
+
+      // Türkçe özel büyük harf kuralları
+      if (ilkHarf === 'i') {
+        buyuk = 'İ';
+      } else if (ilkHarf === 'ı') {
+        buyuk = 'I';
+      } else {
+        buyuk = ilkHarf.toLocaleUpperCase('tr-TR');
+      }
+
+      return buyuk + kelime.slice(1);
+    });
+  }
+
+  /**
+   * Input elementine title case uygulayıp imleç konumunu korur.
+   *
+   * @param {HTMLInputElement} el - Hedef input
+   */
+  function titleCaseUygula(el) {
+    var baslangic = el.selectionStart;
+    var bitis     = el.selectionEnd;
+    var yeni      = turkceBasHarfYap(el.value);
+
+    if (el.value !== yeni) {
+      el.value = yeni;
+      // İmleç konumunu koru
+      try {
+        el.setSelectionRange(baslangic, bitis);
+      } catch (_) {
+        // Bazı tarayıcılarda güvenli şekilde sessizce geç
+      }
+    }
+  }
+
+  // -----------------------------------------------------------------------
   // Hata mesajları
   // -----------------------------------------------------------------------
   const HATALAR = {
@@ -88,6 +137,8 @@
   const elCaptcha     = document.getElementById('ub-captcha-answer');
   const elCaptchaA    = /** @type {HTMLInputElement|null} */ (form.querySelector('[name="captcha_a"]'));
   const elCaptchaB    = /** @type {HTMLInputElement|null} */ (form.querySelector('[name="captcha_b"]'));
+  const elKurum       = /** @type {HTMLInputElement|null} */ (document.getElementById('ub-kurum'));
+  const elGorev       = /** @type {HTMLInputElement|null} */ (document.getElementById('ub-gorev'));
 
   // -----------------------------------------------------------------------
   // Hata göster / temizle
@@ -308,19 +359,21 @@
   // -----------------------------------------------------------------------
 
   /**
-   * Ad Soyad — rakam ve özel karakterleri anlık olarak engeller.
-   * Türkçe karakterler (Ç,ğ,İ,ı,Ö,Ş,Ü vb.) geçerlidir.
+   * Ad Soyad — rakam ve özel karakterleri anlık olarak engeller;
+   * her kelimenin ilk harfini otomatik olarak büyütür (Türkçe farkında).
    */
   if (elAd) {
     elAd.addEventListener('input', function () {
-      const onceki = this.selectionStart ?? this.value.length;
-      const temiz  = this.value.replace(/[^A-Za-zÇçĞğİıÖöŞşÜü\s]/g, '');
+      var onceki = this.selectionStart ?? this.value.length;
+      var temiz  = this.value.replace(/[^A-Za-zÇçĞğİıÖöŞşÜü\s]/g, '');
 
       if (this.value !== temiz) {
         this.value = temiz;
-        const konum = Math.max(0, onceki - (this.value.length - temiz.length + 1));
+        var konum = Math.max(0, onceki - (this.value.length - temiz.length + 1));
         this.setSelectionRange(konum, konum);
       }
+
+      titleCaseUygula(this);
     });
 
     elAd.addEventListener('blur', dogrulaAd);
@@ -328,17 +381,34 @@
 
   if (elSoyad) {
     elSoyad.addEventListener('input', function () {
-      const onceki = this.selectionStart ?? this.value.length;
-      const temiz  = this.value.replace(/[^A-Za-zÇçĞğİıÖöŞşÜü\s]/g, '');
+      var onceki = this.selectionStart ?? this.value.length;
+      var temiz  = this.value.replace(/[^A-Za-zÇçĞğİıÖöŞşÜü\s]/g, '');
 
       if (this.value !== temiz) {
         this.value = temiz;
-        const konum = Math.max(0, onceki - (this.value.length - temiz.length + 1));
+        var konum = Math.max(0, onceki - (this.value.length - temiz.length + 1));
         this.setSelectionRange(konum, konum);
       }
+
+      titleCaseUygula(this);
     });
 
     elSoyad.addEventListener('blur', dogrulaSoyad);
+  }
+
+  /**
+   * Kurum ve Görev — her kelimenin ilk harfini otomatik büyütür.
+   */
+  if (elKurum) {
+    elKurum.addEventListener('input', function () {
+      titleCaseUygula(this);
+    });
+  }
+
+  if (elGorev) {
+    elGorev.addEventListener('input', function () {
+      titleCaseUygula(this);
+    });
   }
 
   /**
