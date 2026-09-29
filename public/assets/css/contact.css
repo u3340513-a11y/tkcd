@@ -301,7 +301,7 @@
 
 .kt-form__girdi--alan {
   resize: vertical;
-  min-height: 9rem;
+  min-height: 7rem;
   font-family: inherit;
 }
 
@@ -341,6 +341,112 @@
   height: 1rem;
 }
 
+/* 2-sütunlu form satırı: Ad+E-posta, Güvenlik+Gönder */
+.kt-form__cift {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--bosluk-4, 1rem);
+}
+
+/* Son satır: captcha solda, gönder sağda hizalı */
+.kt-form__cift--son {
+  align-items: flex-end;
+}
+
+.kt-form__gonder-sarici {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding-bottom: 0.1rem;
+}
+
+/* ============================================================
+   SOSYAL MEDYA
+   ============================================================ */
+
+.kt-sosyal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bosluk-3, 0.75rem);
+}
+
+.kt-sosyal__baslik {
+  font-size: var(--olcek-sm);
+  font-weight: 600;
+  color: var(--bordo-600);
+  margin: 0;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.kt-sosyal__ikonlar {
+  display: flex;
+  gap: var(--bosluk-3, 0.75rem);
+  flex-wrap: wrap;
+}
+
+.kt-sosyal__link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(74, 25, 39, 0.12);
+  color: var(--bordo-600);
+  transition: background var(--gecis-hizli, 150ms ease), color var(--gecis-hizli, 150ms ease), transform var(--gecis-hizli, 150ms ease);
+  text-decoration: none;
+}
+
+.kt-sosyal__link svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.kt-sosyal__link:hover {
+  background: var(--bordo-600);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+/* ============================================================
+   SAAT KARTI
+   ============================================================ */
+
+.kt-saat-karti {
+  background: #fff;
+  border: 1px solid var(--bordo-100, #f5dde3);
+  border-left: 4px solid var(--bordo-500);
+  border-radius: var(--yuvarlak-lg, 0.75rem);
+  padding: var(--bosluk-4, 1rem) var(--bosluk-5, 1.25rem);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.kt-saat-karti__baslik {
+  font-size: var(--olcek-sm);
+  font-weight: 700;
+  color: var(--bordo-700);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.kt-saat-karti__baslik svg {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+.kt-saat-karti__aciklama {
+  font-size: var(--olcek-sm);
+  color: #556070;
+  margin: 0;
+  line-height: 1.6;
+}
+
 /* ============================================================
    RESPONSIVE
    ============================================================ */
@@ -349,6 +455,21 @@
   .kt-icerik__izgara {
     grid-template-columns: 1fr;
     gap: clamp(2.5rem, 5vw, 4rem);
+  }
+}
+
+@media (max-width: 600px) {
+  .kt-form__cift {
+    grid-template-columns: 1fr;
+  }
+
+  .kt-form__gonder-sarici {
+    justify-content: stretch;
+  }
+
+  .kt-form__gonder {
+    width: 100%;
+    justify-content: center;
   }
 }
 

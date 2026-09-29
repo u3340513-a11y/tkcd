@@ -17,6 +17,10 @@ use App\Core\View\SeoMeta;
  * @var SeoMeta              $seo
  * @var array<string, mixed> $site
  * @var string|null          $durum   'basarili' | 'hata' | null
+ * @var array<int, array<string, string>> $socials
+ * @var int                  $captchaA
+ * @var int                  $captchaB
+ * @var string               $captchaToken
  */
 
 /** @var array<string, string> $iletisim */
@@ -29,6 +33,13 @@ $telefonE = (string) ($iletisim['phone_e164'] ?? '');
 $haritaSrc = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3010.4123456789!2d28.9397!3d41.0182!'
     . '2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14cab9e7a1234567%3A0xabcdef!2sFatih%2C%20'
     . 'Yavuz%20Selim%20Cd.%2C%2034134%20Fatih%2F%C4%B0stanbul!5e0!3m2!1str!2str!4v1234567890';
+
+// Gösterilecek sosyal medya kanalları
+$gosteAcilan = ['facebook', 'instagram', 'x', 'whatsapp', 'youtube'];
+$sosyalFiltre = array_filter(
+    $socials ?? [],
+    fn($s) => in_array($s['key'], $gosteAcilan, true)
+);
 
 ?>
 
@@ -84,7 +95,7 @@ $haritaSrc = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3010.4123456
 <section class="kt-icerik" aria-label="İletişim bilgileri ve form">
     <div class="kapsayici kt-icerik__izgara">
 
-        <!-- Sol: bilgiler -->
+        <!-- Sol: bilgiler + sosyal medya -->
         <div class="kt-bilgi">
             <h2 class="kt-bilgi__baslik">Sizinle Konuşmaya Hazırız</h2>
             <span class="kt-bilgi__cizgi" aria-hidden="true"></span>
@@ -113,6 +124,35 @@ $haritaSrc = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3010.4123456
                 </li>
                 <?php endif; ?>
             </ul>
+
+            <!-- Sosyal Medya -->
+            <?php if (!empty($sosyalFiltre)): ?>
+            <div class="kt-sosyal">
+                <p class="kt-sosyal__baslik">Sosyal Medyada Biz</p>
+                <div class="kt-sosyal__ikonlar">
+                    <?php foreach ($sosyalFiltre as $s): ?>
+                    <a href="<?= $view->e($s['url']) ?>"
+                       class="kt-sosyal__link"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       aria-label="<?= $view->e($s['label']) ?>">
+                        <?= $view->icon($s['icon']) ?>
+                    </a>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <?php endif; ?>
+
+            <!-- Çalışma saatleri kartı -->
+            <div class="kt-saat-karti">
+                <div class="kt-saat-karti__baslik">
+                    <?= $view->icon('clock') ?> Yanıt Süresi
+                </div>
+                <p class="kt-saat-karti__aciklama">
+                    Mesajlarınız genellikle <strong>1–2 iş günü</strong> içinde yanıtlanır.
+                    Acil durumlar için WhatsApp hattımızı kullanabilirsiniz.
+                </p>
+            </div>
         </div>
 
         <!-- Sağ: form -->
@@ -143,38 +183,42 @@ $haritaSrc = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3010.4123456
                 novalidate
                 aria-label="İletişim formu"
             >
-                <div class="kt-form__alan">
-                    <label class="kt-form__etiket" for="kt-ad">
-                        Adı Soyadı <span class="kt-form__zorunlu" aria-label="zorunlu">*</span>
-                    </label>
-                    <input
-                        class="kt-form__girdi"
-                        type="text"
-                        id="kt-ad"
-                        name="ad"
-                        autocomplete="name"
-                        maxlength="120"
-                        required
-                        aria-required="true"
-                    >
+                <!-- Satır 1: Ad Soyadı + E-posta (yan yana) -->
+                <div class="kt-form__cift">
+                    <div class="kt-form__alan">
+                        <label class="kt-form__etiket" for="kt-ad">
+                            Adı Soyadı <span class="kt-form__zorunlu" aria-label="zorunlu">*</span>
+                        </label>
+                        <input
+                            class="kt-form__girdi"
+                            type="text"
+                            id="kt-ad"
+                            name="ad"
+                            autocomplete="name"
+                            maxlength="120"
+                            required
+                            aria-required="true"
+                        >
+                    </div>
+
+                    <div class="kt-form__alan">
+                        <label class="kt-form__etiket" for="kt-eposta">
+                            E-posta <span class="kt-form__zorunlu" aria-label="zorunlu">*</span>
+                        </label>
+                        <input
+                            class="kt-form__girdi"
+                            type="email"
+                            id="kt-eposta"
+                            name="eposta"
+                            autocomplete="email"
+                            maxlength="254"
+                            required
+                            aria-required="true"
+                        >
+                    </div>
                 </div>
 
-                <div class="kt-form__alan">
-                    <label class="kt-form__etiket" for="kt-eposta">
-                        E-posta <span class="kt-form__zorunlu" aria-label="zorunlu">*</span>
-                    </label>
-                    <input
-                        class="kt-form__girdi"
-                        type="email"
-                        id="kt-eposta"
-                        name="eposta"
-                        autocomplete="email"
-                        maxlength="254"
-                        required
-                        aria-required="true"
-                    >
-                </div>
-
+                <!-- Satır 2: Konu (tam genişlik) -->
                 <div class="kt-form__alan">
                     <label class="kt-form__etiket" for="kt-konu">
                         Konu <span class="kt-form__zorunlu" aria-label="zorunlu">*</span>
@@ -190,6 +234,7 @@ $haritaSrc = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3010.4123456
                     >
                 </div>
 
+                <!-- Satır 3: Mesaj -->
                 <div class="kt-form__alan">
                     <label class="kt-form__etiket" for="kt-mesaj">
                         Mesajınız <span class="kt-form__zorunlu" aria-label="zorunlu">*</span>
@@ -198,45 +243,49 @@ $haritaSrc = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3010.4123456
                         class="kt-form__girdi kt-form__girdi--alan"
                         id="kt-mesaj"
                         name="mesaj"
-                        rows="5"
+                        rows="4"
                         maxlength="2000"
                         required
                         aria-required="true"
                     ></textarea>
                 </div>
 
-                <!-- Güvenlik Sorusu: Matematik Captcha -->
-                <div class="kt-form__alan">
-                    <label class="kt-form__etiket" for="kt-captcha-cevap">
-                        Güvenlik Sorusu <span class="kt-form__zorunlu" aria-label="zorunlu">*</span>
-                    </label>
-                    <div class="ub-math-captcha">
-                        <span class="ub-math-captcha__soru">
-                            <?= (int)$captchaA ?> + <?= (int)$captchaB ?> = ?
-                        </span>
-                        <input
-                            class="kt-form__girdi ub-math-captcha__girdi"
-                            type="number"
-                            id="kt-captcha-cevap"
-                            name="captcha_answer"
-                            inputmode="numeric"
-                            min="2"
-                            max="24"
-                            autocomplete="off"
-                            placeholder="Cevabınız"
-                            required
-                            aria-required="true"
-                        >
+                <!-- Satır 4: Güvenlik Sorusu + Gönder (yan yana) -->
+                <div class="kt-form__cift kt-form__cift--son">
+                    <div class="kt-form__alan">
+                        <label class="kt-form__etiket" for="kt-captcha-cevap">
+                            Güvenlik Sorusu <span class="kt-form__zorunlu" aria-label="zorunlu">*</span>
+                        </label>
+                        <div class="ub-math-captcha">
+                            <span class="ub-math-captcha__soru">
+                                <?= (int)$captchaA ?> + <?= (int)$captchaB ?> = ?
+                            </span>
+                            <input
+                                class="kt-form__girdi ub-math-captcha__girdi"
+                                type="number"
+                                id="kt-captcha-cevap"
+                                name="captcha_answer"
+                                inputmode="numeric"
+                                min="2"
+                                max="24"
+                                autocomplete="off"
+                                placeholder="Cevabınız"
+                                required
+                                aria-required="true"
+                            >
+                        </div>
+                        <input type="hidden" name="captcha_a"     value="<?= (int)$captchaA ?>">
+                        <input type="hidden" name="captcha_b"     value="<?= (int)$captchaB ?>">
+                        <input type="hidden" name="captcha_token" value="<?= $view->e($captchaToken) ?>">
                     </div>
-                    <input type="hidden" name="captcha_a"     value="<?= (int)$captchaA ?>">
-                    <input type="hidden" name="captcha_b"     value="<?= (int)$captchaB ?>">
-                    <input type="hidden" name="captcha_token" value="<?= $view->e($captchaToken) ?>">
-                </div>
 
-                <button class="kt-form__gonder" type="submit">
-                    <?= $view->icon('send') ?>
-                    Gönder
-                </button>
+                    <div class="kt-form__gonder-sarici">
+                        <button class="kt-form__gonder" type="submit">
+                            <?= $view->icon('send') ?>
+                            Gönder
+                        </button>
+                    </div>
+                </div>
             </form>
         </div>
 
