@@ -228,6 +228,67 @@ try {
     }
 }
 $yas_maks = max(1, ...array_values($yas_dagilimi));
+
+// ── İl Detay Verileri (harita tıklama paneli için) ────────────────────────
+// Tek sorguda tüm illerin özet verisini çek; JS'e göm → ayrı API çağrısı gerekmez.
+$il_detay_verileri = [];
+try {
+    // Temel istatistikler
+    $il_stat_sorgu = $db_baglanti->query(
+        "SELECT
+             TRIM(ikamet_ili)                                                          AS il,
+             COUNT(*)                                                                   AS toplam_uye,
+             COUNT(DISTINCT CASE WHEN TRIM(ikamet_ilcesi) != '' THEN TRIM(ikamet_ilcesi) END) AS ilce_sayisi,
+             COUNT(DISTINCT CASE WHEN TRIM(calistigi_kurum)  != '' THEN TRIM(calistigi_kurum)  END) AS kurum_sayisi,
+             SUM(CASE WHEN (temsilci_turu IS NOT NULL AND TRIM(temsilci_turu) != '')
+                        OR  (ek_gorev     IS NOT NULL AND TRIM(ek_gorev)     != '') THEN 1 ELSE 0 END) AS temsilci_sayisi
+           FROM dernek_uyeler
+          WHERE onay_durumu = 'onayli'
+            AND ikamet_ili  IS NOT NULL
+            AND TRIM(ikamet_ili) != ''
+          GROUP BY TRIM(ikamet_ili)"
+    );
+    $il_stat_satirlar = $il_stat_sorgu ? $il_stat_sorgu->fetchAll(PDO::FETCH_ASSOC) : [];
+
+    // İlçe bazlı dağılım (top-5 için)
+    $ilce_sorgu_il = $db_baglanti->query(
+        "SELECT
+             TRIM(ikamet_ili)    AS il,
+             TRIM(ikamet_ilcesi) AS ilce,
+             COUNT(*)            AS adet
+           FROM dernek_uyeler
+          WHERE onay_durumu    = 'onayli'
+            AND ikamet_ili     IS NOT NULL AND TRIM(ikamet_ili)    != ''
+            AND ikamet_ilcesi  IS NOT NULL AND TRIM(ikamet_ilcesi) != ''
+          GROUP BY TRIM(ikamet_ili), TRIM(ikamet_ilcesi)
+          ORDER BY TRIM(ikamet_ili), adet DESC"
+    );
+    $ilce_satirlar = $ilce_sorgu_il ? $ilce_sorgu_il->fetchAll(PDO::FETCH_ASSOC) : [];
+
+    // İlçeleri il bazında grupla
+    $ilce_gruplari = [];
+    foreach ($ilce_satirlar as $satir) {
+        $ilce_gruplari[$satir['il']][] = [
+            'ilce' => $satir['ilce'],
+            'adet' => (int) $satir['adet'],
+        ];
+    }
+
+    // Nihai yapıyı oluştur
+    foreach ($il_stat_satirlar as $satir) {
+        $il_adi = $satir['il'];
+        $il_detay_verileri[$il_adi] = [
+            'il'              => $il_adi,
+            'toplam_uye'      => (int) $satir['toplam_uye'],
+            'ilce_sayisi'     => (int) $satir['ilce_sayisi'],
+            'kurum_sayisi'    => (int) $satir['kurum_sayisi'],
+            'temsilci_sayisi' => (int) $satir['temsilci_sayisi'],
+            'top_ilceler'     => array_slice($ilce_gruplari[$il_adi] ?? [], 0, 5),
+        ];
+    }
+} catch (\Throwable $e) {
+    $il_detay_verileri = [];
+}
 ?>
 
 <!-- ═══════════════════════════════════════════════════════════════
@@ -1063,6 +1124,9 @@ window.addEventListener('load', function () {
     // GeoJSON — ayrı PHP endpoint üzerinden sunuluyor (büyük dosya, inline gömmek yerine)
     var haritaGeojsonUrl = '/yonetim/api/harita-geojson.php';
 
+    // İl detay verileri — PHP tarafında hazırlandı, inline gömüldü
+    var ilDetayVerileri = <?= json_encode($il_detay_verileri, JSON_UNESCAPED_UNICODE) ?>;
+
     var maksUye = 0;
     Object.values(ilVerileri).forEach(function(v) { if (v > maksUye) maksUye = v; });
     if (maksUye < 1) maksUye = 1;
@@ -1164,77 +1228,64 @@ window.addEventListener('load', function () {
 
         aktifIl = il;
         panel.style.display = 'flex';
-        panel.innerHTML = '<div class="il-panel__yukleniyor"><i class="fa-solid fa-spinner fa-spin"></i> Yükleniyor…</div>';
 
         // offsetHeight okumak zorla reflow yapar — CSS transition için gerekli
-        // eslint-disable-next-line no-unused-expressions
-        panel.offsetHeight;
+        panel.offsetHeight; // eslint-disable-line no-unused-expressions
         panel.classList.add('il-panel--acik');
 
-        fetch('/yonetim/api/il-detay.php?il=' + encodeURIComponent(il), {
-            credentials: 'same-origin',
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        })
-        .then(function(r) {
-            if (!r.ok) throw new Error('HTTP ' + r.status);
-            return r.json();
-        })
-        .then(function(v) {
-            if (v.hata) {
-                panel.innerHTML = '<button class="il-panel__kapat" id="harita-panel-kapat" aria-label="Kapat">×</button>' +
-                    '<p style="color:#ef4444;font-size:.8rem;margin:8px 0 0;">' + v.hata + '</p>';
-                document.getElementById('harita-panel-kapat').onclick = panelKapat;
-                return;
-            }
+        // Gömülü veriden bul — API çağrısı yok, oturum sorunu yok
+        var v = ilDetayVerileri[il] || null;
 
-            var topIlceHtml = '';
-            if (v.top_ilceler && v.top_ilceler.length > 0) {
-                var maks = v.top_ilceler[0].adet || 1;
-                topIlceHtml = '<div class="il-panel__ilce-baslik">En yoğun ilçeler</div>';
-                v.top_ilceler.forEach(function(ilce) {
-                    var yuzde = Math.round((ilce.adet / maks) * 100);
-                    topIlceHtml +=
-                        '<div class="il-panel__ilce-satir">' +
-                            '<span class="il-panel__ilce-ad">' + ilce.ilce + '</span>' +
-                            '<div class="il-panel__ilce-bar-kap">' +
-                                '<div class="il-panel__ilce-bar" style="width:' + yuzde + '%"></div>' +
-                            '</div>' +
-                            '<span class="il-panel__ilce-sayi">' + ilce.adet + '</span>' +
-                        '</div>';
-                });
-            }
-
+        if (!v) {
             panel.innerHTML =
                 '<button class="il-panel__kapat" id="harita-panel-kapat" aria-label="Kapat">×</button>' +
-                '<h6 class="il-panel__baslik">' + v.il + '</h6>' +
-                '<div class="il-panel__istatler">' +
-                    '<div class="il-panel__stat">' +
-                        '<span class="il-panel__stat-deger il-panel__stat-deger--mavi">' + v.toplam_uye.toLocaleString('tr') + '</span>' +
-                        '<span class="il-panel__stat-etiket">Üye</span>' +
-                    '</div>' +
-                    '<div class="il-panel__stat">' +
-                        '<span class="il-panel__stat-deger il-panel__stat-deger--yesil">' + v.ilce_sayisi + '</span>' +
-                        '<span class="il-panel__stat-etiket">İlçe</span>' +
-                    '</div>' +
-                    '<div class="il-panel__stat">' +
-                        '<span class="il-panel__stat-deger il-panel__stat-deger--turuncu">' + v.kurum_sayisi + '</span>' +
-                        '<span class="il-panel__stat-etiket">Kurum</span>' +
-                    '</div>' +
-                    '<div class="il-panel__stat">' +
-                        '<span class="il-panel__stat-deger il-panel__stat-deger--mor">' + v.temsilci_sayisi + '</span>' +
-                        '<span class="il-panel__stat-etiket">Temsilci</span>' +
-                    '</div>' +
-                '</div>' +
-                topIlceHtml;
+                '<h6 class="il-panel__baslik">' + il + '</h6>' +
+                '<p style="color:#94a3b8;font-size:.8rem;margin:8px 0 0;">Bu il için kayıtlı üye bulunmuyor.</p>';
+            document.getElementById('harita-panel-kapat').onclick = panelKapat;
+            return;
+        }
 
-            document.getElementById('harita-panel-kapat').onclick = panelKapat;
-        })
-        .catch(function(err) {
-            console.error('İl detay API hatası:', err);
-            panel.innerHTML = '<button class="il-panel__kapat" id="harita-panel-kapat" aria-label="Kapat">×</button>' +
-                '<p style="color:#ef4444;font-size:.8rem;margin:8px 0 0;">Veri yüklenemedi.</p>';
-            document.getElementById('harita-panel-kapat').onclick = panelKapat;
-        });
+        var topIlceHtml = '';
+        if (v.top_ilceler && v.top_ilceler.length > 0) {
+            var maks = v.top_ilceler[0].adet || 1;
+            topIlceHtml = '<div class="il-panel__ilce-baslik">En yoğun ilçeler</div>';
+            v.top_ilceler.forEach(function(ilce) {
+                var yuzde = Math.round((ilce.adet / maks) * 100);
+                topIlceHtml +=
+                    '<div class="il-panel__ilce-satir">' +
+                        '<span class="il-panel__ilce-ad">' + ilce.ilce + '</span>' +
+                        '<div class="il-panel__ilce-bar-kap">' +
+                            '<div class="il-panel__ilce-bar" style="width:' + yuzde + '%"></div>' +
+                        '</div>' +
+                        '<span class="il-panel__ilce-sayi">' + ilce.adet + '</span>' +
+                    '</div>';
+            });
+        }
+
+        panel.innerHTML =
+            '<button class="il-panel__kapat" id="harita-panel-kapat" aria-label="Kapat">×</button>' +
+            '<h6 class="il-panel__baslik">' + v.il + '</h6>' +
+            '<div class="il-panel__istatler">' +
+                '<div class="il-panel__stat">' +
+                    '<span class="il-panel__stat-deger il-panel__stat-deger--mavi">' + v.toplam_uye.toLocaleString('tr') + '</span>' +
+                    '<span class="il-panel__stat-etiket">Üye</span>' +
+                '</div>' +
+                '<div class="il-panel__stat">' +
+                    '<span class="il-panel__stat-deger il-panel__stat-deger--yesil">' + v.ilce_sayisi + '</span>' +
+                    '<span class="il-panel__stat-etiket">İlçe</span>' +
+                '</div>' +
+                '<div class="il-panel__stat">' +
+                    '<span class="il-panel__stat-deger il-panel__stat-deger--turuncu">' + v.kurum_sayisi + '</span>' +
+                    '<span class="il-panel__stat-etiket">Kurum</span>' +
+                '</div>' +
+                '<div class="il-panel__stat">' +
+                    '<span class="il-panel__stat-deger il-panel__stat-deger--mor">' + v.temsilci_sayisi + '</span>' +
+                    '<span class="il-panel__stat-etiket">Temsilci</span>' +
+                '</div>' +
+            '</div>' +
+            topIlceHtml;
+
+        document.getElementById('harita-panel-kapat').onclick = panelKapat;
     }
 
     function panelKapat() {
