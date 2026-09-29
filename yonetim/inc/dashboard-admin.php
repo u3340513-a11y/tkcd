@@ -646,8 +646,15 @@ $yas_maks = max(1, ...array_values($yas_dagilimi));
                     <!-- Sol: Türkiye Haritası -->
                     <div class="col-lg-8">
                         <div style="position:relative; width:100%; padding-bottom:33%; min-height:220px;">
-                            <div id="turkiyeHaritasi" style="position:absolute; inset:0;"></div>
+                            <div id="turkiyeHaritasi" style="position:absolute; inset:0; cursor:pointer;"></div>
+                            <!-- İl Detay Paneli: tıklama ile haritanin üstüne gerçek-zamanlı açılır -->
+                            <div id="il-detay-panel" class="il-detay-panel" style="display:none;" role="region" aria-label="İl detay bilgisi">
+                            </div>
                         </div>
+                        <p style="font-size:.75rem;color:#94a3b8;margin-top:6px;text-align:center;">
+                            <i class="fa-solid fa-hand-pointer" style="font-size:.7rem;"></i>
+                            Bir ile tıklayarak detay bilgisini görebilirsiniz
+                        </p>
                     </div>
                     <!-- Sağ: Top İller Listesi -->
                     <div class="col-lg-4">
@@ -1131,8 +1138,99 @@ window.addEventListener('load', function () {
         );
         layer.on({
             mouseover: function(e) { e.target.setStyle({ weight: 2, color: '#c62828', fillOpacity: 1 }); },
-            mouseout:  function(e) { geojsonLayer.resetStyle(e.target); }
+            mouseout:  function(e) { geojsonLayer.resetStyle(e.target); },
+            click:     function()  { ilDetayGoster(tr); }
         });
+    }
+
+    // ---- İl Detay Paneli -----------------------------------------------
+
+    var aktifIl = null;
+
+    /**
+     * İl adına göre API'den detay verisi çeker ve paneli gösterir.
+     * Aynı ile tekrar tıklanırsa panel kapanır.
+     *
+     * @param {string} il - Türkçe il adı
+     */
+    function ilDetayGoster(il) {
+        var panel = document.getElementById('il-detay-panel');
+        if (!panel) return;
+
+        if (aktifIl === il) {
+            panelKapat();
+            return;
+        }
+
+        aktifIl = il;
+        panel.style.display = 'flex';
+        panel.innerHTML = '<div class="il-panel__yukleniyor"><i class="fa-solid fa-spinner fa-spin"></i> Yükleniyor…</div>';
+        requestAnimationFrame(function() { panel.classList.add('il-panel--acik'); });
+
+        fetch('/yonetim/api/il-detay.php?il=' + encodeURIComponent(il), {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(v) {
+            if (v.hata) { panelKapat(); return; }
+
+            var topIlceHtml = '';
+            if (v.top_ilceler && v.top_ilceler.length > 0) {
+                var maks = v.top_ilceler[0].adet || 1;
+                topIlceHtml = '<div class="il-panel__ilce-baslik">En yoğun ilçeler</div>';
+                v.top_ilceler.forEach(function(ilce) {
+                    var yuzde = Math.round((ilce.adet / maks) * 100);
+                    topIlceHtml +=
+                        '<div class="il-panel__ilce-satir">' +
+                            '<span class="il-panel__ilce-ad">' + ilce.ilce + '</span>' +
+                            '<div class="il-panel__ilce-bar-kap">' +
+                                '<div class="il-panel__ilce-bar" style="width:' + yuzde + '%"></div>' +
+                            '</div>' +
+                            '<span class="il-panel__ilce-sayi">' + ilce.adet + '</span>' +
+                        '</div>';
+                });
+            }
+
+            panel.innerHTML =
+                '<button class="il-panel__kapat" onclick="document.getElementById(\"harita-panel-kapat\").click()" ' +
+                '        aria-label="Kapat">×</button>' +
+                '<h6 class="il-panel__baslik">' + v.il + '</h6>' +
+                '<div class="il-panel__istatler">' +
+                    '<div class="il-panel__stat">' +
+                        '<span class="il-panel__stat-deger il-panel__stat-deger--mavi">' + v.toplam_uye.toLocaleString('tr') + '</span>' +
+                        '<span class="il-panel__stat-etiket">Üye</span>' +
+                    '</div>' +
+                    '<div class="il-panel__stat">' +
+                        '<span class="il-panel__stat-deger il-panel__stat-deger--yesil">' + v.ilce_sayisi + '</span>' +
+                        '<span class="il-panel__stat-etiket">İlçe</span>' +
+                    '</div>' +
+                    '<div class="il-panel__stat">' +
+                        '<span class="il-panel__stat-deger il-panel__stat-deger--turuncu">' + v.kurum_sayisi + '</span>' +
+                        '<span class="il-panel__stat-etiket">Kurum</span>' +
+                    '</div>' +
+                    '<div class="il-panel__stat">' +
+                        '<span class="il-panel__stat-deger il-panel__stat-deger--mor">' + v.temsilci_sayisi + '</span>' +
+                        '<span class="il-panel__stat-etiket">Temsilci</span>' +
+                    '</div>' +
+                '</div>' +
+                topIlceHtml;
+
+            // Gizli kapatma düğmesi (onclick hedefi için)
+            var gizliKapat = document.createElement('button');
+            gizliKapat.id = 'harita-panel-kapat';
+            gizliKapat.style.display = 'none';
+            gizliKapat.onclick = panelKapat;
+            panel.appendChild(gizliKapat);
+        })
+        .catch(function() { panelKapat(); });
+    }
+
+    function panelKapat() {
+        var panel = document.getElementById('il-detay-panel');
+        if (!panel) return;
+        panel.classList.remove('il-panel--acik');
+        aktifIl = null;
+        setTimeout(function() { panel.style.display = 'none'; panel.innerHTML = ''; }, 280);
     }
 
     fetch(haritaGeojsonUrl)
@@ -1165,6 +1263,131 @@ window.addEventListener('load', function () {
 }
 #turkiyeHaritasi { background: transparent !important; }
 #turkiyeHaritasi .leaflet-container { background: transparent !important; }
+
+/* ── İl Detay Paneli ─────────────────────────────────────────────────── */
+.il-detay-panel {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    min-width: 220px;
+    max-width: 280px;
+    background: rgba(255,255,255,0.97);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    padding: 14px 16px;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 1000;
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+    transition: opacity .25s ease, transform .25s ease;
+    border: 1px solid #e2e8f0;
+}
+.il-detay-panel.il-panel--acik {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+.il-panel__kapat {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 1.1rem;
+    color: #94a3b8;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+}
+.il-panel__kapat:hover { color: #1e293b; }
+.il-panel__baslik {
+    font-size: .95rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0 0 8px;
+    padding-right: 20px;
+}
+.il-panel__istatler {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+.il-panel__stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 6px 4px;
+    border: 1px solid #e2e8f0;
+}
+.il-panel__stat-deger {
+    font-size: 1.15rem;
+    font-weight: 800;
+    line-height: 1;
+}
+.il-panel__stat-deger--mavi   { color: #3b82f6; }
+.il-panel__stat-deger--yesil  { color: #10b981; }
+.il-panel__stat-deger--turuncu{ color: #f59e0b; }
+.il-panel__stat-deger--mor    { color: #8b5cf6; }
+.il-panel__stat-etiket {
+    font-size: .68rem;
+    color: #64748b;
+    margin-top: 2px;
+}
+.il-panel__ilce-baslik {
+    font-size: .72rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    margin-bottom: 6px;
+}
+.il-panel__ilce-satir {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 5px;
+}
+.il-panel__ilce-ad {
+    width: 80px;
+    font-size: .75rem;
+    color: #334155;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-shrink: 0;
+}
+.il-panel__ilce-bar-kap {
+    flex: 1;
+    height: 8px;
+    background: #e2e8f0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+.il-panel__ilce-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #6366f1, #c026d3);
+    border-radius: 4px;
+    transition: width .5s ease;
+}
+.il-panel__ilce-sayi {
+    font-size: .75rem;
+    font-weight: 700;
+    color: #1e293b;
+    width: 24px;
+    text-align: right;
+    flex-shrink: 0;
+}
+.il-panel__yukleniyor {
+    color: #94a3b8;
+    font-size: .85rem;
+    padding: 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
 /* Doğum günü kart hover */
 .dg-kart { cursor: pointer; }
 .dg-kart:hover {
