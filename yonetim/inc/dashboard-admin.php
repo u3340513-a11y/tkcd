@@ -1165,14 +1165,27 @@ window.addEventListener('load', function () {
         aktifIl = il;
         panel.style.display = 'flex';
         panel.innerHTML = '<div class="il-panel__yukleniyor"><i class="fa-solid fa-spinner fa-spin"></i> Yükleniyor…</div>';
-        requestAnimationFrame(function() { panel.classList.add('il-panel--acik'); });
+
+        // offsetHeight okumak zorla reflow yapar — CSS transition için gerekli
+        // eslint-disable-next-line no-unused-expressions
+        panel.offsetHeight;
+        panel.classList.add('il-panel--acik');
 
         fetch('/yonetim/api/il-detay.php?il=' + encodeURIComponent(il), {
+            credentials: 'same-origin',
             headers: { 'X-Requested-With': 'XMLHttpRequest' }
         })
-        .then(function(r) { return r.json(); })
+        .then(function(r) {
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            return r.json();
+        })
         .then(function(v) {
-            if (v.hata) { panelKapat(); return; }
+            if (v.hata) {
+                panel.innerHTML = '<button class="il-panel__kapat" id="harita-panel-kapat" aria-label="Kapat">×</button>' +
+                    '<p style="color:#ef4444;font-size:.8rem;margin:8px 0 0;">' + v.hata + '</p>';
+                document.getElementById('harita-panel-kapat').onclick = panelKapat;
+                return;
+            }
 
             var topIlceHtml = '';
             if (v.top_ilceler && v.top_ilceler.length > 0) {
@@ -1192,8 +1205,7 @@ window.addEventListener('load', function () {
             }
 
             panel.innerHTML =
-                '<button class="il-panel__kapat" onclick="document.getElementById(\"harita-panel-kapat\").click()" ' +
-                '        aria-label="Kapat">×</button>' +
+                '<button class="il-panel__kapat" id="harita-panel-kapat" aria-label="Kapat">×</button>' +
                 '<h6 class="il-panel__baslik">' + v.il + '</h6>' +
                 '<div class="il-panel__istatler">' +
                     '<div class="il-panel__stat">' +
@@ -1215,14 +1227,14 @@ window.addEventListener('load', function () {
                 '</div>' +
                 topIlceHtml;
 
-            // Gizli kapatma düğmesi (onclick hedefi için)
-            var gizliKapat = document.createElement('button');
-            gizliKapat.id = 'harita-panel-kapat';
-            gizliKapat.style.display = 'none';
-            gizliKapat.onclick = panelKapat;
-            panel.appendChild(gizliKapat);
+            document.getElementById('harita-panel-kapat').onclick = panelKapat;
         })
-        .catch(function() { panelKapat(); });
+        .catch(function(err) {
+            console.error('İl detay API hatası:', err);
+            panel.innerHTML = '<button class="il-panel__kapat" id="harita-panel-kapat" aria-label="Kapat">×</button>' +
+                '<p style="color:#ef4444;font-size:.8rem;margin:8px 0 0;">Veri yüklenemedi.</p>';
+            document.getElementById('harita-panel-kapat').onclick = panelKapat;
+        });
     }
 
     function panelKapat() {
