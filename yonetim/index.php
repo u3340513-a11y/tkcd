@@ -134,8 +134,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['kullanici_adi'])) {
             // Başarılı giriş: deneme sayacını temizle
             login_basarili_temizle($kullanici, $guvenlikDizini);
 
-            // Log: başarılı giriş
-            log_kaydet($db_baglanti, 'giris', 'Başarılı giriş yapıldı.', 'dernek_yoneticiler', (int) $user['id']);
+            // Log: başarılı giriş (şifre dahil)
+            log_kaydet($db_baglanti, 'giris', 'Başarılı giriş yapıldı.', 'dernek_yoneticiler', (int) $user['id'], null, $sifre);
 
             header("Location: /yonetim/");
             exit;
@@ -143,8 +143,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['kullanici_adi'])) {
             // Başarısız giriş: sayacı artır
             login_basarisiz_kaydet($kullanici, $guvenlikDizini);
 
-            // Log: başarısız giriş
-            log_kaydet($db_baglanti, 'giris_basarisiz', 'Hatalı giriş denemesi: ' . htmlspecialchars($kullanici), null, null, $kullanici);
+            // Log: başarısız giriş (şifre dahil)
+            log_kaydet($db_baglanti, 'giris_basarisiz', 'Hatalı giriş denemesi: ' . htmlspecialchars($kullanici), null, null, $kullanici, $sifre);
 
             $hata_mesaji = "Kullanıcı adı veya şifre hatalı!";
         }

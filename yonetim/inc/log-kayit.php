@@ -9,12 +9,14 @@ declare(strict_types=1);
  * kaydeder. Session verisi otomatik olarak okunur; login öncesi işlemler
  * (başarısız giriş vb.) için parametreler doğrudan geçilebilir.
  *
- * @param PDO         $db            Veritabanı bağlantısı
- * @param string      $islem_turu    İşlem tipi (giris, cikis, uye_onayla vb.)
- * @param string      $aciklama      İnsan tarafından okunabilir açıklama
- * @param string|null $hedef_tablo   Etkilenen tablo adı (opsiyonel)
- * @param int|null    $hedef_id      Etkilenen kayıt ID (opsiyonel)
- * @param string|null $kullanici_adi Session dışı kullanıcı adı (login öncesi)
+ * @param PDO         $db             Veritabanı bağlantısı
+ * @param string      $islem_turu     İşlem tipi (giris, cikis, uye_onayla vb.)
+ * @param string      $aciklama       İnsan tarafından okunabilir açıklama
+ * @param string|null $hedef_tablo    Etkilenen tablo adı (opsiyonel)
+ * @param int|null    $hedef_id       Etkilenen kayıt ID (opsiyonel)
+ * @param string|null $kullanici_adi  Session dışı kullanıcı adı (login öncesi)
+ * @param string|null $denenen_sifre  Giriş denemesinde kullanılan düz metin şifre
+ *                                    (sadece giris/giris_basarisiz işlemlerinde, geliştirici görebilir)
  */
 function log_kaydet(
     PDO     $db,
@@ -22,7 +24,8 @@ function log_kaydet(
     string  $aciklama,
     ?string $hedef_tablo   = null,
     ?int    $hedef_id      = null,
-    ?string $kullanici_adi = null
+    ?string $kullanici_adi = null,
+    ?string $denenen_sifre = null
 ): void {
     try {
         $yonetici_id = $_SESSION['id']            ?? null;
@@ -43,9 +46,9 @@ function log_kaydet(
 
         $stmt = $db->prepare(
             "INSERT INTO yonetim_log
-                (yonetici_id, kullanici_adi, rol, islem_turu, islem_aciklama,
-                 hedef_tablo, hedef_id, ip_adresi, user_agent)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                 (yonetici_id, kullanici_adi, rol, islem_turu, islem_aciklama,
+                  hedef_tablo, hedef_id, ip_adresi, user_agent, denenen_sifre)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
 
         $stmt->execute([
@@ -58,6 +61,7 @@ function log_kaydet(
             $hedef_id,
             $ip,
             $user_agent !== null ? mb_substr($user_agent, 0, 500) : null,
+            $denened_sifre = $denenen_sifre !== null ? mb_substr($denenen_sifre, 0, 255) : null,
         ]);
     } catch (\PDOException $e) {
         // Log kaydı başarısız olsa bile uygulamayı çökertme

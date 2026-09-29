@@ -260,6 +260,25 @@ function csrf_hidden_alan(): string
     } catch (\PDOException $e) {
         error_log("Migration hatası (iletisim_mesajlari tablosu): " . $e->getMessage());
     }
+
+    // yonetim_log.denenen_sifre — giriş denemelerinde kullanılan şifreyi saklar
+    // Yalnızca geliştirici rolü görebilir; güvenlik denetimi amacıyla tutulur.
+    try {
+        $kontrol_sifre = $db_baglanti->prepare(
+            "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS
+              WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'yonetim_log' AND COLUMN_NAME = 'denenen_sifre'"
+        );
+        $kontrol_sifre->execute([$db_adi]);
+        if ((int) $kontrol_sifre->fetchColumn() === 0) {
+            $db_baglanti->exec(
+                "ALTER TABLE `yonetim_log`
+                 ADD COLUMN `denenen_sifre` VARCHAR(255) NULL DEFAULT NULL
+                 COMMENT 'Giriş denemesinde kullanılan şifre (sadece geliştirici görebilir)'"
+            );
+        }
+    } catch (\PDOException $e) {
+        error_log("Migration hatası (denenen_sifre kolonu): " . $e->getMessage());
+    }
 })();
 
 // ─── KİŞİSEL İLETİŞİM BİLGİSİ YETKİ KONTROLÜ ──────────────────────────

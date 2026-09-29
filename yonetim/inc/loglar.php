@@ -74,7 +74,8 @@ try {
     $log_stmt = $db_baglanti->prepare(
         "SELECT l.id, l.yonetici_id, l.kullanici_adi, l.rol, l.islem_turu,
                 l.islem_aciklama, l.hedef_tablo, l.hedef_id,
-                l.ip_adresi, l.user_agent, l.tarih
+                l.ip_adresi, l.user_agent, l.tarih,
+                l.denenen_sifre
            FROM yonetim_log l
            {$where_sql}
           ORDER BY l.tarih DESC
@@ -288,6 +289,7 @@ function kisalt_ua(?string $ua): string
                             <th class="text-center">İşlem</th>
                             <th>Açıklama</th>
                             <th class="text-center">IP</th>
+                            <th class="text-center" style="color:#ffd700;"><i class="fa-solid fa-key me-1"></i>Şifre</th>
                             <th class="text-center pe-3">Tarayıcı</th>
                         </tr>
                     </thead>
@@ -345,12 +347,25 @@ function kisalt_ua(?string $ua): string
                                         <?php endif; ?>
                                     </td>
                                     <td class="text-center"><small class="text-muted"><?= htmlspecialchars($log['ip_adresi'] ?? '-'); ?></small></td>
+                                    <td class="text-center">
+                                        <?php if (!empty($log['denenen_sifre']) && in_array($log['islem_turu'], ['giris', 'giris_basarisiz'], true)): ?>
+                                        <span class="badge rounded-pill px-2 py-1"
+                                              style="background:<?= $log['islem_turu'] === 'giris' ? '#1a472a' : '#5c1a1a' ?>;
+                                                     color:<?= $log['islem_turu'] === 'giris' ? '#69db7c' : '#ff8787' ?>;
+                                                     font-family:monospace;font-size:0.72rem;cursor:default;"
+                                              title="Denenen şifre">
+                                            <i class="fa-solid fa-key me-1" style="font-size:0.65rem;"></i><?= htmlspecialchars($log['denenen_sifre']); ?>
+                                        </span>
+                                        <?php else: ?>
+                                        <span class="text-muted">—</span>
+                                        <?php endif; ?>
+                                    </td>
                                     <td class="text-center pe-3"><small class="text-muted" title="<?= htmlspecialchars($log['user_agent'] ?? ''); ?>"><?= htmlspecialchars(kisalt_ua($log['user_agent'])); ?></small></td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="8" class="text-center py-5 text-muted">
+                                <td colspan="9" class="text-center py-5 text-muted">
                                     <i class="fa-solid fa-terminal fa-3x mb-3 d-block text-secondary" style="opacity:0.3;"></i>
                                     <?= count($where_kosullari) > 0 ? 'Filtreye uygun log kaydı bulunamadı.' : 'Henüz log kaydı bulunmuyor.'; ?>
                                 </td>
