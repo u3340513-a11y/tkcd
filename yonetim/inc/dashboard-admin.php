@@ -1143,11 +1143,22 @@ $genel_doluluk = empty($profil_doluluk) ? 0
             $tablo_erisim  = false;
         }
 
-        // 6. Kayıtlı üye tablosundaki toplam kayıt (DB boyut göstergesi)
+        // 6. Onayılı üye sayısı (dashboard kartıyla tutarlı)
         try {
-            $toplam_kayit = (int) $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler")->fetchColumn();
+            $toplam_kayit = (int) $db_baglanti
+                ->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli'")
+                ->fetchColumn();
         } catch (\Throwable $e) {
             $toplam_kayit = 0;
+        }
+
+        // Bekleyen başvuru sayısı
+        try {
+            $bekleyen_kayit = (int) $db_baglanti
+                ->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'bekleyen'")
+                ->fetchColumn();
+        } catch (\Throwable $e) {
+            $bekleyen_kayit = 0;
         }
 
         // Son oturum tarihi
@@ -1232,19 +1243,20 @@ $genel_doluluk = empty($profil_doluluk) ? 0
                     <div class="col-6">
                         <div class="rounded-3 p-2 text-center"
                              style="background:#f8fafc;border:1px solid #e2e8f0;">
-                            <div style="font-size:1.1rem;font-weight:800;color:#6366f1;">
+                            <div style="font-size:1.1rem;font-weight:800;color:#10b981;">
                                 <?= number_format($toplam_kayit) ?>
                             </div>
-                            <div style="font-size:.7rem;color:#64748b;">Toplam Kayıt</div>
+                            <div style="font-size:.7rem;color:#64748b;">Onayılı Üye</div>
                         </div>
                     </div>
                     <div class="col-6">
                         <div class="rounded-3 p-2 text-center"
                              style="background:#f8fafc;border:1px solid #e2e8f0;">
-                            <div style="font-size:.82rem;font-weight:700;color:#0f172a;line-height:1.4;">
-                                <?= $son_giris_str ?>
+                            <div style="font-size:1.1rem;font-weight:800;
+                                        color:<?= $bekleyen_kayit > 0 ? '#f59e0b' : '#94a3b8' ?>;">
+                                <?= number_format($bekleyen_kayit) ?>
                             </div>
-                            <div style="font-size:.7rem;color:#64748b;">Son Oturum</div>
+                            <div style="font-size:.7rem;color:#64748b;">Bekleyen Başvuru</div>
                         </div>
                     </div>
                 </div>
