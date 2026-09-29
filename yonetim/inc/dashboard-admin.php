@@ -181,6 +181,53 @@ foreach ($il_verileri as $iv) {
 $bolge_sayilari = array_filter($bolge_sayilari, fn($v) => $v > 0);
 $bolge_etiketler = array_keys($bolge_sayilari);
 $bolge_degerler  = array_values($bolge_sayilari);
+
+// ── Yaş Dağılımı ──────────────────────────────────────────────────────────
+$yas_gruplari = [
+    '18–25' => [18, 25],
+    '26–35' => [26, 35],
+    '36–45' => [36, 45],
+    '46–55' => [46, 55],
+    '56–65' => [56, 65],
+    '65+'   => [66, 150],
+];
+$yas_dagilimi   = [];
+$ortalama_yas   = null;
+$en_genc_yas    = null;
+$en_yasli_yas   = null;
+
+try {
+    $yas_sorgu = $db_baglanti->query(
+        "SELECT
+             TIMESTAMPDIFF(YEAR, dogum_tarihi, CURDATE()) AS yas
+           FROM dernek_uyeler
+          WHERE onay_durumu = 'onayli'
+            AND dogum_tarihi IS NOT NULL
+            AND dogum_tarihi != '0000-00-00'"
+    );
+    $tum_yaslar = $yas_sorgu ? array_column($yas_sorgu->fetchAll(PDO::FETCH_ASSOC), 'yas') : [];
+    $tum_yaslar = array_map('intval', $tum_yaslar);
+    $tum_yaslar = array_filter($tum_yaslar, fn($y) => $y >= 18 && $y <= 120);
+
+    if (!empty($tum_yaslar)) {
+        $ortalama_yas = round(array_sum($tum_yaslar) / count($tum_yaslar), 1);
+        $en_genc_yas  = min($tum_yaslar);
+        $en_yasli_yas = max($tum_yaslar);
+
+        foreach ($yas_gruplari as $etiket => [$min, $maks]) {
+            $yas_dagilimi[$etiket] = count(array_filter($tum_yaslar, fn($y) => $y >= $min && $y <= $maks));
+        }
+    } else {
+        foreach ($yas_gruplari as $etiket => $_) {
+            $yas_dagilimi[$etiket] = 0;
+        }
+    }
+} catch (\Throwable $e) {
+    foreach ($yas_gruplari as $etiket => $_) {
+        $yas_dagilimi[$etiket] = 0;
+    }
+}
+$yas_maks = max(1, ...array_values($yas_dagilimi));
 ?>
 
 <!-- ═══════════════════════════════════════════════════════════════
@@ -772,49 +819,82 @@ $bolge_degerler  = array_values($bolge_sayilari);
         </div>
     </div>
 
-    <!-- Hızlı İşlemler (Tasarım 1) -->
+    <!-- Yaş Dağılımı Kartı -->
     <div class="col-lg-6">
         <div class="dash-card h-100">
             <div class="dash-card__header">
-                <h5 class="dash-card__title"><i class="fa-solid fa-bolt text-warning"></i> Hızlı İşlemler</h5>
+                <h5 class="dash-card__title">
+                    <i class="fa-solid fa-chart-bar" style="color:#6366f1;"></i> Yaş Dağılımı
+                </h5>
+                <span class="dash-card__action">Onaylı Üyeler</span>
             </div>
             <div class="dash-card__body">
-                <div class="row row-cols-2 g-3">
-                    <?php if (!$is_kisitli_rol): ?>
-                    <div class="col">
-                        <a href="index.php?sayfa=uye-ekle" class="dash-quick-btn">
-                            <div class="dash-quick-btn__icon" style="background: rgba(59,130,246,0.1); color: #3b82f6;">
-                                <i class="fa-solid fa-user-plus"></i>
-                            </div>
-                            Yeni Üye Ekle
-                        </a>
+
+                <?php if (!empty(array_filter($yas_dagilimi))): ?>
+
+                <!-- Bar Grafik -->
+                <div class="d-flex flex-column gap-2 mb-4">
+                    <?php foreach ($yas_dagilimi as $grup => $sayi):
+                        $yuzde = $yas_maks > 0 ? round(($sayi / $yas_maks) * 100) : 0;
+                        $bar_renk = match(true) {
+                            $grup === '18–25' => '#818cf8',
+                            $grup === '26–35' => '#6366f1',
+                            $grup === '36–45' => '#4f46e5',
+                            $grup === '46–55' => '#4338ca',
+                            $grup === '56–65' => '#3730a3',
+                            default           => '#312e81',
+                        };
+                    ?>
+                    <div class="d-flex align-items-center gap-2">
+                        <span style="width:46px;font-size:.78rem;font-weight:600;color:#64748b;flex-shrink:0;">
+                            <?= htmlspecialchars($grup) ?>
+                        </span>
+                        <div style="flex:1;background:#f1f5f9;border-radius:6px;height:14px;overflow:hidden;">
+                            <div style="width:<?= $yuzde ?>%;background:<?= $bar_renk ?>;height:100%;border-radius:6px;
+                                        transition:width .6s ease;"></div>
+                        </div>
+                        <span style="width:36px;font-size:.82rem;font-weight:700;color:#1e293b;text-align:right;flex-shrink:0;">
+                            <?= number_format($sayi) ?>
+                        </span>
                     </div>
-                    <div class="col">
-                        <a href="index.php?sayfa=bekleyen-uyeler" class="dash-quick-btn">
-                            <div class="dash-quick-btn__icon" style="background: rgba(239,68,68,0.1); color: #ef4444;">
-                                <i class="fa-solid fa-user-clock"></i>
+                    <?php endforeach; ?>
+                </div>
+
+                <!-- Detay İstatistikler -->
+                <div class="row g-2">
+                    <div class="col-4">
+                        <div class="text-center p-2 rounded-3" style="background:#f8fafc;border:1px solid #e2e8f0;">
+                            <div style="font-size:1.3rem;font-weight:800;color:#4f46e5;">
+                                <?= $ortalama_yas !== null ? $ortalama_yas : '—' ?>
                             </div>
-                            Başvurular
-                        </a>
+                            <div style="font-size:.72rem;color:#64748b;margin-top:2px;">Ort. Yaş</div>
+                        </div>
                     </div>
-                    <?php endif; ?>
-                    <div class="col">
-                        <a href="index.php?sayfa=uyeler" class="dash-quick-btn">
-                            <div class="dash-quick-btn__icon" style="background: rgba(16,185,129,0.1); color: #10b981;">
-                                <i class="fa-solid fa-users"></i>
+                    <div class="col-4">
+                        <div class="text-center p-2 rounded-3" style="background:#f8fafc;border:1px solid #e2e8f0;">
+                            <div style="font-size:1.3rem;font-weight:800;color:#10b981;">
+                                <?= $en_genc_yas !== null ? $en_genc_yas : '—' ?>
                             </div>
-                            Üye Listesi
-                        </a>
+                            <div style="font-size:.72rem;color:#64748b;margin-top:2px;">En Genç</div>
+                        </div>
                     </div>
-                    <div class="col">
-                        <a href="index.php?sayfa=son-onaylananlar" class="dash-quick-btn">
-                            <div class="dash-quick-btn__icon" style="background: rgba(139,92,246,0.1); color: #8b5cf6;">
-                                <i class="fa-solid fa-user-check"></i>
+                    <div class="col-4">
+                        <div class="text-center p-2 rounded-3" style="background:#f8fafc;border:1px solid #e2e8f0;">
+                            <div style="font-size:1.3rem;font-weight:800;color:#f59e0b;">
+                                <?= $en_yasli_yas !== null ? $en_yasli_yas : '—' ?>
                             </div>
-                            Son Onaylananlar
-                        </a>
+                            <div style="font-size:.72rem;color:#64748b;margin-top:2px;">En Yaşlı</div>
+                        </div>
                     </div>
                 </div>
+
+                <?php else: ?>
+                <div class="text-center py-4" style="color:#94a3b8;">
+                    <i class="fa-solid fa-chart-bar fa-2x mb-2"></i>
+                    <p class="mb-0" style="font-size:.875rem;">Yaş verisi bulunamadı.</p>
+                </div>
+                <?php endif; ?>
+
             </div>
         </div>
     </div>
