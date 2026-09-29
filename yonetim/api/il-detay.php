@@ -6,33 +6,36 @@
  *   - Toplam üye sayısı
  *   - Üye bulunan ilçe sayısı
  *   - Benzersiz kurum sayısı
- *   - Kurum temsilcisi sayısı
+ *   - Kurum temsilcisi / teşkilatlanma sorumlusu sayısı
  *   - En yoğun 5 ilçe listesi
  *
  * GET /yonetim/api/il-detay.php?il=Trabzon
  *
- * Güvenlik: kimlik doğrulama oturumu ve CSRF-token kontrolü yapılır.
- *           Yalnızca yönetim panelinden XHR ile erişilebilir.
+ * Güvenlik:
+ *   - baglan.php üzerinden oturum + DB bağlantısı
+ *   - XHR başlık kontrolü (CSRF katmanı)
+ *   - Prepared statements (SQL injection koruması)
  */
 
 declare(strict_types=1);
 
-// ── Oturum & Yetki ────────────────────────────────────────────────────────
-session_start();
+// baglan.php hem session'ı başlatır hem DB bağlantısını ($db_baglanti) oluşturur
+require_once dirname(__DIR__) . '/inc/baglan.php';
 
-if (empty($_SESSION['yonetim_giris']) || $_SESSION['yonetim_giris'] !== true) {
-    http_response_code(401);
-    header('Content-Type: application/json; charset=utf-8');
-    echo json_encode(['hata' => 'Yetkisiz erişim.']);
-    exit;
-}
-
-// Yalnızca XHR kabul et
+// ── Yalnızca XHR kabul et ────────────────────────────────────────────────
 $isXhr = ($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'XMLHttpRequest';
 if (!$isXhr) {
     http_response_code(403);
     header('Content-Type: application/json; charset=utf-8');
     echo json_encode(['hata' => 'Geçersiz istek.']);
+    exit;
+}
+
+// ── Oturum kontrolü (baglan.php session'ı zaten başlattı) ────────────────
+if (empty($_SESSION['oturum']) || $_SESSION['oturum'] !== true) {
+    http_response_code(401);
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode(['hata' => 'Yetkisiz erişim.']);
     exit;
 }
 
@@ -44,16 +47,6 @@ if ($il === '' || mb_strlen($il, 'UTF-8') > 60) {
     echo json_encode(['hata' => 'Geçersiz il parametresi.']);
     exit;
 }
-
-// ── Veritabanı bağlantısı ─────────────────────────────────────────────────
-$config_path = dirname(__DIR__, 2) . '/config/database.php';
-if (!file_exists($config_path)) {
-    http_response_code(500);
-    header('Content-Type: application/json; charset=utf-8');
-    echo json_encode(['hata' => 'Yapılandırma bulunamadı.']);
-    exit;
-}
-require_once $config_path;
 
 try {
     // ── Toplam üye ────────────────────────────────────────────────────────
@@ -94,12 +87,15 @@ try {
     $stmt->execute([':il' => $il]);
     $kurum_sayisi = (int) $stmt->fetchColumn();
 
-    // ── Kurum temsilcisi sayısı ───────────────────────────────────────────
+    // ── Temsilci sayısı ───────────────────────────────────────────────────
     $stmt = $db_baglanti->prepare(
         "SELECT COUNT(*) FROM dernek_uyeler
           WHERE onay_durumu = 'onayli'
             AND LOWER(TRIM(ikamet_ili)) = LOWER(:il)
-            AND rol IN ('kurum_temsilcisi','teskilatlanma_sorumlusu')"
+            AND (
+                temsilci_turu IS NOT NULL AND TRIM(temsilci_turu) != ''
+                OR ek_gorev   IS NOT NULL AND TRIM(ek_gorev)     != ''
+            )"
     );
     $stmt->execute([':il' => $il]);
     $temsilci_sayisi = (int) $stmt->fetchColumn();
@@ -114,12 +110,13 @@ try {
         'kurum_sayisi'    => $kurum_sayisi,
         'temsilci_sayisi' => $temsilci_sayisi,
         'top_ilceler'     => array_map(fn($r) => [
-            'ilce' => htmlspecialchars($r['ilce'], ENT_QUOTES, 'UTF-8'),
+            'ilce' => htmlspecialchars((string) $r['ilce'], ENT_QUOTES, 'UTF-8'),
             'adet' => (int) $r['adet'],
         ], $top_ilceler),
     ], JSON_UNESCAPED_UNICODE);
 
 } catch (\Throwable $e) {
+    error_log('il-detay API hatası: ' . $e->getMessage());
     http_response_code(500);
     header('Content-Type: application/json; charset=utf-8');
     echo json_encode(['hata' => 'Veri alınamadı.']);
