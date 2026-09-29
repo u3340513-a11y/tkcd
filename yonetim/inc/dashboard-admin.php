@@ -289,6 +289,55 @@ try {
 } catch (\Throwable $e) {
     $il_detay_verileri = [];
 }
+
+// ── Üye Profil Bilgi Doluluk Oranı ───────────────────────────────────────────────────
+// Her alan için: dolu sayısı / toplam onayılı üye * 100
+$profil_doluluk = [];
+try {
+    $toplam_q = (int) $db_baglanti
+        ->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli'")
+        ->fetchColumn();
+
+    if ($toplam_q > 0) {
+        $alanlar = [
+            'telefon'       => ['label' => 'Telefon',    'icon' => 'fa-phone',         'renk' => '#3b82f6'],
+            'eposta'        => ['label' => 'E-posta',    'icon' => 'fa-envelope',      'renk' => '#0ea5e9'],
+            'kurum'         => ['label' => 'Kurum',      'icon' => 'fa-building',      'renk' => '#8b5cf6'],
+            'ikamet_ili'    => ['label' => 'İl',         'icon' => 'fa-location-dot', 'renk' => '#10b981'],
+            'ikamet_ilcesi' => ['label' => 'İlçe',       'icon' => 'fa-map-pin',      'renk' => '#14b8a6'],
+            'gorev_unvan'   => ['label' => 'Unvan',      'icon' => 'fa-id-badge',      'renk' => '#f59e0b'],
+            'kan_grubu'     => ['label' => 'Kan Grubu',  'icon' => 'fa-droplet',       'renk' => '#ef4444'],
+            'fotograf'      => ['label' => 'Fotoğraf',  'icon' => 'fa-image',         'renk' => '#ec4899'],
+        ];
+
+        $sartlar = implode(",\n", array_map(
+            fn($k) => "ROUND(SUM(CASE WHEN {$k} IS NOT NULL AND TRIM({$k}) != '' AND {$k} != 'placeholder-kisi.svg' THEN 1 ELSE 0 END) * 100.0 / COUNT(*)) AS {$k}",
+            array_keys($alanlar)
+        ));
+
+        $doluluk_sorgu = $db_baglanti->query(
+            "SELECT {$sartlar} FROM dernek_uyeler WHERE onay_durumu = 'onayli'"
+        );
+        $doluluk_satir = $doluluk_sorgu ? $doluluk_sorgu->fetch(PDO::FETCH_ASSOC) : [];
+
+        foreach ($alanlar as $kolon => $meta) {
+            $yuzde = (int) ($doluluk_satir[$kolon] ?? 0);
+            $profil_doluluk[] = [
+                'kolon'  => $kolon,
+                'label'  => $meta['label'],
+                'icon'   => $meta['icon'],
+                'renk'   => $meta['renk'],
+                'yuzde'  => $yuzde,
+            ];
+        }
+    }
+} catch (\Throwable $e) {
+    $profil_doluluk = [];
+}
+
+// Genel ortalama doluluk
+$genel_doluluk = empty($profil_doluluk) ? 0
+    : (int) round(array_sum(array_column($profil_doluluk, 'yuzde')) / count($profil_doluluk));
 ?>
 
 <!-- ═══════════════════════════════════════════════════════════════
@@ -967,6 +1016,91 @@ try {
         </div>
     </div>
 </div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     ÜYE PROFIL DOLULUK ORANI
+     ═══════════════════════════════════════════════════════════════ -->
+<?php if (!empty($profil_doluluk)): ?>
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="dash-card">
+            <div class="dash-card__header">
+                <h5 class="dash-card__title">
+                    <i class="fa-solid fa-chart-pie" style="color:#6366f1;"></i>
+                    Üye Profil Bilgi Doluluk Oranı
+                </h5>
+                <span class="dash-card__action" style="color:#94a3b8;font-size:.75rem;">Onayılı Üyeler</span>
+            </div>
+            <div class="dash-card__body">
+
+                <!-- Genel Oran Barı -->
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span style="font-size:.82rem;font-weight:600;color:#374151;">Genel Doluluk Oranı</span>
+                        <span style="font-size:1.4rem;font-weight:800;
+                                    color:<?= $genel_doluluk >= 80 ? '#10b981' : ($genel_doluluk >= 60 ? '#f59e0b' : '#ef4444') ?>">
+                            %<?= $genel_doluluk ?>
+                        </span>
+                    </div>
+                    <div style="background:#e2e8f0;border-radius:8px;height:18px;overflow:hidden;">
+                        <div style="height:100%;width:<?= $genel_doluluk ?>%;
+                                    background:<?= $genel_doluluk >= 80
+                                        ? 'linear-gradient(90deg,#10b981,#34d399)'
+                                        : ($genel_doluluk >= 60 ? 'linear-gradient(90deg,#f59e0b,#fbbf24)' : 'linear-gradient(90deg,#ef4444,#f87171)') ?>;
+                                    border-radius:8px;
+                                    transition:width 1s ease;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Alan Bazlı Doluluk: 4 kolon grid -->
+                <div class="row g-3">
+                    <?php foreach ($profil_doluluk as $alan):
+                        $renk_bg = $alan['yuzde'] >= 80 ? '#dcfce7' : ($alan['yuzde'] >= 60 ? '#fef9c3' : '#fee2e2');
+                        $renk_tx = $alan['yuzde'] >= 80 ? '#15803d' : ($alan['yuzde'] >= 60 ? '#a16207' : '#b91c1c');
+                        $bar_renk = $alan['yuzde'] >= 80 ? '#10b981' : ($alan['yuzde'] >= 60 ? '#f59e0b' : '#ef4444');
+                    ?>
+                    <div class="col-lg-3 col-md-4 col-6">
+                        <div class="d-flex flex-column gap-1 p-3 rounded-3"
+                             style="background:#f8fafc;border:1px solid #e2e8f0;">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <div style="width:28px;height:28px;border-radius:8px;
+                                            background:<?= $alan['renk'] ?>18;
+                                            display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                    <i class="fa-solid <?= $alan['icon'] ?>"
+                                       style="font-size:.7rem;color:<?= $alan['renk'] ?>;"></i>
+                                </div>
+                                <span style="font-size:.8rem;font-weight:600;color:#374151;">
+                                    <?= htmlspecialchars($alan['label']) ?>
+                                </span>
+                            </div>
+                            <div style="background:#e2e8f0;border-radius:4px;height:6px;overflow:hidden;">
+                                <div style="height:100%;width:<?= $alan['yuzde'] ?>%;
+                                            background:<?= $bar_renk ?>;
+                                            border-radius:4px;transition:width .8s ease;"></div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mt-1">
+                                <span class="badge" style="background:<?= $renk_bg ?>;color:<?= $renk_tx ?>;
+                                                           font-size:.7rem;padding:2px 8px;border-radius:20px;
+                                                           font-weight:700;">
+                                    %<?= $alan['yuzde'] ?>
+                                </span>
+                                <?php if ($alan['yuzde'] < 100): ?>
+                                <span style="font-size:.68rem;color:#94a3b8;">
+                                    Eksik: <?= number_format(round(($toplam_q * (100 - $alan['yuzde'])) / 100)) ?>
+                                </span>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
 
 <!-- ═══════════════════════════════════════════════════════════════
      H: DUYURULAR  +  L: DİKKAT UYARILARI
