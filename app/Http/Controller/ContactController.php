@@ -7,6 +7,7 @@ namespace App\Http\Controller;
 use App\Application\Service\MailService;
 use App\Application\Service\PageResponder;
 use App\Core\Config;
+use App\Core\Env;
 use App\Core\Http\Request;
 use App\Core\Http\Response;
 use App\Infrastructure\Persistence\ContactRepository;
@@ -14,8 +15,8 @@ use App\Infrastructure\Persistence\ContactRepository;
 /**
  * İletişim formu denetleyicisi.
  *
- * GET  /iletisim → formu göster (opsiyonel durum parametresiyle)
- * POST /iletisim → doğrula, SMTP ile mail gönder, DB'ye kaydet, yönlendir
+ * GET  /iletisim → formu göster (math captcha değerleriyle birlikte)
+ * POST /iletisim → doğrula, captcha kontrol et, SMTP ile gönder, DB'ye kaydet
  *
  * İki hedef:
  *   1. info@trabzonlukamucalisanlaridernegi.com adresine SMTP ile e-posta
@@ -34,6 +35,8 @@ final class ContactController
 
     public function index(): Response
     {
+        [$captchaA, $captchaB, $captchaToken] = $this->generateMathCaptcha();
+
         $seo = $this->responder->seo(
             title: 'İletişim',
             description: 'Derneğimize ulaşabileceğiniz adres, telefon, e-posta ve '
@@ -45,8 +48,11 @@ final class ContactController
         $durum = trim((string) ($this->request->query['durum'] ?? ''));
 
         return $this->responder->page('pages/contact', $seo, [
-            'styles' => ['contact.css'],
-            'durum'  => in_array($durum, ['basarili', 'hata'], true) ? $durum : null,
+            'styles'       => ['contact.css'],
+            'durum'        => in_array($durum, ['basarili', 'hata'], true) ? $durum : null,
+            'captchaA'     => $captchaA,
+            'captchaB'     => $captchaB,
+            'captchaToken' => $captchaToken,
         ]);
     }
 
@@ -57,9 +63,15 @@ final class ContactController
         $konu   = trim((string) ($this->request->body['konu']   ?? ''));
         $mesaj  = trim((string) ($this->request->body['mesaj']  ?? ''));
 
+        // Zorunlu alan kontrolü (mesaj dahil)
         if ($ad === '' || $eposta === '' || $konu === '' || $mesaj === ''
             || !filter_var($eposta, FILTER_VALIDATE_EMAIL)
         ) {
+            return Response::redirect('/iletisim?durum=hata');
+        }
+
+        // Math captcha doğrulaması
+        if (!$this->verifyMathCaptcha((array) $this->request->body)) {
             return Response::redirect('/iletisim?durum=hata');
         }
 
@@ -128,5 +140,71 @@ HTML;
         ]);
 
         return Response::redirect($mailGonderildi ? '/iletisim?durum=basarili' : '/iletisim?durum=hata');
+    }
+
+    // ── Math Captcha ──────────────────────────────────────────────────────
+
+    /**
+     * Rastgele iki sayı üretir ve HMAC token'ı imzalar.
+     * Token; a, b değerini ve saatlik zaman dilimini içerir — replay saldırısına karşı koruma.
+     *
+     * @return array{int, int, string} [$a, $b, $token]
+     */
+    private function generateMathCaptcha(): array
+    {
+        $a        = random_int(1, 12);
+        $b        = random_int(1, 12);
+        $secret   = $this->captchaSecret();
+        $timeSlot = (int) floor(time() / 3600);
+        $token    = hash_hmac('sha256', "{$a}:{$b}:{$timeSlot}", $secret);
+
+        return [$a, $b, $token];
+    }
+
+    /**
+     * Kullanıcının cevabını doğrular. Geçerli saat + önceki saat kabul edilir.
+     *
+     * @param array<string, mixed> $post
+     */
+    private function verifyMathCaptcha(array $post): bool
+    {
+        $a              = (int) ($post['captcha_a']     ?? 0);
+        $b              = (int) ($post['captcha_b']     ?? 0);
+        $submittedToken = trim((string) ($post['captcha_token']  ?? ''));
+        $userAnswerRaw  = trim((string) ($post['captcha_answer'] ?? ''));
+
+        if ($userAnswerRaw === '' || !ctype_digit($userAnswerRaw)) {
+            return false;
+        }
+
+        if ((int) $userAnswerRaw !== ($a + $b)) {
+            return false;
+        }
+
+        $secret   = $this->captchaSecret();
+        $timeSlot = (int) floor(time() / 3600);
+
+        foreach ([$timeSlot, $timeSlot - 1] as $slot) {
+            $expected = hash_hmac('sha256', "{$a}:{$b}:{$slot}", $secret);
+            if (hash_equals($expected, $submittedToken)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * HMAC imzası için sunucu tarafı gizli anahtar.
+     */
+    private function captchaSecret(): string
+    {
+        $key = Env::string('RECAPTCHA_SECRET_KEY');
+
+        if ($key === '') {
+            $key = Env::string('DB_PASSWORD');
+        }
+
+        return $key !== '' ? $key : 'tkcd-contact-captcha-2024';
     }
 }

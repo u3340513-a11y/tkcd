@@ -191,14 +191,46 @@ $haritaSrc = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3010.4123456
                 </div>
 
                 <div class="kt-form__alan">
-                    <label class="kt-form__etiket" for="kt-mesaj">Mesajınız</label>
+                    <label class="kt-form__etiket" for="kt-mesaj">
+                        Mesajınız <span class="kt-form__zorunlu" aria-label="zorunlu">*</span>
+                    </label>
                     <textarea
                         class="kt-form__girdi kt-form__girdi--alan"
                         id="kt-mesaj"
                         name="mesaj"
                         rows="5"
                         maxlength="2000"
+                        required
+                        aria-required="true"
                     ></textarea>
+                </div>
+
+                <!-- Güvenlik Sorusu: Matematik Captcha -->
+                <div class="kt-form__alan">
+                    <label class="kt-form__etiket" for="kt-captcha-cevap">
+                        Güvenlik Sorusu <span class="kt-form__zorunlu" aria-label="zorunlu">*</span>
+                    </label>
+                    <div class="ub-math-captcha">
+                        <span class="ub-math-captcha__soru">
+                            <?= (int)$captchaA ?> + <?= (int)$captchaB ?> = ?
+                        </span>
+                        <input
+                            class="kt-form__girdi ub-math-captcha__girdi"
+                            type="number"
+                            id="kt-captcha-cevap"
+                            name="captcha_answer"
+                            inputmode="numeric"
+                            min="2"
+                            max="24"
+                            autocomplete="off"
+                            placeholder="Cevabınız"
+                            required
+                            aria-required="true"
+                        >
+                    </div>
+                    <input type="hidden" name="captcha_a"     value="<?= (int)$captchaA ?>">
+                    <input type="hidden" name="captcha_b"     value="<?= (int)$captchaB ?>">
+                    <input type="hidden" name="captcha_token" value="<?= $view->e($captchaToken) ?>">
                 </div>
 
                 <button class="kt-form__gonder" type="submit">
