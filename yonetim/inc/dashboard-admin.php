@@ -291,48 +291,57 @@ try {
 }
 
 // ── Üye Profil Bilgi Doluluk Oranı ───────────────────────────────────────────────────
-// Her alan için: dolu sayısı / toplam onayılı üye * 100
+// Her alan ayrı try-catch ile sorgulanır; var olmayan sütun %0 gösterir, kart kaybolmaz.
 $profil_doluluk = [];
+$toplam_q = 0;
 try {
     $toplam_q = (int) $db_baglanti
         ->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli'")
         ->fetchColumn();
-
-    if ($toplam_q > 0) {
-        $alanlar = [
-            'telefon'       => ['label' => 'Telefon',    'icon' => 'fa-phone',         'renk' => '#3b82f6'],
-            'eposta'        => ['label' => 'E-posta',    'icon' => 'fa-envelope',      'renk' => '#0ea5e9'],
-            'kurum'         => ['label' => 'Kurum',      'icon' => 'fa-building',      'renk' => '#8b5cf6'],
-            'ikamet_ili'    => ['label' => 'İl',         'icon' => 'fa-location-dot', 'renk' => '#10b981'],
-            'ikamet_ilcesi' => ['label' => 'İlçe',       'icon' => 'fa-map-pin',      'renk' => '#14b8a6'],
-            'gorev_unvan'   => ['label' => 'Unvan',      'icon' => 'fa-id-badge',      'renk' => '#f59e0b'],
-            'kan_grubu'     => ['label' => 'Kan Grubu',  'icon' => 'fa-droplet',       'renk' => '#ef4444'],
-            'fotograf'      => ['label' => 'Fotoğraf',  'icon' => 'fa-image',         'renk' => '#ec4899'],
-        ];
-
-        $sartlar = implode(",\n", array_map(
-            fn($k) => "ROUND(SUM(CASE WHEN {$k} IS NOT NULL AND TRIM({$k}) != '' AND {$k} != 'placeholder-kisi.svg' THEN 1 ELSE 0 END) * 100.0 / COUNT(*)) AS {$k}",
-            array_keys($alanlar)
-        ));
-
-        $doluluk_sorgu = $db_baglanti->query(
-            "SELECT {$sartlar} FROM dernek_uyeler WHERE onay_durumu = 'onayli'"
-        );
-        $doluluk_satir = $doluluk_sorgu ? $doluluk_sorgu->fetch(PDO::FETCH_ASSOC) : [];
-
-        foreach ($alanlar as $kolon => $meta) {
-            $yuzde = (int) ($doluluk_satir[$kolon] ?? 0);
-            $profil_doluluk[] = [
-                'kolon'  => $kolon,
-                'label'  => $meta['label'],
-                'icon'   => $meta['icon'],
-                'renk'   => $meta['renk'],
-                'yuzde'  => $yuzde,
-            ];
-        }
-    }
 } catch (\Throwable $e) {
-    $profil_doluluk = [];
+    $toplam_q = 0;
+}
+
+if ($toplam_q > 0) {
+    $alanlar_listesi = [
+        ['kolon' => 'telefon',       'label' => 'Telefon',   'icon' => 'fa-phone',        'renk' => '#3b82f6'],
+        ['kolon' => 'eposta',        'label' => 'E-posta',   'icon' => 'fa-envelope',     'renk' => '#0ea5e9'],
+        ['kolon' => 'kurum',         'label' => 'Kurum',     'icon' => 'fa-building',     'renk' => '#8b5cf6'],
+        ['kolon' => 'ikamet_ili',    'label' => 'İl',        'icon' => 'fa-location-dot', 'renk' => '#10b981'],
+        ['kolon' => 'ikamet_ilcesi', 'label' => 'İlçe',      'icon' => 'fa-map-pin',      'renk' => '#14b8a6'],
+        ['kolon' => 'gorev_unvan',   'label' => 'Unvan',     'icon' => 'fa-id-badge',     'renk' => '#f59e0b'],
+        ['kolon' => 'kan_grubu',     'label' => 'Kan Grubu', 'icon' => 'fa-droplet',      'renk' => '#ef4444'],
+        ['kolon' => 'fotograf',      'label' => 'Fotoğraf',  'icon' => 'fa-image',        'renk' => '#ec4899'],
+    ];
+
+    foreach ($alanlar_listesi as $alan_meta) {
+        $k     = $alan_meta['kolon'];
+        $yuzde = 0;
+        try {
+            $extra = ($k === 'fotograf') ? " AND {$k} != 'placeholder-kisi.svg'" : '';
+            $q = $db_baglanti->query(
+                "SELECT ROUND(
+                     SUM(CASE WHEN {$k} IS NOT NULL AND TRIM({$k}) != ''{$extra} THEN 1 ELSE 0 END)
+                     * 100.0 / COUNT(*)
+                 )
+                 FROM dernek_uyeler
+                 WHERE onay_durumu = 'onayli'"
+            );
+            if ($q) {
+                $yuzde = (int) $q->fetchColumn();
+            }
+        } catch (\Throwable $e) {
+            $yuzde = 0;
+        }
+
+        $profil_doluluk[] = [
+            'kolon' => $k,
+            'label' => $alan_meta['label'],
+            'icon'  => $alan_meta['icon'],
+            'renk'  => $alan_meta['renk'],
+            'yuzde' => $yuzde,
+        ];
+    }
 }
 
 // Genel ortalama doluluk
