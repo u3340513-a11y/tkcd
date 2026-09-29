@@ -973,29 +973,144 @@ try {
      ═══════════════════════════════════════════════════════════════ -->
 <div class="row g-4 mb-4">
 
-    <!-- Duyurular (Tasarım 1 — geliştirici CRUD) -->
+    <!-- Sistem Durumu Kartı — sadece yönetim/geliştirici rolü -->
+    <?php if ($is_yonetim || $is_gelistirici): ?>
+    <?php
+        // ── Sistem kontrolleri ───────────────────────────────────────────
+        // 1. Veritabanı
+        $db_durum = true; // Eğer buraya geldik, DB çalışıyor
+
+        // 2. SSL
+        $ssl_gecerli = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+                    || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+                    || (isset($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] === 443);
+
+        // 3. E-posta — mail() fonksiyonu mevcut mu
+        $eposta_durum = function_exists('mail');
+
+        // 4. PHP sürümü
+        $php_surumu   = PHP_VERSION;
+        $php_guncel   = version_compare(PHP_VERSION, '8.1.0', '>=');
+
+        // 5. DB tablolarına erişim kontrolü
+        try {
+            $tablo_kontrol = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE 1=0");
+            $tablo_erisim  = true;
+        } catch (\Throwable $e) {
+            $tablo_erisim  = false;
+        }
+
+        // 6. Kayıtlı üye tablosundaki toplam kayıt (DB boyut göstergesi)
+        try {
+            $toplam_kayit = (int) $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler")->fetchColumn();
+        } catch (\Throwable $e) {
+            $toplam_kayit = 0;
+        }
+
+        // Son oturum tarihi
+        $son_giris_str = isset($_SESSION['son_aktivite'])
+            ? date('d.m.Y H:i', $_SESSION['son_aktivite'])
+            : '—';
+
+        $kontroller = [
+            [
+                'label'  => 'Web Sitesi',
+                'durum'  => true,
+                'metin'  => 'Çalışıyor',
+                'icon'   => 'fa-globe',
+            ],
+            [
+                'label'  => 'Veritabanı',
+                'durum'  => $db_durum && $tablo_erisim,
+                'metin'  => ($db_durum && $tablo_erisim) ? 'Çalışıyor' : 'Hata',
+                'icon'   => 'fa-database',
+            ],
+            [
+                'label'  => 'SSL / HTTPS',
+                'durum'  => $ssl_gecerli,
+                'metin'  => $ssl_gecerli ? 'Geçerli' : 'Aktif değil',
+                'icon'   => 'fa-lock',
+            ],
+            [
+                'label'  => 'E-posta',
+                'durum'  => $eposta_durum,
+                'metin'  => $eposta_durum ? 'Yapılandırıldı' : 'Yapılandırılmadı',
+                'icon'   => 'fa-envelope',
+            ],
+            [
+                'label'  => 'PHP Sürümü',
+                'durum'  => $php_guncel,
+                'metin'  => $php_surumu . ($php_guncel ? '' : ' (Güncellenmeli)'),
+                'icon'   => 'fa-code',
+            ],
+        ];
+    ?>
     <div class="col-lg-6">
         <div class="dash-card h-100">
             <div class="dash-card__header">
-                <h5 class="dash-card__title"><i class="fa-solid fa-bullhorn text-info"></i> Duyurular</h5>
-                <?php if ($is_gelistirici): ?>
-                <a href="index.php?sayfa=duyurular" class="dash-card__action">Yönet →</a>
-                <?php endif; ?>
+                <h5 class="dash-card__title">
+                    <i class="fa-solid fa-heart-pulse" style="color:#10b981;"></i> Sistem Durumu
+                </h5>
+                <span class="dash-card__action" style="color:#94a3b8;font-size:.75rem;">
+                    <?= date('d.m.Y H:i') ?>
+                </span>
             </div>
             <div class="dash-card__body">
-                <?php if (!empty($duyurular)): ?>
-                <?php foreach ($duyurular as $duyuru): ?>
-                <div class="border-bottom pb-2 mb-2">
-                    <div class="fw-semibold small"><?= htmlspecialchars($duyuru['baslik']) ?></div>
-                    <div class="text-muted" style="font-size:0.75rem;"><?= date('d.m.Y', strtotime($duyuru['tarih'])) ?></div>
+
+                <!-- Durum satırları -->
+                <div class="d-flex flex-column gap-2 mb-3">
+                    <?php foreach ($kontroller as $kontrol): ?>
+                    <div class="d-flex align-items-center justify-content-between py-1"
+                         style="border-bottom:1px solid #f1f5f9;">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fa-solid <?= $kontrol['icon'] ?>"
+                               style="width:14px;font-size:.8rem;color:<?= $kontrol['durum'] ? '#10b981' : '#ef4444' ?>;"></i>
+                            <span style="font-size:.82rem;color:#374151;font-weight:500;">
+                                <?= htmlspecialchars($kontrol['label']) ?>
+                            </span>
+                        </div>
+                        <span class="badge"
+                              style="background:<?= $kontrol['durum'] ? '#dcfce7' : '#fee2e2' ?>;
+                                     color:<?= $kontrol['durum'] ? '#15803d' : '#b91c1c' ?>;
+                                     font-size:.72rem;font-weight:600;padding:3px 9px;border-radius:20px;">
+                            <?php if ($kontrol['durum']): ?>
+                                <i class="fa-solid fa-circle-check me-1" style="font-size:.65rem;"></i>
+                            <?php else: ?>
+                                <i class="fa-solid fa-circle-xmark me-1" style="font-size:.65rem;"></i>
+                            <?php endif; ?>
+                            <?= htmlspecialchars($kontrol['metin']) ?>
+                        </span>
+                    </div>
+                    <?php endforeach; ?>
                 </div>
-                <?php endforeach; ?>
-                <?php else: ?>
-                <p class="text-muted small text-center py-3">Henüz duyuru bulunmuyor.</p>
-                <?php endif; ?>
+
+                <!-- Alt bilgiler -->
+                <div class="row g-2">
+                    <div class="col-6">
+                        <div class="rounded-3 p-2 text-center"
+                             style="background:#f8fafc;border:1px solid #e2e8f0;">
+                            <div style="font-size:1.1rem;font-weight:800;color:#6366f1;">
+                                <?= number_format($toplam_kayit) ?>
+                            </div>
+                            <div style="font-size:.7rem;color:#64748b;">Toplam Kayıt</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="rounded-3 p-2 text-center"
+                             style="background:#f8fafc;border:1px solid #e2e8f0;">
+                            <div style="font-size:.82rem;font-weight:700;color:#0f172a;line-height:1.4;">
+                                <?= $son_giris_str ?>
+                            </div>
+                            <div style="font-size:.7rem;color:#64748b;">Son Oturum</div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
+    <?php endif; ?>
+
 
     <!-- Dikkat Gerektiren Uyarılar (Tasarım 2) -->
     <div class="col-lg-6">
