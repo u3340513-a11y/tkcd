@@ -11,6 +11,64 @@
  *   5. Oturum zaman aşımı 30 dk (baglan.php'de)
  */
 
+// ─── ADMIN GATE — GİZLİ URL KAPISI ─────────────────────────────────────
+/**
+ * /yonetim/ adresine doğrudan erişim engeli.
+ *
+ * Geçerli token yoksa sayfa 404 gibi davranır — sunucunun varlığı bile
+ * açığa çıkmamalıdır. Token session'a kaydedilir; bir kez doğrulanan
+ * tarayıcının her istekte token göndermesi gerekmez.
+ *
+ * Giriş URL'i: /yonetim/?k=<ADMIN_GATE_TOKEN>
+ * Token değerini değiştirmek için .env → ADMIN_GATE_TOKEN
+ */
+(static function (): void {
+    // Session'ı henüz başlatmadıysak başlat (baglan.php'den önce)
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    // .env'den token oku
+    $envDosyasi = dirname(__DIR__) . '/.env';
+    $gateToken  = '';
+    if (is_file($envDosyasi)) {
+        $satirlar = file($envDosyasi, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [];
+        foreach ($satirlar as $satir) {
+            if (str_starts_with(trim($satir), 'ADMIN_GATE_TOKEN=')) {
+                $ham  = substr(trim($satir), strlen('ADMIN_GATE_TOKEN='));
+                $gateToken = trim($ham, '"\'' );
+                break;
+            }
+        }
+    }
+
+    // Eğer token .env'de tanımlı değilse kapı devre dışı (güvenli varsayılan)
+    if ($gateToken === '') {
+        return;
+    }
+
+    // Session'da zaten onaylı kapı bayrağı var mı?
+    if (($_SESSION['gate_gecti'] ?? '') === hash('sha256', $gateToken)) {
+        return;
+    }
+
+    // URL'den token kontrolü
+    $gelen = trim($_GET['k'] ?? '');
+    if ($gelen !== '' && hash_equals(hash('sha256', $gateToken), hash('sha256', $gelen))) {
+        $_SESSION['gate_gecti'] = hash('sha256', $gateToken);
+        // Token'ı URL'den temizle — redirect
+        header('Location: /yonetim/');
+        exit;
+    }
+
+    // Token yok ya da yanlış → 404 gibi yanıt ver
+    http_response_code(404);
+    header('Content-Type: text/html; charset=UTF-8');
+    echo '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><title>404 Not Found</title></head>'
+       . '<body><h1>Not Found</h1><p>The requested URL was not found on this server.</p></body></html>';
+    exit;
+})();
+
 require_once 'inc/baglan.php';
 require_once 'inc/log-kayit.php';
 
@@ -21,6 +79,7 @@ if (isset($_GET['islem']) && $_GET['islem'] === 'cikis') {
     log_kaydet($db_baglanti, 'cikis', 'Kullanıcı oturumu kapattı.');
     $_SESSION = [];
     session_destroy();
+    // Çıkış sonrası gate URL'ine yönlendir — ama bunu bilenler zaten yetkili
     header("Location: /yonetim/");
     exit;
 }

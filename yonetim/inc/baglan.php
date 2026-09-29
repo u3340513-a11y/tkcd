@@ -11,6 +11,45 @@
  * DB bilgileri artık kodda değil, kök dizindeki .env dosyasından okunur.
  */
 
+// ─── 0. GATE KONTROLÜ — URL KAPISININ GEÇİLİP GEÇİLMEDİĞİNİ DOĞRULA ───
+// index.php'deki gate bloğu session bayrağını set eder.
+// Buradaki kontrol diğer olası doğrudan erişim denemelerini durdurur.
+if (session_status() === PHP_SESSION_NONE) {
+    session_start(); // Tam cookie ayarları aşağıdaki 1. blokta uygulanır
+}
+
+(static function (): void {
+    $envDosyasi = dirname(__DIR__, 2) . '/.env';
+    $gateToken  = '';
+    if (is_file($envDosyasi)) {
+        $satirlar = file($envDosyasi, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [];
+        foreach ($satirlar as $satir) {
+            $satir = trim($satir);
+            if (str_starts_with($satir, 'ADMIN_GATE_TOKEN=')) {
+                $ham       = substr($satir, strlen('ADMIN_GATE_TOKEN='));
+                $gateToken = trim($ham, '"\'' );
+                break;
+            }
+        }
+    }
+
+    if ($gateToken === '') {
+        return; // Token tanımlı değilse gate devre dışı
+    }
+
+    $beklenen = hash('sha256', $gateToken);
+    if (($_SESSION['gate_gecti'] ?? '') === $beklenen) {
+        return; // Gate bayrağı mevcut — erişim serbest
+    }
+
+    // Gate geçilmemiş → 404 gibi görünen hata
+    http_response_code(404);
+    header('Content-Type: text/html; charset=UTF-8');
+    echo '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><title>404 Not Found</title></head>'
+       . '<body><h1>Not Found</h1><p>The requested URL was not found on this server.</p></body></html>';
+    exit;
+})();
+
 // ─── 1. SESSION GÜVENLİĞİ ─────────────────────────────────────────────
 if (session_status() === PHP_SESSION_NONE) {
     $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
