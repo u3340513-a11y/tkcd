@@ -362,7 +362,6 @@ $genel_doluluk = empty($profil_doluluk) ? 0
         “Memleket sevdası,<br>insana en güzel hizmeti yaptırır.”
     </div>
 </div>
-
 <!-- ═══════════════════════════════════════════════════════════════
      A: İSTATİSTİK KARTLARI (Tasarım 1 — 8 kart, 4'lü satırlar)
      ═══════════════════════════════════════════════════════════════ -->
@@ -488,6 +487,79 @@ $genel_doluluk = empty($profil_doluluk) ? 0
             </div>
             <div class="dash-stat-card__icon" style="background: rgba(20,184,166,0.1); color: #14b8a6;">
                 <i class="fa-solid fa-user-check"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     C: TÜRKİYE HARİTASI — İl Bazlı Üye Dağılımı
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="dash-card">
+            <div class="dash-card__header">
+                <h5 class="dash-card__title">
+                    <i class="fa-solid fa-location-dot text-danger"></i> Üyelerin İllere Göre Dağılımı
+                </h5>
+                <span class="dash-card__action">Canlı Veri</span>
+            </div>
+            <div class="dash-card__body">
+                <div class="row g-4 align-items-center">
+                    <!-- Sol: Türkiye Haritası -->
+                    <div class="col-lg-8">
+                        <div style="position:relative; width:100%; padding-bottom:33%; min-height:220px;">
+                            <div id="turkiyeHaritasi" style="position:absolute; inset:0; cursor:pointer;"></div>
+                            <!-- İl Detay Paneli: tıklama ile haritanin üstüne gerçek-zamanlı açılır -->
+                            <div id="il-detay-panel" class="il-detay-panel" style="display:none;" role="region" aria-label="İl detay bilgisi">
+                            </div>
+                        </div>
+                        <p style="font-size:.75rem;color:#94a3b8;margin-top:6px;text-align:center;">
+                            <i class="fa-solid fa-hand-pointer" style="font-size:.7rem;"></i>
+                            Bir ile tıklayarak detay bilgisini görebilirsiniz
+                        </p>
+                    </div>
+                    <!-- Sağ: Top İller Listesi -->
+                    <div class="col-lg-4">
+                        <div class="p-3 rounded-3" style="background: #f8fafc;">
+                            <h6 class="fw-bold mb-3" style="font-size:0.85rem; color:#1e293b;">
+                                <i class="fa-solid fa-trophy text-warning me-1"></i> En Çok Üye Olan İller
+                            </h6>
+                            <div class="d-flex flex-column gap-2">
+                            <?php foreach (array_slice($il_verileri, 0, 5) as $si => $il):
+                                $il_max = (int)($il_verileri[0]['adet'] ?? 1);
+                                $il_adet = (int)$il['adet'];
+                                $il_yuzde = $il_max > 0 ? round(($il_adet / $il_max) * 100) : 0;
+                                $rank_renkler = ['#c0392b','#e74c3c','#e67e22','#f39c12','#2980b9'];
+                                $rank_renk = $rank_renkler[$si] ?? '#6b7280';
+                            ?>
+                            <div class="d-flex align-items-center gap-3 py-2 px-2 rounded-2 hover-bg"
+                                 style="transition:background 0.15s;">
+                                <span class="fw-bold d-flex align-items-center justify-content-center rounded-circle flex-shrink-0"
+                                      style="width:28px;height:28px;background:<?= $rank_renk ?>;color:#fff;font-size:0.75rem;">
+                                    <?= $si + 1 ?>
+                                </span>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="fw-semibold" style="font-size:0.88rem;"><?= htmlspecialchars($il['ikamet_ili']) ?></span>
+                                        <span class="fw-bold" style="color:<?= $rank_renk ?>;font-size:0.88rem;"><?= $il_adet ?></span>
+                                    </div>
+                                    <div style="height:4px;background:#e2e8f0;border-radius:2px;overflow:hidden;">
+                                        <div style="height:100%;width:<?= $il_yuzde ?>%;background:<?= $rank_renk ?>;border-radius:2px;transition:width 0.6s ease;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php endforeach; ?>
+                            </div>
+                            <?php if (count($il_verileri) > 5): ?>
+                            <a href="index.php?sayfa=uyeler" class="d-block text-center mt-4 py-2 px-4 rounded-2 fw-semibold text-decoration-none"
+                               style="background:#eef2ff;color:#3b82f6;font-size:0.85rem;">
+                                Tüm İlleri Gör <i class="fa-solid fa-arrow-right ms-1"></i>
+                            </a>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -683,234 +755,6 @@ $genel_doluluk = empty($profil_doluluk) ? 0
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════
-     HAFTALIK QUIZ ŞAMPİYONLARI
-     ═══════════════════════════════════════════════════════════════ -->
-<div class="row g-4 mb-4">
-    <div class="col-12">
-        <div class="dash-card">
-            <div class="dash-card__header">
-                <h5 class="dash-card__title">
-                    <i class="fa-solid fa-trophy text-warning"></i> Haftanın TS Bilgi Yarışması Şampiyonlar Ligi
-                </h5>
-                <a href="index.php?sayfa=quiz" class="dash-card__action" style="text-decoration:none; color:#e94560;">
-                    <i class="fa-solid fa-futbol me-1"></i> Yarışmaya Katıl
-                </a>
-            </div>
-            <div class="dash-card__body">
-                <?php if (empty($quiz_liderleri)): ?>
-                    <div class="text-center py-4">
-                        <div style="font-size:2.5rem; margin-bottom:0.5rem;">⚽</div>
-                        <p class="text-muted mb-1">Henüz bu hafta kimse yarışmaya katılmadı.</p>
-                        <a href="index.php?sayfa=quiz" class="btn btn-sm px-3 py-1 fw-bold rounded-pill" style="background:linear-gradient(135deg,#e94560,#c72c41); color:#fff; border:none;">
-                            İlk Sen Katıl!
-                        </a>
-                    </div>
-                <?php else: ?>
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0" style="font-size:0.9rem;">
-                            <thead>
-                                <tr style="border-bottom:2px solid #e94560;">
-                                    <th style="width:50px;">#</th>
-                                    <th>Kullanıcı</th>
-                                    <th class="text-center">Toplam Puan</th>
-                                    <th class="text-center">Oynama</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($quiz_liderleri as $qi => $ql): ?>
-                                <tr>
-                                    <td>
-                                        <?php if ($qi === 0): ?>
-                                            <span style="font-size:1.3rem;">🥇</span>
-                                        <?php elseif ($qi === 1): ?>
-                                            <span style="font-size:1.3rem;">🥈</span>
-                                        <?php elseif ($qi === 2): ?>
-                                            <span style="font-size:1.3rem;">🥉</span>
-                                        <?php else: ?>
-                                            <span class="fw-bold text-muted"><?= $qi + 1 ?></span>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td class="fw-bold"><?= htmlspecialchars($ql['kullanici_adi'], ENT_QUOTES, 'UTF-8') ?></td>
-                                    <td class="text-center">
-                                        <span class="badge rounded-pill px-3 py-1" style="background:linear-gradient(135deg,#e94560,#c72c41); font-size:0.85rem;">
-                                            <?= (int)$ql['en_yuksek_puan'] ?> puan
-                                        </span>
-                                    </td>
-                                    <td class="text-center text-muted"><?= (int)$ql['oynama_sayisi'] ?> kez</td>
-                                </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                <?php endif; ?>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════════
-     C: TÜRKİYE HARİTASI — İl Bazlı Üye Dağılımı
-     ═══════════════════════════════════════════════════════════════ -->
-<div class="row g-4 mb-4">
-    <div class="col-12">
-        <div class="dash-card">
-            <div class="dash-card__header">
-                <h5 class="dash-card__title">
-                    <i class="fa-solid fa-location-dot text-danger"></i> Üyelerin İllere Göre Dağılımı
-                </h5>
-                <span class="dash-card__action">Canlı Veri</span>
-            </div>
-            <div class="dash-card__body">
-                <div class="row g-4 align-items-center">
-                    <!-- Sol: Türkiye Haritası -->
-                    <div class="col-lg-8">
-                        <div style="position:relative; width:100%; padding-bottom:33%; min-height:220px;">
-                            <div id="turkiyeHaritasi" style="position:absolute; inset:0; cursor:pointer;"></div>
-                            <!-- İl Detay Paneli: tıklama ile haritanin üstüne gerçek-zamanlı açılır -->
-                            <div id="il-detay-panel" class="il-detay-panel" style="display:none;" role="region" aria-label="İl detay bilgisi">
-                            </div>
-                        </div>
-                        <p style="font-size:.75rem;color:#94a3b8;margin-top:6px;text-align:center;">
-                            <i class="fa-solid fa-hand-pointer" style="font-size:.7rem;"></i>
-                            Bir ile tıklayarak detay bilgisini görebilirsiniz
-                        </p>
-                    </div>
-                    <!-- Sağ: Top İller Listesi -->
-                    <div class="col-lg-4">
-                        <div class="p-3 rounded-3" style="background: #f8fafc;">
-                            <h6 class="fw-bold mb-3" style="font-size:0.85rem; color:#1e293b;">
-                                <i class="fa-solid fa-trophy text-warning me-1"></i> En Çok Üye Olan İller
-                            </h6>
-                            <div class="d-flex flex-column gap-2">
-                            <?php foreach (array_slice($il_verileri, 0, 5) as $si => $il):
-                                $il_max = (int)($il_verileri[0]['adet'] ?? 1);
-                                $il_adet = (int)$il['adet'];
-                                $il_yuzde = $il_max > 0 ? round(($il_adet / $il_max) * 100) : 0;
-                                $rank_renkler = ['#c0392b','#e74c3c','#e67e22','#f39c12','#2980b9'];
-                                $rank_renk = $rank_renkler[$si] ?? '#6b7280';
-                            ?>
-                            <div class="d-flex align-items-center gap-3 py-2 px-2 rounded-2 hover-bg"
-                                 style="transition:background 0.15s;">
-                                <span class="fw-bold d-flex align-items-center justify-content-center rounded-circle flex-shrink-0"
-                                      style="width:28px;height:28px;background:<?= $rank_renk ?>;color:#fff;font-size:0.75rem;">
-                                    <?= $si + 1 ?>
-                                </span>
-                                <div class="flex-grow-1">
-                                    <div class="d-flex justify-content-between align-items-center mb-1">
-                                        <span class="fw-semibold" style="font-size:0.88rem;"><?= htmlspecialchars($il['ikamet_ili']) ?></span>
-                                        <span class="fw-bold" style="color:<?= $rank_renk ?>;font-size:0.88rem;"><?= $il_adet ?></span>
-                                    </div>
-                                    <div style="height:4px;background:#e2e8f0;border-radius:2px;overflow:hidden;">
-                                        <div style="height:100%;width:<?= $il_yuzde ?>%;background:<?= $rank_renk ?>;border-radius:2px;transition:width 0.6s ease;"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <?php endforeach; ?>
-                            </div>
-                            <?php if (count($il_verileri) > 5): ?>
-                            <a href="index.php?sayfa=uyeler" class="d-block text-center mt-4 py-2 px-4 rounded-2 fw-semibold text-decoration-none"
-                               style="background:#eef2ff;color:#3b82f6;font-size:0.85rem;">
-                                Tüm İlleri Gör <i class="fa-solid fa-arrow-right ms-1"></i>
-                            </a>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-<!-- ═══════════════════════════════════════════════════════════════
-     E: KAN GRUBU  +  TRABZON İLÇELERİ  +  F: KURUMLAR
-     ═══════════════════════════════════════════════════════════════ -->
-<div class="row g-4 mb-4">
-
-    <!-- Kan Grubu Dağılımı -->
-    <div class="col-lg-4">
-        <div class="dash-card h-100">
-            <div class="dash-card__header">
-                <h5 class="dash-card__title"><i class="fa-solid fa-droplet text-danger"></i> Kan Grubu Dağılımı</h5>
-            </div>
-            <div class="dash-card__body text-center">
-                <?php if (!empty($admin_kan_etiketler)): ?>
-                <div style="position:relative; height:200px; max-height:200px;">
-                    <canvas id="kanGrubuGrafik"></canvas>
-                </div>
-                <div class="mt-3 d-flex flex-wrap justify-content-center gap-2">
-                    <?php
-                    $kan_toplam = array_sum($admin_kan_sayilar);
-                    foreach ($admin_kan_etiketler as $ki => $etiket):
-                        $yuzde = $kan_toplam > 0 ? round(($admin_kan_sayilar[$ki] / $kan_toplam) * 100) : 0;
-                    ?>
-                    <span class="badge bg-light text-dark border px-2 py-1" style="font-size:0.7rem;">
-                        <?= htmlspecialchars($etiket) ?>: %<?= $yuzde ?>
-                    </span>
-                    <?php endforeach; ?>
-                </div>
-                <?php else: ?>
-                <p class="text-muted small py-4">Kan grubu verisi bulunamadı.</p>
-                <?php endif; ?>
-            </div>
-        </div>
-    </div>
-
-    <!-- Trabzon İlçelerine Göre Üye Dağılımı -->
-    <div class="col-lg-4">
-        <div class="dash-card h-100">
-            <div class="dash-card__header">
-                <h5 class="dash-card__title"><i class="fa-solid fa-map text-success"></i> Trabzon İlçe Dağılımı</h5>
-            </div>
-            <div class="dash-card__body text-center">
-                <?php if (!empty($grafik_ekseni)): ?>
-                <div style="position:relative; height:200px; max-height:200px;">
-                    <canvas id="ilceDagilimi"></canvas>
-                </div>
-                <div class="mt-3 d-flex flex-wrap justify-content-center gap-2" style="max-height:90px; overflow-y:auto;">
-                    <?php
-                    $ilce_toplam = array_sum($grafik_sayilari);
-                    foreach ($grafik_ekseni as $gi => $etiket):
-                        $yuzde = $ilce_toplam > 0 ? round(($grafik_sayilari[$gi] / $ilce_toplam) * 100) : 0;
-                    ?>
-                    <span class="badge bg-light text-dark border px-2 py-1" style="font-size:0.7rem;">
-                        <?= htmlspecialchars($etiket) ?>: %<?= $yuzde ?>
-                    </span>
-                    <?php endforeach; ?>
-                </div>
-                <?php else: ?>
-                <p class="text-muted small py-4">Trabzon ilçesi verisi bulunamadı.</p>
-                <?php endif; ?>
-            </div>
-        </div>
-    </div>
-
-    <!-- En Çok Üye Olan Kurumlar -->
-    <div class="col-lg-4">
-        <div class="dash-card h-100">
-            <div class="dash-card__header">
-                <h5 class="dash-card__title"><i class="fa-solid fa-building text-info"></i> En Çok Üye Olan Kurumlar</h5>
-                <span class="badge bg-info bg-opacity-10 text-info"><?= $admin_toplam_kurum ?> kurum</span>
-            </div>
-            <div class="dash-card__body" style="max-height:360px; overflow-y:auto;">
-                <table class="dash-kurum-table">
-                    <thead><tr><th>#</th><th>Kurum</th><th>Üye</th></tr></thead>
-                    <tbody>
-                    <?php foreach ($admin_kurum_verileri as $ki => $kurum): ?>
-                    <tr>
-                        <td class="kurum-rank"><?= $ki + 1 ?></td>
-                        <td><?= htmlspecialchars($kurum['kurum']) ?></td>
-                        <td><strong><?= $kurum['adet'] ?></strong></td>
-                    </tr>
-                    <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════════
      F: SON EKLENEN ÜYELER  +  J: HIZLI İŞLEMLER
      ═══════════════════════════════════════════════════════════════ -->
 <div class="row g-4 mb-4">
@@ -1027,11 +871,11 @@ $genel_doluluk = empty($profil_doluluk) ? 0
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════
-     ÜYE PROFIL DOLULUK ORANI
+     ÜYE PROFİL DOLULUK + SİSTEM DURUMU
      ═══════════════════════════════════════════════════════════════ -->
 <?php if (!empty($profil_doluluk)): ?>
 <div class="row g-4 mb-4">
-    <div class="col-12">
+    <div class="col-lg-7">
         <div class="dash-card">
             <div class="dash-card__header">
                 <h5 class="dash-card__title">
@@ -1108,14 +952,6 @@ $genel_doluluk = empty($profil_doluluk) ? 0
             </div>
         </div>
     </div>
-</div>
-<?php endif; ?>
-
-<!-- ═══════════════════════════════════════════════════════════════
-     H: DUYURULAR  +  L: DİKKAT UYARILARI
-     ═══════════════════════════════════════════════════════════════ -->
-<div class="row g-4 mb-4">
-
     <!-- Sistem Durumu Kartı — sadece yönetim/geliştirici rolü -->
     <?php if ($is_yonetim || $is_gelistirici): ?>
     <?php
@@ -1199,7 +1035,7 @@ $genel_doluluk = empty($profil_doluluk) ? 0
             ],
         ];
     ?>
-    <div class="col-lg-6">
+    <div class="col-lg-5">
         <div class="dash-card h-100">
             <div class="dash-card__header">
                 <h5 class="dash-card__title">
@@ -1265,10 +1101,15 @@ $genel_doluluk = empty($profil_doluluk) ? 0
         </div>
     </div>
     <?php endif; ?>
+</div>
+<?php endif; ?>
 
-
+<!-- ═══════════════════════════════════════════════════════════════
+     DİKKAT GEREKTİRENLER
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="row g-4 mb-4">
     <!-- Dikkat Gerektiren Uyarılar (Tasarım 2) -->
-    <div class="col-lg-6">
+    <div class="col-12">
         <div class="dash-alert-card h-100">
             <div class="dash-alert-card__title">
                 <i class="fa-solid fa-triangle-exclamation me-2"></i>Dikkat Gerektirenler
@@ -1311,6 +1152,162 @@ $genel_doluluk = empty($profil_doluluk) ? 0
         </div>
     </div>
 </div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     E: KAN GRUBU  +  TRABZON İLÇELERİ  +  F: KURUMLAR
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="row g-4 mb-4">
+
+    <!-- Kan Grubu Dağılımı -->
+    <div class="col-lg-4">
+        <div class="dash-card h-100">
+            <div class="dash-card__header">
+                <h5 class="dash-card__title"><i class="fa-solid fa-droplet text-danger"></i> Kan Grubu Dağılımı</h5>
+            </div>
+            <div class="dash-card__body text-center">
+                <?php if (!empty($admin_kan_etiketler)): ?>
+                <div style="position:relative; height:200px; max-height:200px;">
+                    <canvas id="kanGrubuGrafik"></canvas>
+                </div>
+                <div class="mt-3 d-flex flex-wrap justify-content-center gap-2">
+                    <?php
+                    $kan_toplam = array_sum($admin_kan_sayilar);
+                    foreach ($admin_kan_etiketler as $ki => $etiket):
+                        $yuzde = $kan_toplam > 0 ? round(($admin_kan_sayilar[$ki] / $kan_toplam) * 100) : 0;
+                    ?>
+                    <span class="badge bg-light text-dark border px-2 py-1" style="font-size:0.7rem;">
+                        <?= htmlspecialchars($etiket) ?>: %<?= $yuzde ?>
+                    </span>
+                    <?php endforeach; ?>
+                </div>
+                <?php else: ?>
+                <p class="text-muted small py-4">Kan grubu verisi bulunamadı.</p>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trabzon İlçelerine Göre Üye Dağılımı -->
+    <div class="col-lg-4">
+        <div class="dash-card h-100">
+            <div class="dash-card__header">
+                <h5 class="dash-card__title"><i class="fa-solid fa-map text-success"></i> Trabzon İlçe Dağılımı</h5>
+            </div>
+            <div class="dash-card__body text-center">
+                <?php if (!empty($grafik_ekseni)): ?>
+                <div style="position:relative; height:200px; max-height:200px;">
+                    <canvas id="ilceDagilimi"></canvas>
+                </div>
+                <div class="mt-3 d-flex flex-wrap justify-content-center gap-2" style="max-height:90px; overflow-y:auto;">
+                    <?php
+                    $ilce_toplam = array_sum($grafik_sayilari);
+                    foreach ($grafik_ekseni as $gi => $etiket):
+                        $yuzde = $ilce_toplam > 0 ? round(($grafik_sayilari[$gi] / $ilce_toplam) * 100) : 0;
+                    ?>
+                    <span class="badge bg-light text-dark border px-2 py-1" style="font-size:0.7rem;">
+                        <?= htmlspecialchars($etiket) ?>: %<?= $yuzde ?>
+                    </span>
+                    <?php endforeach; ?>
+                </div>
+                <?php else: ?>
+                <p class="text-muted small py-4">Trabzon ilçesi verisi bulunamadı.</p>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+
+    <!-- En Çok Üye Olan Kurumlar -->
+    <div class="col-lg-4">
+        <div class="dash-card h-100">
+            <div class="dash-card__header">
+                <h5 class="dash-card__title"><i class="fa-solid fa-building text-info"></i> En Çok Üye Olan Kurumlar</h5>
+                <span class="badge bg-info bg-opacity-10 text-info"><?= $admin_toplam_kurum ?> kurum</span>
+            </div>
+            <div class="dash-card__body" style="max-height:360px; overflow-y:auto;">
+                <table class="dash-kurum-table">
+                    <thead><tr><th>#</th><th>Kurum</th><th>Üye</th></tr></thead>
+                    <tbody>
+                    <?php foreach ($admin_kurum_verileri as $ki => $kurum): ?>
+                    <tr>
+                        <td class="kurum-rank"><?= $ki + 1 ?></td>
+                        <td><?= htmlspecialchars($kurum['kurum']) ?></td>
+                        <td><strong><?= $kurum['adet'] ?></strong></td>
+                    </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     HAFTALIK QUIZ ŞAMPİYONLARI
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="dash-card">
+            <div class="dash-card__header">
+                <h5 class="dash-card__title">
+                    <i class="fa-solid fa-trophy text-warning"></i> Haftanın TS Bilgi Yarışması Şampiyonlar Ligi
+                </h5>
+                <a href="index.php?sayfa=quiz" class="dash-card__action" style="text-decoration:none; color:#e94560;">
+                    <i class="fa-solid fa-futbol me-1"></i> Yarışmaya Katıl
+                </a>
+            </div>
+            <div class="dash-card__body">
+                <?php if (empty($quiz_liderleri)): ?>
+                    <div class="text-center py-4">
+                        <div style="font-size:2.5rem; margin-bottom:0.5rem;">⚽</div>
+                        <p class="text-muted mb-1">Henüz bu hafta kimse yarışmaya katılmadı.</p>
+                        <a href="index.php?sayfa=quiz" class="btn btn-sm px-3 py-1 fw-bold rounded-pill" style="background:linear-gradient(135deg,#e94560,#c72c41); color:#fff; border:none;">
+                            İlk Sen Katıl!
+                        </a>
+                    </div>
+                <?php else: ?>
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0" style="font-size:0.9rem;">
+                            <thead>
+                                <tr style="border-bottom:2px solid #e94560;">
+                                    <th style="width:50px;">#</th>
+                                    <th>Kullanıcı</th>
+                                    <th class="text-center">Toplam Puan</th>
+                                    <th class="text-center">Oynama</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($quiz_liderleri as $qi => $ql): ?>
+                                <tr>
+                                    <td>
+                                        <?php if ($qi === 0): ?>
+                                            <span style="font-size:1.3rem;">🥇</span>
+                                        <?php elseif ($qi === 1): ?>
+                                            <span style="font-size:1.3rem;">🥈</span>
+                                        <?php elseif ($qi === 2): ?>
+                                            <span style="font-size:1.3rem;">🥉</span>
+                                        <?php else: ?>
+                                            <span class="fw-bold text-muted"><?= $qi + 1 ?></span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class="fw-bold"><?= htmlspecialchars($ql['kullanici_adi'], ENT_QUOTES, 'UTF-8') ?></td>
+                                    <td class="text-center">
+                                        <span class="badge rounded-pill px-3 py-1" style="background:linear-gradient(135deg,#e94560,#c72c41); font-size:0.85rem;">
+                                            <?= (int)$ql['en_yuksek_puan'] ?> puan
+                                        </span>
+                                    </td>
+                                    <td class="text-center text-muted"><?= (int)$ql['oynama_sayisi'] ?> kez</td>
+                                </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <?php if ($is_yonetim || $is_gelistirici): ?>
 <!-- ═══════════════════════════════════════════════════════════════
