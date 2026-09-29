@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Core;
 
+use App\Application\Service\MailService;
 use App\Application\Service\LayoutDataComposer;
 use App\Application\Service\VisitorLogger;
 use App\Core\Exception\HttpNotFoundException;
@@ -30,6 +31,7 @@ use App\Infrastructure\Content\PhpFileEventRepository;
 use App\Infrastructure\Content\PhpFileMilestoneRepository;
 use App\Infrastructure\Content\PhpFileStatisticRepository;
 use App\Infrastructure\Membership\PdoMembershipRepository;
+use App\Infrastructure\Persistence\ContactRepository;
 use PDO;
 use Throwable;
 
@@ -160,6 +162,35 @@ final class Application
                 };
 
                 return new PdoMembershipRepository($pdoFactory);
+            }
+        );
+
+        // İletişim formu: MailService + ContactRepository
+        // Her ikisi de PDO gerektirdiğinden factory pattern ile lazy yüklenir.
+        $this->container->factory(
+            MailService::class,
+            fn() => new MailService($this->config)
+        );
+
+        $this->container->factory(
+            ContactRepository::class,
+            static function (): ContactRepository {
+                $host    = Env::string('DB_HOST',     '127.0.0.1');
+                $port    = Env::string('DB_PORT',     '3306');
+                $dbname  = Env::string('DB_DATABASE', '');
+                $user    = Env::string('DB_USERNAME', '');
+                $pass    = Env::string('DB_PASSWORD', '');
+                $charset = Env::string('DB_CHARSET',  'utf8mb4');
+
+                $dsn = "mysql:host={$host};port={$port};dbname={$dbname};charset={$charset}";
+
+                $pdo = new PDO($dsn, $user, $pass, [
+                    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    PDO::ATTR_EMULATE_PREPARES   => false,
+                ]);
+
+                return new ContactRepository($pdo);
             }
         );
     }

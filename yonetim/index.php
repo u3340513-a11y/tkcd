@@ -395,6 +395,15 @@ switch ($sayfa) {
         }
         break;
 
+    case 'iletisim-mesajlari':
+        if (!$is_gelistirici) {
+            echo '<div class="container py-5"><div class="alert alert-danger text-center fw-bold"><i class="fa-solid fa-lock me-2"></i>Erişim Engellendi: Bu sayfa yalnızca geliştirici hesabına özeldir.</div></div>';
+        } else {
+            log_kaydet($db_baglanti, 'sayfa_goruntulem', 'İletişim mesajları sayfası açıldı.');
+            include 'inc/iletisim-mesajlari.php';
+        }
+        break;
+
     case 'quiz':
         log_kaydet($db_baglanti, 'sayfa_goruntulem', 'Bilgi yarışması sayfası açıldı.');
         include 'inc/quiz.php';

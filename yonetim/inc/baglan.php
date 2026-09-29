@@ -239,6 +239,27 @@ function csrf_hidden_alan(): string
     } catch (\PDOException $e) {
         error_log("Migration hatası (duyurular tablosu): " . $e->getMessage());
     }
+
+    // iletisim_mesajlari tablosu — /iletisim formundan gelen mesajlar
+    try {
+        $db_baglanti->exec("
+            CREATE TABLE IF NOT EXISTS `iletisim_mesajlari` (
+                `id`          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                `ad`          VARCHAR(150) NOT NULL,
+                `eposta`      VARCHAR(255) NOT NULL,
+                `konu`        VARCHAR(255) NOT NULL,
+                `mesaj`       TEXT NOT NULL,
+                `mail_durum`  ENUM('gonderildi','hata') NOT NULL DEFAULT 'gonderildi',
+                `okundu`      TINYINT(1) NOT NULL DEFAULT 0,
+                `ip_adresi`   VARCHAR(45) NULL,
+                `olusturuldu` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                INDEX `idx_okundu`      (`okundu`),
+                INDEX `idx_olusturuldu` (`olusturuldu` DESC)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        ");
+    } catch (\PDOException $e) {
+        error_log("Migration hatası (iletisim_mesajlari tablosu): " . $e->getMessage());
+    }
 })();
 
 // ─── KİŞİSEL İLETİŞİM BİLGİSİ YETKİ KONTROLÜ ──────────────────────────

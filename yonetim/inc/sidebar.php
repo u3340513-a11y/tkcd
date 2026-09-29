@@ -117,6 +117,22 @@ if (!$is_kisitli_rol) {
                 <i class="sb-link__icon fa-solid fa-bullhorn"></i>
                 <span>Duyurular</span>
             </a>
+            <a class="sb-link <?= $sayfa === 'iletisim-mesajlari' ? 'sb-link--active' : '' ?>"
+               href="index.php?sayfa=iletisim-mesajlari"
+               style="position:relative;">
+                <i class="sb-link__icon fa-solid fa-envelope"></i>
+                <span>İletişim Mesajları</span>
+                <?php
+                // Okunmamış mesaj rozeti
+                try {
+                    $sb_okunmamis = (int) $db_baglanti
+                        ->query("SELECT COUNT(*) FROM iletisim_mesajlari WHERE okundu = 0")
+                        ->fetchColumn();
+                    if ($sb_okunmamis > 0): ?>
+                <span class="sb-link__badge" style="background:#ef4444;color:#fff;"><?= $sb_okunmamis ?></span>
+                    <?php endif;
+                } catch (\Throwable $e) { } ?>
+            </a>
             <?php else: ?>
             <a class="sb-link sb-link--disabled" href="#" aria-disabled="true" tabindex="-1">
                 <i class="sb-link__icon fa-solid fa-bullhorn"></i>
