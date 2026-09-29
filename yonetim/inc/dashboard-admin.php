@@ -236,10 +236,10 @@ try {
     // Temel istatistikler
     $il_stat_sorgu = $db_baglanti->query(
         "SELECT
-             TRIM(ikamet_ili)                                                          AS il,
-             COUNT(*)                                                                   AS toplam_uye,
+             TRIM(ikamet_ili)                                                              AS il,
+             COUNT(*)                                                                       AS toplam_uye,
              COUNT(DISTINCT CASE WHEN TRIM(ikamet_ilcesi) != '' THEN TRIM(ikamet_ilcesi) END) AS ilce_sayisi,
-             COUNT(DISTINCT CASE WHEN TRIM(calistigi_kurum)  != '' THEN TRIM(calistigi_kurum)  END) AS kurum_sayisi,
+             COUNT(DISTINCT CASE WHEN TRIM(kurum) != '' THEN TRIM(kurum) END)              AS kurum_sayisi,
              SUM(CASE WHEN (temsilci_turu IS NOT NULL AND TRIM(temsilci_turu) != '')
                         OR  (ek_gorev     IS NOT NULL AND TRIM(ek_gorev)     != '') THEN 1 ELSE 0 END) AS temsilci_sayisi
            FROM dernek_uyeler
