@@ -397,6 +397,11 @@ function formatDogum(array $b): string
             $dogum     = formatDogum($b);
             $il        = htmlspecialchars($b['ikamet_ili']    ?: '-');
             $ilce      = htmlspecialchars($b['ikamet_ilcesi'] ?: ($b['trabzon_ilcesi'] ?: '-'));
+            // Başvuru tarihi
+            $kayitTarihi = '';
+            if (!empty($b['kayit_tarihi']) && $b['kayit_tarihi'] !== '0000-00-00' && $b['kayit_tarihi'] !== '0000-00-00 00:00:00') {
+                $kayitTarihi = date('d.m.Y', strtotime($b['kayit_tarihi']));
+            }
         ?>
         <div class="bub-kart">
             <div class="bub-kart__renk-serit <?= $isKadin ? 'bub-kart__renk-serit--kadin' : '' ?>"></div>
@@ -414,8 +419,13 @@ function formatDogum(array $b): string
                     <span class="bub-kart__kan bub-kart__kan--bos">Kan Grubu Yok</span>
                     <?php endif; ?>
                 </div>
-                <div style="text-align:right;flex-shrink:0;">
-                    <small style="color:#adb5bd;font-size:0.72rem;">#<?= (int)$b['id'] ?></small>
+                <div style="text-align:right;flex-shrink:0;min-width:0;">
+                    <small style="color:#adb5bd;font-size:0.72rem;display:block;">#<?= (int)$b['id'] ?></small>
+                    <?php if ($kayitTarihi !== ''): ?>
+                    <span style="font-size:0.68rem;color:#adb5bd;white-space:nowrap;">
+                        <i class="fa-regular fa-calendar me-1"></i><?= $kayitTarihi ?>
+                    </span>
+                    <?php endif; ?>
                 </div>
             </div>
 
