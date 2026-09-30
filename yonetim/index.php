@@ -463,6 +463,11 @@ switch ($sayfa) {
         }
         break;
 
+    case 'bos-il-excel':
+        // Doğrudan dosya indirme — sayfa template'i kullanmaz, exit ile biter
+        include 'inc/bos-il-excel.php';
+        exit;
+
     case 'quiz':
         log_kaydet($db_baglanti, 'sayfa_goruntulem', 'Bilgi yarışması sayfası açıldı.');
         include 'inc/quiz.php';
