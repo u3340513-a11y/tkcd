@@ -58,6 +58,15 @@ if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'basvuru_onayla' && isset($_
             )->execute([$uyeId]);
 
             $onayAdi = $mevcut['adi_soyadi'] ?? ('Bilinmeyen #' . $uyeId);
+
+            // Zorunlu notu dernek_notlar tablosuna kaydet
+            $onayNotu = trim($_POST['islem_notu'] ?? '');
+            if ($onayNotu !== '') {
+                $db_baglanti->prepare(
+                    "INSERT INTO dernek_notlar (uye_id, not_icerik) VALUES (?, ?)"
+                )->execute([$uyeId, '✅ ONAY NOTU: ' . $onayNotu]);
+            }
+
             log_kaydet($db_baglanti, 'uye_onayla', $onayAdi . ' adlı başvuru onaylandı.', 'dernek_uyeler', $uyeId);
             echo "<script>window.location.href='index.php?sayfa=bekleyen-uyeler&mesaj_durum=onaylandi';</script>";
             exit;
@@ -79,11 +88,17 @@ if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'basvuru_reddet' && isset($_
         $redAdSorgu->execute([$uyeId]);
         $redAdi = $redAdSorgu->fetchColumn() ?: ('Bilinmeyen #' . $uyeId);
 
+        $redNotu = trim($_POST['islem_notu'] ?? '');
+
         $db_baglanti->prepare(
             "DELETE FROM dernek_uyeler WHERE id = ? AND onay_durumu = 'bekleyen'"
         )->execute([$uyeId]);
 
-        log_kaydet($db_baglanti, 'uye_reddet', $redAdi . ' adlı başvuru reddedildi.', 'dernek_uyeler', $uyeId);
+        $logMesaj = $redAdi . ' adlı başvuru reddedildi.';
+        if ($redNotu !== '') {
+            $logMesaj .= ' | Red Notu: ' . $redNotu;
+        }
+        log_kaydet($db_baglanti, 'uye_reddet', $logMesaj, 'dernek_uyeler', $uyeId);
         echo "<script>window.location.href='index.php?sayfa=bekleyen-uyeler&mesaj_durum=reddedildi';</script>";
         exit;
     } catch (\PDOException $e) {
@@ -451,16 +466,16 @@ function formatDogum(array $b): string
                         <i class="fa-solid fa-lock me-1"></i>İşlem Yetkiniz Yok
                     </div>
                 <?php else: ?>
-                    <a href="index.php?sayfa=bekleyen-uyeler&aksiyon=basvuru_onayla&id=<?= (int)$b['id'] ?>"
-                       class="bub-kart__btn bub-kart__btn--onayla"
-                       onclick="return confirm('<?= htmlspecialchars($b['adi_soyadi']) ?> isimli adayı üye olarak onaylıyor musunuz?')">
+                    <button type="button"
+                            class="bub-kart__btn bub-kart__btn--onayla"
+                            onclick="islemModalAc('onayla', <?= (int)$b['id'] ?>, '<?= htmlspecialchars(addslashes($b['adi_soyadi'])) ?>')">
                         <i class="fa-solid fa-user-check"></i> Onayla
-                    </a>
-                    <a href="index.php?sayfa=bekleyen-uyeler&aksiyon=basvuru_reddet&id=<?= (int)$b['id'] ?>"
-                       class="bub-kart__btn bub-kart__btn--reddet"
-                       onclick="return confirm('<?= htmlspecialchars($b['adi_soyadi']) ?> başvurusunu reddetmek istediğinize emin misiniz?')">
+                    </button>
+                    <button type="button"
+                            class="bub-kart__btn bub-kart__btn--reddet"
+                            onclick="islemModalAc('reddet', <?= (int)$b['id'] ?>, '<?= htmlspecialchars(addslashes($b['adi_soyadi'])) ?>')">
                         <i class="fa-solid fa-user-xmark"></i> Reddet
-                    </a>
+                    </button>
                 <?php endif; ?>
             </div>
         </div>
@@ -474,3 +489,165 @@ function formatDogum(array $b): string
     </div>
 
 </div>
+<!-- ── ONAY / RED MODAL ──────────────────────────────────────────────── -->
+<div class="bub-modal-arka" id="islem-modal" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="modal-baslik">
+    <div class="bub-modal">
+        <div class="bub-modal__ust" id="modal-ust">
+            <div class="bub-modal__ikon" id="modal-ikon">
+                <i class="fa-solid fa-user-check" id="modal-ikon-i"></i>
+            </div>
+            <div>
+                <h5 class="bub-modal__baslik" id="modal-baslik">İşlem Onayı</h5>
+                <p class="bub-modal__alt-baslik" id="modal-alt-baslik"></p>
+            </div>
+        </div>
+
+        <form id="islem-form" method="POST" action="">
+            <input type="hidden" name="islem_turu" id="modal-islem-turu">
+            <div class="bub-modal__alan">
+                <label class="bub-modal__etiket" for="modal-not">
+                    Açıklama / Not <span style="color:#dc3545;">*</span>
+                </label>
+                <textarea
+                    id="modal-not"
+                    name="islem_notu"
+                    class="bub-modal__textarea"
+                    rows="4"
+                    required
+                    placeholder="Bu işlem için zorunlu bir not giriniz..."></textarea>
+                <p class="bub-modal__ipucu">Bu not üye kartına kaydedilecektir.</p>
+            </div>
+            <div class="bub-modal__butonlar">
+                <button type="button" class="bub-modal__btn bub-modal__btn--iptal"
+                        onclick="islemModalKapat()">Vazgeç</button>
+                <button type="submit" class="bub-modal__btn bub-modal__btn--onayla" id="modal-onayla-btn">
+                    <i class="fa-solid fa-user-check me-1"></i> Onayla
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.bub-modal-arka {
+    position: fixed; inset: 0; z-index: 9999;
+    background: rgba(0,0,0,.55);
+    backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 1rem;
+    animation: modalFadeIn .2s ease;
+}
+@keyframes modalFadeIn { from { opacity:0 } to { opacity:1 } }
+.bub-modal {
+    background: #fff;
+    border-radius: 20px;
+    width: 100%; max-width: 480px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.25);
+    overflow: hidden;
+    animation: modalSlideUp .22s ease;
+}
+@keyframes modalSlideUp { from { transform:translateY(30px);opacity:0 } to { transform:translateY(0);opacity:1 } }
+.bub-modal__ust {
+    padding: 1.4rem 1.5rem 1rem;
+    display: flex; align-items: flex-start; gap: 1rem;
+    border-bottom: 1px solid #f0f0f5;
+}
+.bub-modal__ikon {
+    width: 48px; height: 48px; border-radius: 14px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+}
+.bub-modal__ikon--onayla { background: rgba(0,184,148,.12); color: #00b894; }
+.bub-modal__ikon--reddet { background: rgba(231,76,60,.12); color: #e74c3c; }
+.bub-modal__baslik { margin: 0; font-weight: 800; font-size: 1rem; color: #1a1a2e; }
+.bub-modal__alt-baslik { margin: 0.2rem 0 0; font-size: 0.84rem; color: #6c757d; }
+.bub-modal__alan { padding: 1.25rem 1.5rem 0.5rem; }
+.bub-modal__etiket {
+    display: block; font-size: 0.78rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .04em;
+    color: #6c757d; margin-bottom: 0.45rem;
+}
+.bub-modal__textarea {
+    width: 100%; border: 1.5px solid #e9ecef; border-radius: 12px;
+    padding: 0.7rem 0.9rem; font-size: 0.88rem; color: #343a40;
+    resize: vertical; outline: none;
+    transition: border-color .18s, box-shadow .18s;
+    font-family: inherit;
+}
+.bub-modal__textarea:focus {
+    border-color: #0f3460;
+    box-shadow: 0 0 0 3px rgba(15,52,96,.1);
+}
+.bub-modal__ipucu { font-size: 0.72rem; color: #adb5bd; margin: 0.35rem 0 0; }
+.bub-modal__butonlar {
+    padding: 1rem 1.5rem 1.4rem;
+    display: flex; gap: 0.7rem;
+}
+.bub-modal__btn {
+    flex: 1; border: none; border-radius: 11px; padding: 0.7rem;
+    font-weight: 700; font-size: 0.88rem; cursor: pointer;
+    transition: filter .15s, transform .15s;
+}
+.bub-modal__btn:hover { filter: brightness(1.07); transform: scale(1.02); }
+.bub-modal__btn--iptal {
+    background: #f8f9fa; color: #6c757d;
+    border: 1.5px solid #dee2e6;
+}
+.bub-modal__btn--onayla {
+    background: linear-gradient(135deg, #00b894, #00cec9);
+    color: #fff; box-shadow: 0 4px 12px rgba(0,184,148,.3);
+}
+.bub-modal__btn--reddet-stil {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: #fff; box-shadow: 0 4px 12px rgba(231,76,60,.3);
+}
+</style>
+
+<script>
+function islemModalAc(tur, uyeId, uyeAdi) {
+    const modal  = document.getElementById('islem-modal');
+    const form   = document.getElementById('islem-form');
+    const baslik = document.getElementById('modal-baslik');
+    const altBas = document.getElementById('modal-alt-baslik');
+    const ikon   = document.getElementById('modal-ikon');
+    const ikonI  = document.getElementById('modal-ikon-i');
+    const onaylaBt = document.getElementById('modal-onayla-btn');
+    const textarea = document.getElementById('modal-not');
+
+    textarea.value = '';
+
+    if (tur === 'onayla') {
+        form.action = 'index.php?sayfa=bekleyen-uyeler&aksiyon=basvuru_onayla&id=' + uyeId;
+        baslik.textContent = 'Başvuruyu Onayla';
+        altBas.textContent = uyeAdi + ' isimli adayı üye olarak onaylıyorsunuz.';
+        ikon.className = 'bub-modal__ikon bub-modal__ikon--onayla';
+        ikonI.className = 'fa-solid fa-user-check';
+        onaylaBt.className = 'bub-modal__btn bub-modal__btn--onayla';
+        onaylaBt.innerHTML = '<i class="fa-solid fa-user-check me-1"></i> Onayla';
+    } else {
+        form.action = 'index.php?sayfa=bekleyen-uyeler&aksiyon=basvuru_reddet&id=' + uyeId;
+        baslik.textContent = 'Başvuruyu Reddet';
+        altBas.textContent = uyeAdi + ' isimli başvuruyu reddedeceksiniz.';
+        ikon.className = 'bub-modal__ikon bub-modal__ikon--reddet';
+        ikonI.className = 'fa-solid fa-user-xmark';
+        onaylaBt.className = 'bub-modal__btn bub-modal__btn--reddet-stil';
+        onaylaBt.innerHTML = '<i class="fa-solid fa-user-xmark me-1"></i> Reddet';
+    }
+
+    modal.style.display = 'flex';
+    setTimeout(() => textarea.focus(), 100);
+}
+
+function islemModalKapat() {
+    document.getElementById('islem-modal').style.display = 'none';
+}
+
+// ESC tuşuyla kapat
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') islemModalKapat();
+});
+
+// Arka plana tıklayınca kapat
+document.getElementById('islem-modal').addEventListener('click', function(e) {
+    if (e.target === this) islemModalKapat();
+});
+</script>
