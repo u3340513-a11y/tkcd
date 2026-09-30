@@ -434,9 +434,13 @@ function formatDogum(array $b): string
                     <span class="bub-kart__bilgi-etiket"><i class="fa-solid fa-briefcase me-1"></i>Ünvan</span>
                     <span class="bub-kart__bilgi-deger"><?= htmlspecialchars($b['gorev_unvan'] ?: '-') ?></span>
                 </div>
-                <div class="bub-kart__bilgi bub-kart__bilgi--tam">
+                <div class="bub-kart__bilgi">
                     <span class="bub-kart__bilgi-etiket"><i class="fa-solid fa-id-badge me-1"></i>Çalışma Şekli</span>
                     <span class="bub-kart__bilgi-deger"><?= htmlspecialchars($b['calisma_sekli'] ?: '-') ?></span>
+                </div>
+                <div class="bub-kart__bilgi">
+                    <span class="bub-kart__bilgi-etiket"><i class="fa-solid fa-location-dot me-1"></i>Trabzon İlçesi</span>
+                    <span class="bub-kart__bilgi-deger"><?= htmlspecialchars($b['trabzon_ilcesi'] ?: '-') ?></span>
                 </div>
             </div>
 
