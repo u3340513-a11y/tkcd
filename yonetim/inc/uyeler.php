@@ -223,376 +223,672 @@ try {
 }
 ?>
 
-<div class="container-fluid px-2 px-md-4 py-3" style="max-width: 100%; overflow-x: hidden;">
-    
-    <!-- ÜST HEADER BÖLÜMÜ -->
-    <div class="row mb-3 align-items-center g-2" style="margin-left: 0 !important; margin-right: 0 !important;">
-        <div class="col-12 col-md-5 text-center text-md-start px-0">
-            <h3 class="fw-bold text-dark mb-0 fs-4"><i class="fa-solid fa-users me-2"></i>Üye Listesi</h3>
-            <p class="text-muted mb-0 small">
-                <?php 
-                if($aktif_filtre === 'kurum_temsilcisi') echo 'Filtrelenen: Kurum Temsilcileri Listesi';
-                elseif($aktif_filtre === 'yonetim_kurulu') echo 'Filtrelenen: Yönetim Kurulu Üyeleri Listesi';
-                elseif($aktif_filtre === 'bolge_koordinatoru') echo 'Filtrelenen: Bölge Koordinatörleri Listesi';
-                elseif($aktif_filtre === 'il_baskani') echo 'Filtrelenen: İl Başkanları Listesi';
-                elseif($aktif_filtre === 'ilce_baskani') echo 'Filtrelenen: İlçe Başkanları Listesi';
-                elseif($aktif_filtre === 'teskilatlanma_sorumlusu') echo 'Filtrelenen: Teşkilatlanma, Komiteler ve Temsilcilerden Sorumlu Başkan Listesi';
-                elseif($aktif_filtre === 'kadin_kollari') echo 'Filtrelenen: Kadın Kolları Başkanları Listesi';
-                elseif($aktif_filtre === 'aktif_iller') echo 'Filtrelenen: Aktif İl Listesi (Toplam ' . $toplam_onayli . ' İl)';
-                else echo 'Derneğe kayıtlı aktif üyeler listesi.';
+<style>
+/* ═══════════════════════════════════════════════════
+   Üye Listesi — Modern Tasarım
+   Tüm iş mantığı korunmuştur; yalnızca görsel katman
+   yeniden tasarlandı.
+═══════════════════════════════════════════════════ */
+
+/* ── Header ──────────────────────────────────────── */
+.ul-header {
+    display: flex; align-items: center; gap: 1rem;
+    flex-wrap: wrap; margin-bottom: 1.5rem;
+    background: #fff;
+    border: 1px solid #eef0f5;
+    border-radius: 16px;
+    padding: 1rem 1.25rem;
+    box-shadow: 0 2px 16px rgba(0,0,0,.05);
+}
+.ul-header__ikon {
+    width: 46px; height: 46px; border-radius: 13px; flex-shrink: 0;
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 14px rgba(26,26,46,.3);
+}
+.ul-header__ikon i { color: #00c9a7; font-size: 1.15rem; }
+.ul-header__baslik { font-size: 1.2rem; font-weight: 800; color: #1a1a2e; margin: 0; }
+.ul-header__aciklama { color: #6c757d; font-size: 0.8rem; margin: 0; }
+.ul-header__sag { margin-left: auto; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+
+/* Arama input */
+.ul-arama-grup {
+    display: flex; align-items: center;
+    border: 1.5px solid #e9ecef; border-radius: 10px;
+    overflow: hidden; background: #fff;
+    transition: border-color .18s, box-shadow .18s;
+}
+.ul-arama-grup:focus-within {
+    border-color: #1a1a2e;
+    box-shadow: 0 0 0 3px rgba(26,26,46,.1);
+}
+.ul-arama-grup__ikon {
+    padding: 0 0.75rem; color: #adb5bd; font-size: 0.85rem;
+    background: #f8f9fa; border-right: 1.5px solid #e9ecef;
+    height: 36px; display: flex; align-items: center;
+}
+.ul-arama-input {
+    border: none; outline: none; padding: 0 0.8rem;
+    font-size: 0.85rem; color: #343a40; height: 36px; width: 220px;
+    background: transparent;
+}
+.ul-arama-input::placeholder { color: #adb5bd; }
+
+/* Export butonları */
+.ul-btn {
+    height: 36px; border: none; border-radius: 9px;
+    padding: 0 0.9rem; font-weight: 700; font-size: 0.78rem;
+    cursor: pointer; display: flex; align-items: center; gap: 0.35rem;
+    white-space: nowrap; transition: filter .15s, transform .15s;
+}
+.ul-btn:hover { filter: brightness(1.08); transform: scale(1.02); }
+.ul-btn--excel { background: #1d7a45; color: #fff; box-shadow: 0 3px 8px rgba(29,122,69,.3); }
+.ul-btn--pdf   { background: #c0392b; color: #fff; box-shadow: 0 3px 8px rgba(192,57,43,.3); }
+.ul-btn--harita { background: #e67e22; color: #fff; box-shadow: 0 3px 8px rgba(230,126,34,.3); }
+.ul-btn--cinsiyet {
+    height: 36px; border: 1.5px solid #dee2e6; border-radius: 9px;
+    padding: 0 0.65rem; font-size: 0.78rem; color: #495057;
+    background: #fff; cursor: pointer;
+}
+
+/* ── Tablo sarmalayıcı ────────────────────────────── */
+.ul-kart {
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid #eef0f5;
+    box-shadow: 0 2px 20px rgba(0,0,0,.06);
+    overflow: hidden; margin-bottom: 1rem;
+}
+
+/* ── Tablo ────────────────────────────────────────── */
+.ul-tablo {
+    width: 100%; border-collapse: collapse; min-width: 880px;
+}
+.ul-tablo thead tr {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+}
+.ul-tablo thead th {
+    color: rgba(255,255,255,.85);
+    font-size: 0.72rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .05em;
+    padding: 0.85rem 0.75rem; white-space: nowrap;
+    border: none;
+}
+.ul-tablo thead th:first-child { padding-left: 1.25rem; border-radius: 0; }
+.ul-tablo thead th:last-child  { padding-right: 1.25rem; }
+
+/* Gövde satırlar */
+.ul-tablo tbody tr {
+    border-bottom: 1px solid #f5f6fa;
+    transition: background .15s;
+}
+.ul-tablo tbody tr:hover td { background: #f8f9ff !important; }
+.ul-tablo tbody tr:last-child { border-bottom: none; }
+.ul-tablo tbody td {
+    padding: 0.7rem 0.75rem; font-size: 0.84rem; color: #343a40;
+    vertical-align: middle;
+}
+.ul-tablo tbody td:first-child { padding-left: 1.25rem; }
+.ul-tablo tbody td:last-child  { padding-right: 1.25rem; }
+
+/* Renkli statü satırları */
+.ul-satir--yk td              { background: rgba(0,123,255,.05); }
+.ul-satir--yk-yedek td        { background: rgba(23,162,184,.05); }
+.ul-satir--il td              { background: rgba(40,167,69,.05); }
+.ul-satir--ilce td            { background: rgba(106,27,154,.05); }
+.ul-satir--kurum td           { background: rgba(255,193,7,.05); }
+.ul-satir--bolge td           { background: rgba(0,131,143,.05); }
+.ul-satir--kadin td           { background: rgba(214,51,132,.05); }
+
+/* Üye adı linki */
+.ul-uye-link {
+    text-decoration: none; color: #1a1a2e; font-weight: 700;
+    display: flex; align-items: center; gap: 0.5rem;
+    transition: color .15s;
+}
+.ul-uye-link:hover { color: #610012; text-decoration: underline; }
+
+/* Avatar ikon */
+.ul-avatar {
+    width: 30px; height: 30px; border-radius: 8px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 0.75rem;
+}
+.ul-avatar--erkek { background: rgba(0,123,255,.1); color: #007bff; }
+.ul-avatar--kadin { background: rgba(232,62,140,.1); color: #e83e8c; }
+
+/* Kan grubu badge */
+.ul-kan {
+    display: inline-block; background: #ff4757; color: #fff;
+    border-radius: 6px; padding: 2px 7px; font-size: 0.68rem; font-weight: 700;
+}
+.ul-kan--bos { background: #e9ecef; color: #6c757d; }
+
+/* İl / İlçe */
+.ul-il { font-weight: 700; color: #1a1a2e; }
+.ul-ilce { font-size: 0.74rem; color: #adb5bd; }
+
+/* Kurum/Ünvan */
+.ul-kurum { font-weight: 600; font-size: 0.82rem; color: #343a40; }
+.ul-unvan { font-size: 0.74rem; color: #6c757d; }
+
+/* Statü rozeti */
+.ul-rozet {
+    display: inline-block; border-radius: 8px; padding: 4px 10px;
+    font-size: 0.72rem; font-weight: 700; white-space: nowrap;
+    text-align: center; min-width: 130px;
+}
+.ul-rozet--normal   { background: #f0f2f5; color: #495057; }
+.ul-rozet--yk       { background: #dbeafe; color: #1d4ed8; }
+.ul-rozet--yk-yedek { background: #cff4fc; color: #055160; }
+.ul-rozet--il       { background: #d1fae5; color: #065f46; }
+.ul-rozet--ilce     { background: #ede9fe; color: #5b21b6; }
+.ul-rozet--kurum    { background: #fef3c7; color: #92400e; }
+.ul-rozet--bolge    { background: #e0f7fa; color: #006064; }
+.ul-rozet--kadin    { background: rgba(214,51,132,.1); color: #be185d; }
+
+.ul-ek-rozet {
+    display: inline-block; background: #1a1a2e; color: #fff;
+    border-radius: 6px; padding: 2px 8px; font-size: 0.68rem; font-weight: 600;
+    margin-top: 3px;
+}
+.ul-bolge-yazisi {
+    font-size: 0.72rem; font-weight: 700; color: #1a1a2e;
+    text-align: center; margin-bottom: 3px; word-break: keep-all; max-width: 200px;
+}
+
+/* Yönet butonu */
+.ul-yonet-btn {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    color: #fff; border: none; border-radius: 8px;
+    padding: 0.38rem 0.75rem; font-size: 0.78rem; font-weight: 700;
+    cursor: pointer; transition: filter .15s, transform .15s;
+    display: flex; align-items: center; gap: 0.35rem;
+}
+.ul-yonet-btn:hover { filter: brightness(1.2); transform: scale(1.03); }
+
+/* Dropdown menu geliştirme */
+.ul-dropdown-menu {
+    min-width: 220px; font-size: 0.82rem;
+    border: none; border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.15);
+    z-index: 999999 !important;
+}
+.ul-dropdown-menu .dropdown-item { padding: 0.4rem 1rem; }
+.ul-dropdown-menu .dropdown-header {
+    font-size: 0.68rem; font-weight: 800;
+    text-transform: uppercase; letter-spacing: .06em; color: #adb5bd;
+    padding: 0.5rem 1rem 0.25rem;
+}
+
+/* Sayfalama */
+.ul-sayfalama { display: flex; justify-content: center; padding: 0.75rem 0; }
+.ul-sayfalama .page-link {
+    border-radius: 8px; margin: 0 2px;
+    border: 1.5px solid #e9ecef; color: #343a40; font-weight: 600;
+    font-size: 0.82rem;
+    transition: background .15s, border-color .15s;
+}
+.ul-sayfalama .page-item.active .page-link {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    border-color: #1a1a2e; color: #fff;
+}
+
+/* Boş durum */
+.ul-bos { text-align: center; padding: 4rem 2rem; color: #adb5bd; }
+.ul-bos i { font-size: 2.5rem; margin-bottom: 1rem; display: block; }
+
+/* Çalışma şekli chip */
+.ul-calisma {
+    background: #f0f2f5; color: #495057; border-radius: 6px;
+    padding: 2px 8px; font-size: 0.72rem; font-weight: 600; white-space: nowrap;
+}
+
+/* Responsive */
+.ul-table-wrap {
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+    width: 100%; min-height: 420px;
+}
+
+/* Telefon arama input ipuçları engelleme */
+#tabloCanliAra::-webkit-contacts-auto-fill-button,
+#tabloCanliAra::-webkit-credentials-auto-fill-button,
+#tabloCanliAra::-webkit-search-decoration,
+#tabloCanliAra::-webkit-search-cancel-button,
+#tabloCanliAra::-webkit-search-results-button,
+#tabloCanliAra::-webkit-search-results-decoration {
+    visibility: hidden !important; display: none !important;
+    pointer-events: none !important; -webkit-appearance: none !important;
+}
+
+/* İlçe/Bölge satır renkleri (hover koruması) */
+.ul-satir--ilce:hover td  { background: rgba(106,27,154,.09) !important; }
+.ul-satir--bolge:hover td { background: rgba(0,131,143,.09) !important; }
+.ul-satir--kadin:hover td { background: rgba(214,51,132,.09) !important; }
+</style>
+
+<div class="container-fluid px-2 px-md-4 py-3">
+
+    <!-- ── HEADER ─────────────────────────────────────── -->
+    <div class="ul-header">
+        <div class="ul-header__ikon">
+            <i class="fa-solid fa-users"></i>
+        </div>
+        <div>
+            <h3 class="ul-header__baslik">Üye Listesi</h3>
+            <p class="ul-header__aciklama">
+                <?php
+                if($aktif_filtre === 'kurum_temsilcisi')        echo 'Kurum Temsilcileri · ' . $toplam_onayli . ' kişi';
+                elseif($aktif_filtre === 'yonetim_kurulu')      echo 'Yönetim Kurulu Üyeleri · ' . $toplam_onayli . ' kişi';
+                elseif($aktif_filtre === 'bolge_koordinatoru')  echo 'Bölge Koordinatörleri · ' . $toplam_onayli . ' kişi';
+                elseif($aktif_filtre === 'il_baskani')          echo 'İl Başkanları · ' . $toplam_onayli . ' kişi';
+                elseif($aktif_filtre === 'ilce_baskani')        echo 'İlçe Başkanları · ' . $toplam_onayli . ' kişi';
+                elseif($aktif_filtre === 'teskilatlanma_sorumlusu') echo 'Teşkilatlanma Sorumlu Başkanlar · ' . $toplam_onayli . ' kişi';
+                elseif($aktif_filtre === 'kadin_kollari')       echo 'Kadın Kolları Başkanları · ' . $toplam_onayli . ' kişi';
+                elseif($aktif_filtre === 'aktif_iller')         echo 'Aktif İller · ' . $toplam_onayli . ' il';
+                else echo 'Kayıtlı aktif üyeler · ' . number_format($toplam_onayli) . ' kişi';
                 ?>
             </p>
         </div>
-        <div class="col-12 col-md-7 px-0 mt-2 mt-md-0">
-            <div class="d-flex shadow-sm rounded-3">
-                <div class="input-group">
-                    <!-- Readonly hilesi ile klavye tamamlama baloncuğu tamamen engellendi -->
-                    <input type="text" id="tabloCanliAra" readonly onfocus="this.removeAttribute('readonly');" <?= $iller_modu ? 'disabled placeholder="İl modunda arama devre dışı..."' : 'oninput="canliVeritabanıArama(this.value)" placeholder="Arama..."'; ?> class="form-control rounded-start px-3" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-                    
-                    <?php if(!$iller_modu && !$is_kisitli_rol && !$is_yonetim): ?>
-                    <select id="indirCinsiyetFiltre" class="form-select form-select-sm" style="max-width: 110px; flex: 0 0 auto;" title="İndirilecek listeyi cinsiyete göre filtrele">
-                        <option value="">Tümü (K/E)</option>
-                        <option value="Erkek">Erkek</option>
-                        <option value="Kadın">Kadın</option>
-                    </select>
-                    <button type="button" onclick="dosyaYonlendir('excel')" class="btn btn-success fw-bold px-2 px-sm-3 d-flex align-items-center justify-content-center btn-sm">
-                        <i class="fa-solid fa-file-excel me-1"></i> Excel
-                    </button>
-                    <button type="button" onclick="dosyaYonlendir('pdf')" class="btn btn-danger fw-bold px-2 px-sm-3 d-flex align-items-center justify-content-center btn-sm">
-                        <i class="fa-solid fa-file-pdf me-1"></i> PDF
-                    </button>
-                    <?php if (in_array($_SESSION['rol'] ?? '', ['admin', 'gelistirici'], true)): ?>
-                    <button type="button"
-                            onclick="window.location.href='index.php?sayfa=bos-il-excel'"
-                            class="btn btn-warning fw-bold px-2 px-sm-3 d-flex align-items-center justify-content-center btn-sm"
-                            title="Sistemde onaylı üyesi bulunmayan illerin listesi">
-                        <i class="fa-solid fa-map-location-dot me-1"></i> Üyesiz İller
-                    </button>
-                    <?php endif; ?>
-                    <?php endif; ?>
-                </div>
+        <div class="ul-header__sag">
+            <!-- Arama -->
+            <div class="ul-arama-grup">
+                <div class="ul-arama-grup__ikon"><i class="fa-solid fa-magnifying-glass"></i></div>
+                <input type="text" id="tabloCanliAra" class="ul-arama-input"
+                       readonly onfocus="this.removeAttribute('readonly');"
+                       <?= $iller_modu ? 'disabled placeholder="İl modunda arama devre dışı..."' : 'oninput="canliVeritabanıArama(this.value)" placeholder="İsim, il, kurum ara..."'; ?>
+                       autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
             </div>
+
+            <!-- Export araçları -->
+            <?php if (!$iller_modu && !$is_kisitli_rol && !$is_yonetim): ?>
+            <select id="indirCinsiyetFiltre" class="ul-btn--cinsiyet" title="Cinsiyete göre filtrele">
+                <option value="">Tümü (K/E)</option>
+                <option value="Erkek">Erkek</option>
+                <option value="Kadın">Kadın</option>
+            </select>
+            <button type="button" onclick="dosyaYonlendir('excel')" class="ul-btn ul-btn--excel">
+                <i class="fa-solid fa-file-excel"></i> Excel
+            </button>
+            <button type="button" onclick="dosyaYonlendir('pdf')" class="ul-btn ul-btn--pdf">
+                <i class="fa-solid fa-file-pdf"></i> PDF
+            </button>
+            <?php if (in_array($_SESSION['rol'] ?? '', ['admin', 'gelistirici'], true)): ?>
+            <button type="button" onclick="window.location.href='index.php?sayfa=bos-il-excel'"
+                    class="ul-btn ul-btn--harita" title="Üyesi olmayan iller">
+                <i class="fa-solid fa-map-location-dot"></i> Üyesiz İller
+            </button>
+            <?php endif; ?>
+            <?php endif; ?>
         </div>
     </div>
 
-    <!-- TABLO KARTI -->
-    <div class="card border-0 shadow-sm rounded-3 mb-3">
-        <div class="card-body p-0">
-            <div class="table-responsive" style="overflow-x: auto !important; -webkit-overflow-scrolling: touch; width: 100%; min-height: 420px;">
-                
-                <?php if ($iller_modu): ?>
-                <table class="table table-hover align-middle mb-0 w-100">
-                    <thead class="table-dark">
-                        <tr>
-                            <th class="ps-3" style="width: 10%;">#</th>
-                            <th style="width: 50%;">İl Adı</th>
-                            <th class="text-center" style="width: 20%;">Kayıtlı Üye Sayısı</th>
-                            <th class="text-center" style="width: 20%;">İşlem</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (count($veriler) > 0): $sira = $offset + 1; ?>
-                            <?php foreach ($veriler as $satir): ?>
-                                <tr>
-                                    <td class="ps-3 fw-bold text-muted"><?= $sira++; ?></td>
-                                    <td class="fw-bold text-dark"><i class="fa-solid fa-map-pin text-danger me-2"></i><?= htmlspecialchars($satir['ikamet_ili']); ?></td>
-                                    <td class="text-center"><span class="badge bg-primary fs-6 px-3 py-1.5 rounded-pill"><?= $satir['uye_adet']; ?> Üye</span></td>
-                                    <td class="text-center">
-                                        <a href="index.php?sayfa=uyeler" onclick="localStorage.setItem('oto_ara', '<?= $satir['ikamet_ili']; ?>');" class="btn btn-dark btn-sm fw-bold shadow-sm">
-                                            <i class="fa-solid fa-eye me-1"></i> Üyeleri Gör
+    <!-- ── TABLO KARTI ─────────────────────────────────── -->
+    <div class="ul-kart">
+        <div class="ul-table-wrap">
+
+            <?php if ($iller_modu): ?>
+            <!-- İL MODU TABLOSU -->
+            <table class="ul-tablo">
+                <thead>
+                    <tr>
+                        <th style="width:60px;">#</th>
+                        <th>İl Adı</th>
+                        <th class="text-center" style="width:160px;">Kayıtlı Üye</th>
+                        <th class="text-center" style="width:140px;">İşlem</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (count($veriler) > 0): $sira = $offset + 1; ?>
+                    <?php foreach ($veriler as $satir): ?>
+                    <tr>
+                        <td style="color:#adb5bd;font-weight:600;"><?= $sira++ ?></td>
+                        <td>
+                            <span style="display:flex;align-items:center;gap:.5rem;font-weight:700;color:#1a1a2e;">
+                                <i class="fa-solid fa-map-pin" style="color:#ff4757;font-size:.8rem;"></i>
+                                <?= htmlspecialchars($satir['ikamet_ili']) ?>
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <span style="background:linear-gradient(135deg,#1a1a2e,#16213e);color:#00c9a7;border-radius:8px;padding:4px 14px;font-weight:700;font-size:.82rem;">
+                                <?= $satir['uye_adet'] ?> Üye
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <a href="index.php?sayfa=uyeler"
+                               onclick="localStorage.setItem('oto_ara', '<?= $satir['ikamet_ili'] ?>');"
+                               class="ul-btn ul-btn--excel" style="display:inline-flex;height:30px;border-radius:7px;font-size:.76rem;padding:0 .7rem;">
+                                <i class="fa-solid fa-eye"></i> Üyeleri Gör
+                            </a>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                    <?php else: ?>
+                    <tr><td colspan="4" class="ul-bos"><i class="fa-solid fa-folder-open"></i>Henüz aktif il verisi bulunmamaktadır.</td></tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+
+            <?php else: ?>
+            <!-- ANA ÜYE TABLOSU -->
+            <table class="ul-tablo">
+                <thead>
+                    <tr>
+                        <th style="width:180px;">Adı Soyadı</th>
+                        <th style="width:115px;">Telefon</th>
+                        <th style="width:155px;">E-Posta</th>
+                        <th style="width:65px;" class="text-center">Kan</th>
+                        <th style="width:80px;" class="text-center">Doğum</th>
+                        <th style="width:110px;">İl / İlçe</th>
+                        <th style="width:150px;">Kurum / Ünvan</th>
+                        <th style="width:85px;">Çalışma</th>
+                        <th style="width:160px;" class="text-center">Statü</th>
+                        <th style="width:100px;" class="text-center">İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody id="uyeTabloGövdesi">
+                    <?php if (count($veriler) > 0): ?>
+                    <?php foreach ($veriler as $uye):
+                        $temsilciTurKontrol = trim($uye['temsilci_turu']);
+                        $ekGorevKontrol     = trim($uye['ek_gorev'] ?? '');
+
+                        // ── Cinsiyet tespiti ──────────────────────────
+                        $cinsiyetDb = mb_strtolower(trim($uye['cinsiyet'] ?? ''), 'UTF-8');
+                        if (in_array($cinsiyetDb, ['kadın','kadin','female','k'], true)) {
+                            $isKadin = true;
+                        } elseif (in_array($cinsiyetDb, ['erkek','male','e'], true)) {
+                            $isKadin = false;
+                        } else {
+                            $ilkIsim = mb_strtoupper(explode(' ', trim($uye['adi_soyadi']))[0], 'UTF-8');
+                            $kadinIsimleri = ['SEMRA','AYŞEGÜL','BEGÜM','HATİCE','FATMA','AYŞE','EMİNE','ZEYNEP','MERYEM','ELİF','HÜLYA','GAMZE','MERVE','BÜŞRA','ESRA','SEDA','DERYA','KÜBRA','ASLI','PELİN','TUĞBA','DEMET','ÖZLEM','SİNEM','GÜL','NUR','MELİS','DİLAN','BURCU','CANAN','SULTAN','MELİKE','YASEMİN','EDA','BERNA','SELEN','PINAR','BANU','YEŞİM','EBRU','FADİME','NURAN','SELMA','DİLEK','FİLİZ','ARZU','LEYLA','SİBEL','HALE','JALE','GONCA','MÜGE','NESLİHAN','NAZLI','MİNE','SELİN','ESMA','FAZİLET','NESRİN','REYHAN','AHSEN','İPEK','ÖZGE','GÜLAY','SÜREYYA','DİDEM','HANDAN','NURTEN','ŞERİFE','SABİHA','ZEHRA','ÜMMÜHAN','RABİA','BÜŞRANUR','FATMANUR','GÜLSÜM','KÜBRANUR','ŞEYMA','BETÜL','SÜMEYYE','KADRİYE','HAVVA','SONGÜL','DÖNDÜ','NURAY','FİRDEVS','AYTEN','AYSEL','GÜLER','NURSEL','NURCAN','MELEK','NURHAN','PERİHAN','SUZAN','SUNA','ŞENNUR','İLKAY','GÜLDEN','GÜLŞAH','SEVAL','SEVİL','SEVİM','NİHAL','NİLÜFER','NİLAY','MELTEM','DUYGU','NURŞEN'];
+                            $isKadin = in_array($ilkIsim, $kadinIsimleri, true);
+                        }
+
+                        // ── Satır / Rozet sınıfı ─────────────────────
+                        $satirKlasi  = '';
+                        $rozetKlasi  = 'ul-rozet--normal';
+                        $rozetYazisi = htmlspecialchars($uye['temsilci_turu'] ?: 'Normal Üye');
+                        $solIkonHtml = '';
+
+                        match ($temsilciTurKontrol) {
+                            'Yönetim Kurulu Üyesi' => [
+                                $satirKlasi = 'ul-satir--yk',
+                                $rozetKlasi = 'ul-rozet--yk',
+                            ],
+                            'Yönetim Kurulu Üyesi Yedek' => [
+                                $satirKlasi = 'ul-satir--yk-yedek',
+                                $rozetKlasi = 'ul-rozet--yk-yedek',
+                            ],
+                            'İl Başkanı' => [
+                                $satirKlasi = 'ul-satir--il',
+                                $rozetKlasi = 'ul-rozet--il',
+                            ],
+                            'İlçe Başkanı' => [
+                                $satirKlasi = 'ul-satir--ilce',
+                                $rozetKlasi = 'ul-rozet--ilce',
+                            ],
+                            'Kurum Temsilcisi' => [
+                                $satirKlasi = 'ul-satir--kurum',
+                                $rozetKlasi = 'ul-rozet--kurum',
+                            ],
+                            'Bölge Koordinatörü' => [
+                                $satirKlasi = 'ul-satir--bolge',
+                                $rozetKlasi = 'ul-rozet--bolge',
+                            ],
+                            'Kadın Kolları Başkanı' => [
+                                $satirKlasi = 'ul-satir--kadin',
+                                $rozetKlasi = 'ul-rozet--kadin',
+                            ],
+                            default => null,
+                        };
+
+                        // ── Sorumlu Bölge Yazısı ─────────────────────
+                        $ustBolgeHtml = '';
+                        if (!empty($uye['sorumlu_bolge'])) {
+                            $bolgeMetni = trim($uye['sorumlu_bolge']);
+                            $dinamikIkon = 'fa-solid fa-award';
+                            if (mb_stripos($bolgeMetni, 'Türkiye Temsilci', 0, 'UTF-8') !== false)
+                                $dinamikIkon = 'fa-solid fa-ranking-star';
+                            elseif (mb_stripos($bolgeMetni, 'Dernek Başkanı', 0, 'UTF-8') !== false)
+                                $dinamikIkon = 'fa-solid fa-crown';
+                            elseif (mb_stripos($bolgeMetni, 'Bölge', 0, 'UTF-8') !== false)
+                                $dinamikIkon = 'fa-solid fa-earth-europe';
+                            elseif ($temsilciTurKontrol === 'İlçe Başkanı')
+                                $dinamikIkon = 'fa-solid fa-location-dot';
+                            $ustBolgeHtml = '<div class="ul-bolge-yazisi"><i class="'.$dinamikIkon.' me-1"></i>'.htmlspecialchars($bolgeMetni).'</div>';
+                        }
+
+                        // ── Doğum tarihi ─────────────────────────────
+                        $dogum = '-';
+                        if (!empty($uye['dogum_tarihi'])) {
+                            $dt = trim($uye['dogum_tarihi']);
+                            if (preg_match('/^(\d{2})[\/\.](\d{2})[\/\.](\d{4})$/', $dt, $m)) {
+                                $ts = mktime(0,0,0,(int)$m[2],(int)$m[1],(int)$m[3]);
+                                $dogum = $ts ? date('d.m.Y', $ts) : $dt;
+                            } elseif (preg_match('/^\d{4}-\d{2}-\d{2}$/', $dt)) {
+                                $dogum = date('d.m.Y', strtotime($dt));
+                            } else {
+                                $dogum = $dt;
+                            }
+                        } elseif (!empty($uye['dogum_yili'])) {
+                            $dogum = $uye['dogum_yili'];
+                        }
+
+                        $kan = $uye['kan_grubu'] ?? '';
+                    ?>
+                    <tr class="<?= $satirKlasi ?>">
+
+                        <!-- Ad Soyad -->
+                        <td>
+                            <a href="index.php?sayfa=uye-detay&id=<?= $uye['id'] ?>" class="ul-uye-link">
+                                <div class="ul-avatar <?= $isKadin ? 'ul-avatar--kadin' : 'ul-avatar--erkek' ?>">
+                                    <i class="fa-solid <?= $isKadin ? 'fa-user-nurse' : 'fa-user' ?>"></i>
+                                </div>
+                                <span><?= htmlspecialchars($uye['adi_soyadi']) ?></span>
+                            </a>
+                        </td>
+
+                        <!-- Telefon -->
+                        <td style="white-space:nowrap;font-weight:500;">
+                            <?= gizli_alan(htmlspecialchars($uye['telefon'] ?: '')) ?>
+                        </td>
+
+                        <!-- E-Posta -->
+                        <td>
+                            <span class="d-inline-block text-truncate" style="max-width:140px;font-size:0.78rem;color:#6c757d;">
+                                <?= gizli_alan(htmlspecialchars($uye['eposta'] ?: '')) ?>
+                            </span>
+                        </td>
+
+                        <!-- Kan Grubu -->
+                        <td class="text-center">
+                            <?php if ($kan): ?>
+                            <span class="ul-kan"><?= htmlspecialchars($kan) ?></span>
+                            <?php else: ?>
+                            <span class="ul-kan ul-kan--bos">—</span>
+                            <?php endif; ?>
+                        </td>
+
+                        <!-- Doğum -->
+                        <td class="text-center" style="font-size:0.78rem;color:#6c757d;">
+                            <?= htmlspecialchars($dogum) ?>
+                        </td>
+
+                        <!-- İl / İlçe -->
+                        <td>
+                            <div class="ul-il"><?= htmlspecialchars($uye['ikamet_ili'] ?: '-') ?></div>
+                            <?php if (!empty($uye['ikamet_ilcesi'])): ?>
+                            <div class="ul-ilce"><?= htmlspecialchars($uye['ikamet_ilcesi']) ?></div>
+                            <?php endif; ?>
+                            <?php if (!empty($uye['trabzon_ilcesi'])): ?>
+                            <div class="ul-ilce" style="color:#00c9a7;">Trab: <?= htmlspecialchars($uye['trabzon_ilcesi']) ?></div>
+                            <?php endif; ?>
+                        </td>
+
+                        <!-- Kurum / Ünvan -->
+                        <td>
+                            <div class="ul-kurum"><?= htmlspecialchars($uye['kurum'] ?: '-') ?></div>
+                            <div class="ul-unvan"><?= htmlspecialchars($uye['gorev_unvan'] ?: '') ?></div>
+                        </td>
+
+                        <!-- Çalışma -->
+                        <td>
+                            <span class="ul-calisma"><?= htmlspecialchars($uye['calisma_sekli'] ?: '-') ?></span>
+                        </td>
+
+                        <!-- Statü -->
+                        <td class="text-center">
+                            <?= $ustBolgeHtml ?>
+                            <span class="ul-rozet <?= $rozetKlasi ?>"><?= $rozetYazisi ?></span>
+                            <?php if (!empty($ekGorevKontrol)): ?>
+                            <br>
+                            <span class="ul-ek-rozet">
+                                <i class="fa-solid fa-plus-circle me-1" style="color:#00c9a7;"></i><?= htmlspecialchars($ekGorevKontrol) ?>
+                            </span>
+                            <?php endif; ?>
+                        </td>
+
+                        <!-- İşlemler -->
+                        <td class="text-center">
+                            <?php if ($is_kisitli_rol): ?>
+                            <span style="font-size:0.72rem;color:#adb5bd;background:#f8f9fa;border-radius:7px;padding:4px 8px;">
+                                <i class="fa-solid fa-eye me-1"></i>Görüntüleme
+                            </span>
+                            <?php else: ?>
+                            <div class="btn-group dropup position-static">
+                                <button class="ul-yonet-btn dropdown-toggle" type="button"
+                                        data-bs-toggle="dropdown" aria-expanded="false"
+                                        data-bs-popper-config='{"strategy":"fixed"}'>
+                                    <i class="fa-solid fa-user-gear"></i> Yönet
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end ul-dropdown-menu shadow-lg border-0 kucuk-yonet-menu">
+                                    <li><h6 class="dropdown-header">Ana Statü Değiştir</h6></li>
+                                    <li><a class="dropdown-item text-info fw-bold py-1" href="javascript:void(0);" onclick="bolgeSecimPenceresi(<?= $uye['id'] ?>)"><i class="fa-solid fa-earth-americas me-1"></i>Bölge Koordinatörü Yap</a></li>
+
+                                    <?php if($temsilciTurKontrol !== 'Yönetim Kurulu Üyesi'): ?>
+                                    <li><a class="dropdown-item text-primary py-1" href="index.php?sayfa=uyeler&aksiyon=stat%C3%BC_degistir&id=<?= $uye['id'] ?>&tur=Yönetim+Kurulu+Üyesi"><i class="fa-solid fa-user-shield me-1"></i>Yönetim Kurulu Üyesi Yap</a></li>
+                                    <?php endif; ?>
+
+                                    <?php if($temsilciTurKontrol !== 'Yönetim Kurulu Üyesi Yedek'): ?>
+                                    <li><a class="dropdown-item text-info py-1" href="index.php?sayfa=uyeler&aksiyon=stat%C3%BC_degistir&id=<?= $uye['id'] ?>&tur=Yönetim+Kurulu+Üyesi+Yedek"><i class="fa-solid fa-user-shield me-1"></i>Y.K. Üyesi Yedek Yap</a></li>
+                                    <?php endif; ?>
+
+                                    <?php if($temsilciTurKontrol !== 'İl Başkanı'): ?>
+                                    <li><a class="dropdown-item text-success py-1" href="index.php?sayfa=uyeler&aksiyon=stat%C3%BC_degistir&id=<?= $uye['id'] ?>&tur=İl+Başkanı"><i class="fa-solid fa-building-flag me-1"></i>İl Başkanı Yap</a></li>
+                                    <?php endif; ?>
+
+                                    <?php if($temsilciTurKontrol !== 'İlçe Başkanı'): ?>
+                                    <li><a class="dropdown-item py-1" style="color:#6a1b9a;" href="index.php?sayfa=uyeler&aksiyon=stat%C3%BC_degistir&id=<?= $uye['id'] ?>&tur=İlçe+Başkanı"><i class="fa-solid fa-map-location-dot me-1"></i>İlçe Başkanı Yap</a></li>
+                                    <?php endif; ?>
+
+                                    <?php if($temsilciTurKontrol !== 'Kurum Temsilcisi'): ?>
+                                    <li><a class="dropdown-item text-warning py-1" href="index.php?sayfa=uyeler&aksiyon=stat%C3%BC_degistir&id=<?= $uye['id'] ?>&tur=Kurum+Temsilcisi"><i class="fa-solid fa-building-user me-1"></i>Kurum Temsilcisi Yap</a></li>
+                                    <?php endif; ?>
+
+                                    <?php if($temsilciTurKontrol !== 'Kadın Kolları Başkanı'): ?>
+                                    <li><a class="dropdown-item py-1" style="color:#d63384;" href="index.php?sayfa=uyeler&aksiyon=stat%C3%BC_degistir&id=<?= $uye['id'] ?>&tur=Kadın+Kolları+Başkanı"><i class="fa-solid fa-venus me-1"></i>Kadın Kolları Başkanı Yap</a></li>
+                                    <?php endif; ?>
+
+                                    <?php if($temsilciTurKontrol !== 'Normal Üye'): ?>
+                                    <li><a class="dropdown-item text-secondary py-1" href="index.php?sayfa=uyeler&aksiyon=stat%C3%BC_degistir&id=<?= $uye['id'] ?>&tur=Normal+Üye"><i class="fa-solid fa-user-minus me-1"></i>Normal Üyeliğe Çek</a></li>
+                                    <?php endif; ?>
+
+                                    <li><hr class="dropdown-divider my-1"></li>
+                                    <li><h6 class="dropdown-header">Ek Görev Atamaları</h6></li>
+
+                                    <?php if($ekGorevKontrol !== 'Yönetim Kurulu Üyesi' && $temsilciTurKontrol !== 'Yönetim Kurulu Üyesi'): ?>
+                                    <li><a class="dropdown-item text-primary fw-bold py-1" href="index.php?sayfa=uyeler&aksiyon=ek_gorev_degistir&id=<?= $uye['id'] ?>&gorev=Yönetim+Kurulu+Üyesi"><i class="fa-solid fa-plus me-1"></i>+ Görev: Y.K. Üyesi</a></li>
+                                    <?php endif; ?>
+
+                                    <?php if($ekGorevKontrol !== 'Yönetim Kurulu Üyesi Yedek' && $temsilciTurKontrol !== 'Yönetim Kurulu Üyesi Yedek'): ?>
+                                    <li><a class="dropdown-item text-info fw-bold py-1" href="index.php?sayfa=uyeler&aksiyon=ek_gorev_degistir&id=<?= $uye['id'] ?>&gorev=Yönetim+Kurulu+Üyesi+Yedek"><i class="fa-solid fa-plus me-1"></i>+ Görev: Y.K. Yedek</a></li>
+                                    <?php endif; ?>
+
+                                    <?php if($ekGorevKontrol !== 'Teşkilatlanma Sorumlu Başkan' && $temsilciTurKontrol !== 'Teşkilatlanma Sorumlu Başkan'): ?>
+                                    <li><a class="dropdown-item fw-bold py-1" style="color:#e65100;" href="index.php?sayfa=uyeler&aksiyon=ek_gorev_degistir&id=<?= $uye['id'] ?>&gorev=Teşkilatlanma+Sorumlu+Başkan"><i class="fa-solid fa-plus me-1"></i>+ Görev: Teşk. Sor. Bşk.</a></li>
+                                    <?php endif; ?>
+
+                                    <?php if(!empty($ekGorevKontrol)): ?>
+                                    <li><a class="dropdown-item text-danger py-1" href="index.php?sayfa=uyeler&aksiyon=ek_gorev_degistir&id=<?= $uye['id'] ?>&gorev=sil"><i class="fa-solid fa-xmark me-1"></i>Görevi İptal Et</a></li>
+                                    <?php endif; ?>
+
+                                    <li><hr class="dropdown-divider my-1"></li>
+                                    <li>
+                                        <a class="dropdown-item text-danger fw-bold py-1"
+                                           href="index.php?sayfa=uyeler&aksiyon=uye_sil&id=<?= $uye['id'] ?>"
+                                           onclick="return confirm('<?= htmlspecialchars($uye['adi_soyadi']) ?> isimli üyeyi silmek istediğinize emin misiniz?')">
+                                            <i class="fa-solid fa-trash-can me-1"></i>Üyeyi Sil
                                         </a>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr><td colspan="4" class="text-center py-5 text-muted">Henüz aktif il verisi bulunmamaktadır.</td></tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-                
-                <?php else: ?>
-                <table class="table table-hover align-middle mb-0" style="min-width: 900px; width: 100%;">
-                    <thead class="table-dark">
-                        <tr>
-                            <th class="ps-3 py-3" style="width: 160px;">Adı Soyadı</th>
-                            <th style="width: 110px; white-space: nowrap;">Telefon</th>
-                            <th style="width: 150px; white-space: nowrap;">E-Posta</th>
-                            <th style="width: 65px; white-space: nowrap;" class="text-center">Kan</th>
-                            <th style="width: 85px; white-space: nowrap;" class="text-center">Doğum T.</th>
-                            <th style="width: 100px; white-space: nowrap;">İl / İlçe</th>
-                            <th style="width: 130px; white-space: nowrap;">Kurum / Ünvan</th>
-                            <th style="width: 85px; white-space: nowrap;">Çalışma</th>
-                            <th style="width: 150px; white-space: nowrap;" class="text-center">Statü</th>
-                            <th class="text-center pe-3" style="width: 100px; white-space: nowrap;">İşlemler</th>
-                        </tr>
-                    </thead>
-                    <tbody id="uyeTabloGövdesi">
-                        <?php if (count($veriler) > 0): ?>
-                            <?php foreach ($veriler as $uye): ?>
-                                <?php 
-                                $satir_klasi = "";
-                                $rozet_klasi = "bg-secondary";
-                                
-                                $parcalar = explode(' ', trim($uye['adi_soyadi']));
-                                $ilk_isim = mb_strtoupper($parcalar[0], 'UTF-8');
-                                
-                                $kadin_isimleri = ['SEMRA', 'AYŞEGÜL', 'BEGÜM', 'HATİCE', 'FATMA', 'AYŞE', 'EMİNE', 'ZEYNEP', 'MERYEM', 'ELİF', 'HÜLYA', 'GAMZE', 'MERVE', 'BÜŞRA', 'ESRA', 'SEDA', 'DERYA', 'KÜBRA', 'ASLI', 'PELİN', 'TUĞBA', 'DEMET', 'ÖZLEM', 'SİNEM', 'GÜL', 'NUR', 'MELİS', 'DİLAN', 'BURCU', 'CANAN', 'SULTAN', 'MELİKE', 'YASEMİN', 'EDA', 'BERNA', 'SELEN', 'PINAR', 'BANU', 'YEŞİM', 'EBRU', 'FADİME', 'NURAN', 'SELMA', 'DİLEK', 'FİLİZ', 'ARZU', 'LEYLA', 'SİBEL', 'HALE', 'JALE', 'GONCA', 'MÜGE', 'NESLİHAN', 'NAZLI', 'MİNE', 'SELİN', 'ESMA', 'FAZİLET', 'NESRİN', 'REYHAN', 'AHSEN', 'İPEK', 'ÖZGE', 'GÜLAY', 'SÜREYYA', 'DİDEM', 'Handan', 'NURTEN', 'ŞERİFE', 'SABİHA', 'ZEHRA', 'ÜMMÜHAN', 'RABİA', 'BÜŞRANUR', 'FATMANUR', 'GÜLSÜM', 'KÜBRANUR', 'ŞEYMA', 'BETÜL', 'SÜMEYYE', 'KADRİYE', 'HAVVA', 'SONGÜL', 'DÖNDÜ', 'NURAY', 'FİRDEVS', 'AYTEN', 'AYSEL', 'GÜLER', 'NURSEL', 'NURCAN', 'MELEK', 'FİLİZ', 'NURHAN', 'PERİHAN', 'SUZAN', 'SUNA', 'ŞENNUR', 'İLKAY', 'GÜLDEN', 'İLKY_NUR', 'GÜLŞAH', 'AŞKIN', 'SEVAL', 'SEVİL', 'SEVİM', 'NİHAL', 'NİLÜFER', 'NİLAY', 'NURSEl', 'MELTEM'];
-                                
-                                if (in_array($ilk_isim, $kadin_isimleri)) {
-                                    $ikon_renk = 'color: #e83e8c !important;'; 
-                                    $ikon_sekil = 'fa-user-nurse';
-                                } else {
-                                    $ikon_renk = 'color: #007bff !important;'; 
-                                    $ikon_sekil = 'fa-user';
-                                }
+                                    </li>
+                                </ul>
+                            </div>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                    <?php else: ?>
+                    <tr><td colspan="10" class="ul-bos">
+                        <i class="fa-solid fa-folder-open" style="color:#dee2e6;"></i>
+                        Henüz kayıtlı onaylı üye bulunmamaktadır.
+                    </td></tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+            <?php endif; ?>
 
-                                $temsilci_turu_kontrol = trim($uye['temsilci_turu']);
-                                $ek_gorev_kontrol     = trim($uye['ek_gorev'] ?? '');
-
-                                $ust_bolge_yazisi = "";
-                                $rozet_yazisi = htmlspecialchars($uye['temsilci_turu']);
-                                
-                                if(!empty($uye['sorumlu_bolge'])) {
-                                    $bolge_metni = trim($uye['sorumlu_bolge']);
-                                    $dinamik_ikon = 'fa-solid fa-award text-dark'; 
-                                    
-                                    if (mb_stripos($bolge_metni, 'Türkiye Temsilci ve Komite Başkanı', 0, 'UTF-8') !== false) {
-                                        $dinamik_ikon = 'fa-solid fa-ranking-star text-primary animate__animated animate__pulse animate__infinite';
-                                    } elseif (mb_stripos($bolge_metni, 'Dernek Başkanı', 0, 'UTF-8') !== false) {
-                                        $dinamik_ikon = 'fa-solid fa-crown text-warning animate__animated animate__pulse animate__infinite';
-                                    } elseif (mb_stripos($bolge_metni, 'Gençlik', 0, 'UTF-8') !== false) {
-                                        $dinamik_ikon = 'fa-solid fa-child-reaching text-primary';
-                                    } elseif (mb_stripos($bolge_metni, 'Kadın', 0, 'UTF-8') !== false) {
-                                        $dinamik_ikon = 'fa-solid fa-person-dress text-pink';
-                                    } elseif ($temsilci_turu_kontrol === 'İlçe Başkanı') {
-                                        $dinamik_ikon = 'fa-solid fa-location-dot text-purple';
-                                    } elseif ($temsilci_turu_kontrol === 'Bölge Koordinatörü' || mb_stripos($bolge_metni, 'Bölge', 0, 'UTF-8') !== false) {
-                                        $dinamik_ikon = 'fa-solid fa-earth-europe text-info';
-                                    }
-                                    
-                                    $ust_bolge_yazisi = '<div class="fw-bold text-dark text-center mb-1 small" style="word-break: keep-all; max-width: 220px; line-height: 1.3;"><i class="' . $dinamik_ikon . ' me-1"></i>' . htmlspecialchars($bolge_metni) . '</div>';
-                                }
-                                
-                                if ($temsilci_turu_kontrol === 'Yönetim Kurulu Üyesi') {
-                                    $satir_klasi = 'class="table-primary"'; 
-                                    $rozet_klasi = "bg-primary text-white";
-                                    $sol_ikon = '<i class="fa-solid fa-user-shield text-primary me-2"></i>';
-                                } elseif ($temsilci_turu_kontrol === 'Yönetim Kurulu Üyesi Yedek') {
-                                    $satir_klasi = 'class="table-info"'; 
-                                    $rozet_klasi = "bg-info text-dark";
-                                    $sol_ikon = '<i class="fa-solid fa-user-shield text-info me-2"></i>';
-                                } elseif ($temsilci_turu_kontrol === 'İl Başkanı') {
-                                    $satir_klasi = 'class="table-success"'; 
-                                    $rozet_klasi = "bg-success text-white";
-                                    $sol_ikon = '<i class="fa-solid fa-building-flag text-success me-2"></i>';
-                                } elseif ($temsilci_turu_kontrol === 'İlçe Başkanı') {
-                                    $satir_klasi = 'class="ilce-baskani-satir"'; 
-                                    $rozet_klasi = "text-white";
-                                    $sol_ikon = '<i class="fa-solid fa-map-location-dot me-2" style="color:#6a1b9a !important;"></i>';
-                                } elseif ($temsilci_turu_kontrol === 'Kurum Temsilcisi') {
-                                    $satir_klasi = 'class="table-warning"'; 
-                                    $rozet_klasi = "bg-warning text-dark";
-                                    $sol_ikon = '<i class="fa-solid fa-building-user text-warning me-2"></i>';
-                                } elseif ($temsilci_turu_kontrol === 'Bölge Koordinatörü') {
-                                    $satir_klasi = 'class="bolge-koordinator-satir"'; 
-                                    $rozet_klasi = "text-white";
-                                    $sol_ikon = '<i class="fa-solid fa-earth-americas me-2" style="color:#00838f !important;"></i>';
-                                } elseif ($temsilci_turu_kontrol === 'Kadın Kolları Başkanı') {
-                                    $satir_klasi = 'style="background-color:rgba(214,51,132,0.08);"'; 
-                                    $rozet_klasi = "text-white";
-                                    $sol_ikon = '<i class="fa-solid fa-venus me-2" style="color:#d63384 !important;"></i>';
-                                } else {
-                                    $sol_ikon = '<i class="fa-solid '.$ikon_sekil.' me-2" style="'.$ikon_renk.'"></i>';
-                                }
-                                
-                                $kan = !empty($uye['kan_grubu']) ? $uye['kan_grubu'] : '-';
-                                if (!empty($uye['dogum_tarihi'])) {
-                                    $dt = trim($uye['dogum_tarihi']);
-                                    if (preg_match('/^(\d{2})[\/\.](\d{2})[\/\.](\d{4})$/', $dt, $m)) {
-                                        $ts = mktime(0, 0, 0, (int)$m[2], (int)$m[1], (int)$m[3]);
-                                        $dogum = $ts ? date('d.m.Y', $ts) : $dt;
-                                    } elseif (preg_match('/^\d{4}-\d{2}-\d{2}$/', $dt)) {
-                                        $dogum = date('d.m.Y', strtotime($dt));
-                                    } else {
-                                        $dogum = $dt;
-                                    }
-                                } else {
-                                    $dogum = !empty($uye['dogum_yili']) ? $uye['dogum_yili'] : '-';
-                                }
-                                ?>
-                                <tr <?= $satir_klasi; ?> style="transition: background-color 0.2s;">
-                                    <td class="ps-3 fw-bold">
-                                        <a href="index.php?sayfa=uye-detay&id=<?= $uye['id']; ?>" class="text-decoration-none text-dark d-block py-1 hover-link" style="cursor: pointer;">
-                                            <div class="d-flex align-items-center">
-                                                <?= $sol_ikon; ?> 
-                                                <div>
-                                                    <?= htmlspecialchars($uye['adi_soyadi']); ?>
-                                                </div>
-                                            </div>
-                                        </a>
-                                    </td>
-                                    <td style="white-space: nowrap; font-weight: 500; font-size: 0.9rem;"><?= gizli_alan(htmlspecialchars($uye['telefon'] ?: '')); ?></td>
-                                    <td><small class="text-truncate d-inline-block" style="max-width: 140px;"><?= gizli_alan(htmlspecialchars($uye['eposta'] ?: '')); ?></small></td>
-                                    <td class="text-center"><span class="badge bg-danger text-white"><?= htmlspecialchars($kan ?: '-'); ?></span></td>
-                                    <td class="text-center"><small><?= htmlspecialchars($dogum); ?></small></td>
-                                    <td>
-                                        <strong><?= htmlspecialchars($uye['ikamet_ili'] ?: '-'); ?></strong>
-                                        <?php if (!empty($uye['ikamet_ilcesi'])): ?>
-                                        <br><small class="text-muted"><?= htmlspecialchars($uye['ikamet_ilcesi']); ?></small>
-                                        <?php endif; ?>
-                                        <?php if (!empty($uye['trabzon_ilcesi'])): ?>
-                                        <br><small class="text-secondary" style="font-size:0.7rem;">Trab: <?= htmlspecialchars($uye['trabzon_ilcesi']); ?></small>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td>
-                                        <small><?= htmlspecialchars($uye['kurum'] ?: '-'); ?></small>
-                                        <br><small class="text-muted"><?= htmlspecialchars($uye['gorev_unvan'] ?: '-'); ?></small>
-                                    </td>
-                                    <td><small><?= htmlspecialchars($uye['calisma_sekli'] ?: '-'); ?></small></td>
-                                    <td class="text-center">
-                                        <div class="d-flex flex-column align-items-center justify-content-center">
-                                            <?= $ust_bolge_yazisi; ?>
-                                            <span class="badge <?= $rozet_klasi; ?> statu-rozet fw-semibold" 
-                                                <?php 
-                                                if($temsilci_turu_kontrol === 'İlçe Başkanı') echo 'style="background-color: #6a1b9a !important;"';
-                                                if($temsilci_turu_kontrol === 'Bölge Koordinatörü') echo 'style="background-color: #00838f !important;"';
-                                                if($temsilci_turu_kontrol === 'Kadın Kolları Başkanı') echo 'style="background-color: #d63384 !important;"';
-                                                ?>>
-                                                <?= $rozet_yazisi; ?>
-                                            </span>
-
-                                            <?php if(!empty($ek_gorev_kontrol)): ?>
-                                                <div class="mt-1">
-                                                    <span class="badge bg-dark text-white statu-rozet small" title="Ek Görev">
-                                                        <i class="fa-solid fa-plus-circle text-warning me-1"></i><?= htmlspecialchars($ek_gorev_kontrol); ?>
-                                                    </span>
-                                                </div>
-                                            <?php endif; ?>
-                                        </div>
-                                    </td>
-                                    <td class="text-center pe-3">
-                                        <?php if ($is_kisitli_rol): ?>
-                                            <span class="badge bg-info text-dark px-2 py-1"><i class="fa-solid fa-eye me-1"></i>Sadece Görüntüleme</span>
-                                        <?php else: ?>
-                                            <div class="btn-group dropup position-static">
-                                                <button class="btn btn-dark btn-sm dropdown-toggle fw-bold shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-popper-config='{"strategy":"fixed"}'>
-                                                    <i class="fa-solid fa-user-gear me-1"></i> Yönet
-                                                </button>
-                                                <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 kucuk-yonet-menu">
-                                                    <li><h6 class="dropdown-header fw-bold text-uppercase py-1" style="font-size: 0.72rem;">Ana Statü Değiştir</h6></li>
-                                                    <li><a class="dropdown-item text-info fw-bold py-1" href="javascript:void(0);" onclick="bolgeSecimPenceresi(<?= $uye['id']; ?>)"><i class="fa-solid fa-earth-americas me-1.5"></i>Bölge Koordinatörü Yap</a></li>
-                                                    
-                                                    <?php if($temsilci_turu_kontrol !== 'Yönetim Kurulu Üyesi'): ?>
-                                                        <li><a class="dropdown-item text-primary py-1" href="index.php?sayfa=uyeler&aksiyon=stat%C3%BC_degistir&id=<?= $uye['id']; ?>&tur=Yönetim+Kurulu+Üyesi"><i class="fa-solid fa-user-shield me-1.5"></i>Yönetim Kurulu Üyesi Yap</a></li>
-                                                    <?php endif; ?>
-
-                                                    <?php if($temsilci_turu_kontrol !== 'Yönetim Kurulu Üyesi Yedek'): ?>
-                                                        <li><a class="dropdown-item text-info py-1" href="index.php?sayfa=uyeler&aksiyon=stat%C3%BC_degistir&id=<?= $uye['id']; ?>&tur=Yönetim+Kurulu+Üyesi+Yedek"><i class="fa-solid fa-user-shield me-1.5"></i>Yönetim Kurulu Üyesi Yedek Yap</a></li>
-                                                    <?php endif; ?>
-                                                    
-                                                    <?php if($temsilci_turu_kontrol !== 'İl Başkanı'): ?>
-                                                        <li><a class="dropdown-item text-success py-1" href="index.php?sayfa=uyeler&aksiyon=stat%C3%BC_degistir&id=<?= $uye['id']; ?>&tur=İl+Başkanı"><i class="fa-solid fa-building-flag me-1.5"></i>İl Başkanı Yap</a></li>
-                                                    <?php endif; ?>
-                                                    
-                                                    <?php if($temsilci_turu_kontrol !== 'İlçe Başkanı'): ?>
-                                                        <li><a class="dropdown-item py-1" style="color: #6a1b9a;" href="index.php?sayfa=uyeler&aksiyon=stat%C3%BC_degistir&id=<?= $uye['id']; ?>&tur=İlçe+Başkanı"><i class="fa-solid fa-map-location-dot me-1.5"></i>İlçe Başkanı Yap</a></li>
-                                                    <?php endif; ?>
-                                                    
-                                                    <?php if($temsilci_turu_kontrol !== 'Kurum Temsilcisi'): ?>
-                                                        <li><a class="dropdown-item text-warning py-1" href="index.php?sayfa=uyeler&aksiyon=stat%C3%BC_degistir&id=<?= $uye['id']; ?>&tur=Kurum+Temsilcisi"><i class="fa-solid fa-building-user me-1.5"></i>Kurum Temsilcisi Yap</a></li>
-                                                    <?php endif; ?>
-                                                    
-                                                    <?php if($temsilci_turu_kontrol !== 'Kadın Kolları Başkanı'): ?>
-                                                        <li><a class="dropdown-item py-1" style="color: #d63384;" href="index.php?sayfa=uyeler&aksiyon=stat%C3%BC_degistir&id=<?= $uye['id']; ?>&tur=Kadın+Kolları+Başkanı"><i class="fa-solid fa-venus me-1.5"></i>Kadın Kolları Başkanı Yap</a></li>
-                                                    <?php endif; ?>
-                                                    
-                                                    <?php if($temsilci_turu_kontrol !== 'Normal Üye'): ?>
-                                                        <li><a class="dropdown-item text-secondary py-1" href="index.php?sayfa=uyeler&aksiyon=stat%C3%BC_degistir&id=<?= $uye['id']; ?>&tur=Normal+Üye"><i class="fa-solid fa-user-minus me-1.5"></i>Normal Üyeliğe Çek</a></li>
-                                                    <?php endif; ?>
-
-                                                    <!-- EK GÖREV ATAMALARI -->
-                                                    <li><hr class="dropdown-divider my-1"></li>
-                                                    <li><h6 class="dropdown-header text-dark fw-bold text-uppercase py-1" style="font-size: 0.72rem;">Ek Görev Atamaları</h6></li>
-
-                                                    <?php if($ek_gorev_kontrol !== 'Yönetim Kurulu Üyesi' && $temsilci_turu_kontrol !== 'Yönetim Kurulu Üyesi'): ?>
-                                                        <li><a class="dropdown-item text-primary fw-bold py-1" href="index.php?sayfa=uyeler&aksiyon=ek_gorev_degistir&id=<?= $uye['id']; ?>&gorev=Yönetim+Kurulu+Üyesi"><i class="fa-solid fa-plus me-1.5"></i>+ Görev: Yönetim Kurulu Üyesi Yap</a></li>
-                                                    <?php endif; ?>
-
-                                                    <?php if($ek_gorev_kontrol !== 'Yönetim Kurulu Üyesi Yedek' && $temsilci_turu_kontrol !== 'Yönetim Kurulu Üyesi Yedek'): ?>
-                                                        <li><a class="dropdown-item text-info fw-bold py-1" href="index.php?sayfa=uyeler&aksiyon=ek_gorev_degistir&id=<?= $uye['id']; ?>&gorev=Yönetim+Kurulu+Üyesi+Yedek"><i class="fa-solid fa-plus me-1.5"></i>+ Görev: Y. Kurulu Yedek Yap</a></li>
-                                                    <?php endif; ?>
-
-                                                    <?php if($ek_gorev_kontrol !== 'Teşkilatlanma Sorumlu Başkan' && $temsilci_turu_kontrol !== 'Teşkilatlanma Sorumlu Başkan'): ?>
-                                                        <li><a class="dropdown-item fw-bold py-1" style="color: #e65100;" href="index.php?sayfa=uyeler&aksiyon=ek_gorev_degistir&id=<?= $uye['id']; ?>&gorev=Teşkilatlanma+Sorumlu+Başkan"><i class="fa-solid fa-plus me-1.5"></i>+ Görev: Teşkilatlanma Sor. Bşk.</a></li>
-                                                    <?php endif; ?>
-
-                                                    <?php if(!empty($ek_gorev_kontrol)): ?>
-                                                        <li><a class="dropdown-item text-danger py-1" href="index.php?sayfa=uyeler&aksiyon=ek_gorev_degistir&id=<?= $uye['id']; ?>&gorev=sil"><i class="fa-solid fa-xmark me-1.5"></i>Görev İptal Et/Sil</a></li>
-                                                    <?php endif; ?>
-
-                                                    <li><hr class="dropdown-divider my-1"></li>
-                                                    <li>
-                                                        <a class="dropdown-item text-danger fw-bold py-1" href="index.php?sayfa=uyeler&aksiyon=uye_sil&id=<?= $uye['id']; ?>" onclick="return confirm('<?= htmlspecialchars($uye['adi_soyadi']); ?> isimli üyeyi tamamen silmek istediğinize emin misiniz?');">
-                                                            <i class="fa-solid fa-trash-can me-1.5"></i> Üyeyi Sil
-                                                        </a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        <?php endif; ?>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr><td colspan="10" class="text-center py-5 text-muted"><i class="fa-solid fa-folder-open fa-3x mb-3 d-block text-secondary"></i>Henüz veritabanında kayıtlı onaylı üye bulunmamaktadır.</td></tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-                <?php endif; ?>
-                
-            </div>
         </div>
     </div>
 
+    <!-- ── SAYFALAMA ──────────────────────────────────── -->
     <div id="sayfalamaKutusu">
         <?php if ($toplam_sayfa > 1): ?>
-            <nav aria-label="Page navigation">
-                <ul class="pagination justify-content-center shadow-sm rounded">
-                    <li class="page-item <?= ($mevcut_sayfa <= 1) ? 'disabled' : ''; ?>">
-                        <a class="page-link fw-bold text-dark" href="index.php?sayfa=uyeler&p=<?= $mevcut_sayfa - 1; ?><?= !empty($aktif_filtre) ? '&filtre='.$aktif_filtre : ''; ?>"><i class="fa-solid fa-chevron-left me-1"></i> Önceki</a>
-                    </li>
-                    <?php for ($i = 1; $i <= $toplam_sayfa; $i++): ?>
-                        <li class="page-item <?= ($mevcut_sayfa == $i) ? 'active' : ''; ?>">
-                            <a class="page-link fw-bold <?= ($mevcut_sayfa == $i) ? 'bg-dark border-dark text-white' : 'text-dark'; ?>" href="index.php?sayfa=uyeler&p=<?= $i; ?><?= !empty($aktif_filtre) ? '&filtre='.$aktif_filtre : ''; ?>"><?= $i; ?></a>
-                        </li>
-                    <?php endfor; ?>
-                    <li class="page-item <?= ($mevcut_sayfa >= $toplam_sayfa) ? 'disabled' : ''; ?>">
-                        <a class="page-link fw-bold text-dark" href="index.php?sayfa=uyeler&p=<?= $mevcut_sayfa + 1; ?><?= !empty($aktif_filtre) ? '&filtre='.$aktif_filtre : ''; ?>">Sonraki <i class="fa-solid fa-chevron-right ms-1"></i></a>
-                    </li>
-                </ul>
-            </nav>
+        <nav aria-label="Sayfalama" class="ul-sayfalama">
+            <ul class="pagination mb-0">
+                <li class="page-item <?= ($mevcut_sayfa <= 1) ? 'disabled' : '' ?>">
+                    <a class="page-link" href="index.php?sayfa=uyeler&p=<?= $mevcut_sayfa - 1 ?><?= !empty($aktif_filtre) ? '&filtre='.$aktif_filtre : '' ?>">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </a>
+                </li>
+                <?php for ($i = 1; $i <= $toplam_sayfa; $i++): ?>
+                <li class="page-item <?= ($mevcut_sayfa == $i) ? 'active' : '' ?>">
+                    <a class="page-link" href="index.php?sayfa=uyeler&p=<?= $i ?><?= !empty($aktif_filtre) ? '&filtre='.$aktif_filtre : '' ?>"><?= $i ?></a>
+                </li>
+                <?php endfor; ?>
+                <li class="page-item <?= ($mevcut_sayfa >= $toplam_sayfa) ? 'disabled' : '' ?>">
+                    <a class="page-link" href="index.php?sayfa=uyeler&p=<?= $mevcut_sayfa + 1 ?><?= !empty($aktif_filtre) ? '&filtre='.$aktif_filtre : '' ?>">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
         <?php endif; ?>
     </div>
+
 </div>
 
+<!-- ── BÖLGE MODAL (Bootstrap) ──────────────────────── -->
 <?php if (!$is_kisitli_rol): ?>
 <div class="modal fade" id="bolgeModal" tabindex="-1" aria-labelledby="bolgeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content border-0 shadow-lg">
-      <div class="modal-header bg-dark text-white">
-        <h5 class="modal-title fw-bold" id="bolgeModalLabel"><i class="fa-solid fa-earth-americas me-2 text-info"></i>Sorumlu Bölge Seçimi</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-content border-0 shadow-lg" style="border-radius:18px;overflow:hidden;">
+      <div class="modal-header" style="background:linear-gradient(135deg,#1a1a2e,#16213e);border:none;">
+        <h5 class="modal-title fw-bold text-white" id="bolgeModalLabel">
+            <i class="fa-solid fa-earth-americas me-2" style="color:#00c9a7;"></i>Sorumlu Bölge Seçimi
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Kapat"></button>
       </div>
       <div class="modal-body p-4">
-        <p class="text-muted small mb-3">Lütfen bu üyenin koordine edeceği Türkiye coğrafi bölgesini seçiniz:</p>
+        <p class="text-muted small mb-3">Bu üyenin koordine edeceği Türkiye coğrafi bölgesini seçiniz:</p>
         <input type="hidden" id="modalUyeId" value="">
         <div class="d-grid gap-2">
-            <button onclick="bolgeAta('Marmara Bölgesi')" class="btn btn-outline-dark fw-bold text-start"><i class="fa-solid fa-circle-dot text-info me-2"></i>Marmara Bölgesi</button>
-            <button onclick="bolgeAta('Karadeniz Bölgesi')" class="btn btn-outline-dark fw-bold text-start"><i class="fa-solid fa-circle-dot text-info me-2"></i>Karadeniz Bölgesi</button>
-            <button onclick="bolgeAta('İç Anadolu Bölgesi')" class="btn btn-outline-dark fw-bold text-start"><i class="fa-solid fa-circle-dot text-info me-2"></i>İç Anadolu Bölgesi</button>
-            <button onclick="bolgeAta('Ege Bölgesi')" class="btn btn-outline-dark fw-bold text-start"><i class="fa-solid fa-circle-dot text-info me-2"></i>Ege Bölgesi</button>
-            <button onclick="bolgeAta('Akdeniz Bölgesi')" class="btn btn-outline-dark fw-bold text-start"><i class="fa-solid fa-circle-dot text-info me-2"></i>Akdeniz Bölgesi</button>
-            <button onclick="bolgeAta('Doğu Anadolu Bölgesi')" class="btn btn-outline-dark fw-bold text-start"><i class="fa-solid fa-circle-dot text-info me-2"></i>Doğu Anadolu Bölgesi</button>
-            <button onclick="bolgeAta('Güneydoğu Anadolu Bölgesi')" class="btn btn-outline-dark fw-bold text-start"><i class="fa-solid fa-circle-dot text-info me-2"></i>Güneydoğu Anadolu Bölgesi</button>
+            <?php foreach (['Marmara Bölgesi','Karadeniz Bölgesi','İç Anadolu Bölgesi','Ege Bölgesi','Akdeniz Bölgesi','Doğu Anadolu Bölgesi','Güneydoğu Anadolu Bölgesi'] as $bolge): ?>
+            <button onclick="bolgeAta('<?= $bolge ?>')"
+                    class="btn fw-bold text-start"
+                    style="background:#f8f9fa;border:1.5px solid #e9ecef;border-radius:10px;color:#1a1a2e;transition:all .15s;"
+                    onmouseover="this.style.background='#1a1a2e';this.style.color='#00c9a7';"
+                    onmouseout="this.style.background='#f8f9fa';this.style.color='#1a1a2e';">
+                <i class="fa-solid fa-circle-dot me-2" style="color:#00c9a7;"></i><?= $bolge ?>
+            </button>
+            <?php endforeach; ?>
         </div>
       </div>
     </div>
@@ -614,30 +910,22 @@ window.addEventListener('load', function() {
 });
 
 let aramaZamanlayici;
-
 function canliVeritabanıArama(deger) {
     clearTimeout(aramaZamanlayici);
     aramaZamanlayici = setTimeout(() => {
         let kelime = deger.trim();
-        let sayfalama = document.getElementById("sayfalamaKutusu");
+        let sayfalama = document.getElementById('sayfalamaKutusu');
         if (kelime.length >= 2 || kelime.length === 0) {
-            if(kelime.length > 0) { if(sayfalama) sayfalama.style.display = "none"; }
-            else { if(sayfalama) sayfalama.style.display = "block"; }
-
-            let aktifFiltre = '<?= $aktif_filtre; ?>';
+            if (kelime.length > 0) { if (sayfalama) sayfalama.style.display = 'none'; }
+            else                   { if (sayfalama) sayfalama.style.display = 'block'; }
+            let aktifFiltre = '<?= $aktif_filtre ?>';
             let url = 'inc/canli-ara.php?kelime=' + encodeURIComponent(kelime);
-            if(aktifFiltre !== '') {
-                url += '&filtre=' + encodeURIComponent(aktifFiltre);
-            }
-
+            if (aktifFiltre !== '') url += '&filtre=' + encodeURIComponent(aktifFiltre);
             fetch(url)
-                .then(response => response.text())
+                .then(r => r.text())
                 .then(html => {
-                    document.getElementById("uyeTabloGövdesi").innerHTML = html;
-                    let dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
-                    dropdownElementList.map(function (dropdownToggleEl) {
-                        return new bootstrap.Dropdown(dropdownToggleEl);
-                    });
+                    document.getElementById('uyeTabloGövdesi').innerHTML = html;
+                    [].slice.call(document.querySelectorAll('.dropdown-toggle')).map(el => new bootstrap.Dropdown(el));
                 });
         }
     }, 200);
@@ -648,114 +936,28 @@ function dosyaYonlendir(tur) {
         alert('Bu kullanıcı yetkisi ile dosya indirme işlemi kısıtlanmıştır.');
         return;
     <?php endif; ?>
-    let aramaKutusu = document.getElementById('tabloCanliAra');
-    let aramaKelimesi = aramaKutusu ? aramaKutusu.value.trim() : '';
-    let aktifFiltre = '<?= $aktif_filtre; ?>';
-    let cinsiyetKutusu = document.getElementById('indirCinsiyetFiltre');
-    let cinsiyetSecimi = cinsiyetKutusu ? cinsiyetKutusu.value : '';
-    let temelUrl = (tur === 'excel') ? "inc/excel-indir.php" : "inc/pdf-indir.php";
-    
-    let queryParams = [];
-    
-    if (aramaKelimesi !== "") {
-        queryParams.push("arama=" + encodeURIComponent(aramaKelimesi));
-    }
-    if (aktifFiltre !== "") {
-        queryParams.push("filtre=" + encodeURIComponent(aktifFiltre));
-    }
-    if (cinsiyetSecimi !== "") {
-        queryParams.push("cinsiyet=" + encodeURIComponent(cinsiyetSecimi));
-    }
-    
-    let nihaiUrl = temelUrl;
-    if (queryParams.length > 0) {
-        nihaiUrl += "?" + queryParams.join("&");
-    }
-    
-    window.open(nihaiUrl, '_blank');
+    let aramaKelimesi = (document.getElementById('tabloCanliAra') || {value:''}).value.trim();
+    let aktifFiltre   = '<?= $aktif_filtre ?>';
+    let cinsiyet      = (document.getElementById('indirCinsiyetFiltre') || {value:''}).value;
+    let base          = tur === 'excel' ? 'inc/excel-indir.php' : 'inc/pdf-indir.php';
+    let params        = [];
+    if (aramaKelimesi) params.push('arama=' + encodeURIComponent(aramaKelimesi));
+    if (aktifFiltre)   params.push('filtre=' + encodeURIComponent(aktifFiltre));
+    if (cinsiyet)      params.push('cinsiyet=' + encodeURIComponent(cinsiyet));
+    window.open(base + (params.length ? '?' + params.join('&') : ''), '_blank');
 }
 
 function bolgeSecimPenceresi(uyeId) {
     <?php if (!$is_kisitli_rol): ?>
-    document.getElementById("modalUyeId").value = uyeId;
-    var myModal = new bootstrap.Modal(document.getElementById('bolgeModal'));
-    myModal.show();
+    document.getElementById('modalUyeId').value = uyeId;
+    new bootstrap.Modal(document.getElementById('bolgeModal')).show();
     <?php endif; ?>
 }
 
 function bolgeAta(bolgeAdi) {
     <?php if (!$is_kisitli_rol): ?>
-    var uyeId = document.getElementById("modalUyeId").value;
-    if(uyeId) {
-        window.location.href = 'index.php?sayfa=uyeler&aksiyon=statü_degistir&id=' + uyeId + '&tur=Bölge+Koordinatörü&bolge=' + encodeURIComponent(bolgeAdi);
-    }
+    var uyeId = document.getElementById('modalUyeId').value;
+    if (uyeId) window.location.href = 'index.php?sayfa=uyeler&aksiyon=statü_degistir&id=' + uyeId + '&tur=Bölge+Koordinatörü&bolge=' + encodeURIComponent(bolgeAdi);
     <?php endif; ?>
 }
 </script>
-
-<style>
-.hover-link:hover { color: #610012 !important; text-decoration: underline !important; }
-.ilce-baskani-satir, .ilce-baskani-satir td { background-color: #f3e5f5 !important; }
-.ilce-baskani-satir:hover, .ilce-baskani-satir:hover td { background-color: #eaecfa !important; }
-.bolge-koordinator-satir, .bolge-koordinator-satir td { background-color: #e0f7fa !important; }
-.bolge-koordinator-satir:hover, .bolge-koordinator-satir:hover td { background-color: #b2ebf2 !important; }
-.text-pink { color: #e83e8c !important; }
-
-/* Mobilde Sağa-Sola Akıcı Kaydırma */
-.table-responsive {
-    width: 100% !important;
-    max-width: 100% !important;
-    overflow-x: auto !important;
-    overflow-y: visible !important;
-    min-height: 420px !important;
-    -webkit-overflow-scrolling: touch;
-}
-
-.table-responsive table {
-    table-layout: fixed !important;
-}
-
-.card-body {
-    overflow: visible !important;
-}
-
-#uyeTabloGövdesi {
-    min-height: 280px !important;
-}
-
-/* Rozet Standart Boyut Sınıfı */
-.statu-rozet {
-    min-width: 140px !important;
-    display: inline-block !important;
-    text-align: center !important;
-    padding: 6px 8px !important;
-    font-size: 0.78rem !important;
-    white-space: nowrap !important;
-}
-
-/* Telefon Klavyelerinin Geçmiş Tamamlama Baloncuğunu / Otomatik Doldurmasını Tamamen Engelleme */
-#tabloCanliAra::-webkit-contacts-auto-fill-button,
-#tabloCanliAra::-webkit-credentials-auto-fill-button,
-#tabloCanliAra::-webkit-search-decoration,
-#tabloCanliAra::-webkit-search-cancel-button,
-#tabloCanliAra::-webkit-search-results-button,
-#tabloCanliAra::-webkit-search-results-decoration {
-    visibility: hidden !important;
-    display: none !important;
-    pointer-events: none !important;
-    -webkit-appearance: none !important;
-}
-
-/* Yönet Menüsü Açılma Z-Index & Konumlandırma */
-.kucuk-yonet-menu {
-    z-index: 999999 !important;
-    min-width: 220px !important;
-    font-size: 0.82rem !important;
-}
-
-.kucuk-yonet-menu .dropdown-item {
-    font-size: 0.82rem !important;
-    padding-top: 0.3rem !important;
-    padding-bottom: 0.3rem !important;
-}
-</style>
