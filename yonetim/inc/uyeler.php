@@ -261,6 +261,14 @@ try {
                     <button type="button" onclick="dosyaYonlendir('pdf')" class="btn btn-danger fw-bold px-2 px-sm-3 d-flex align-items-center justify-content-center btn-sm">
                         <i class="fa-solid fa-file-pdf me-1"></i> PDF
                     </button>
+                    <?php if (in_array($_SESSION['rol'] ?? '', ['admin', 'gelistirici'], true)): ?>
+                    <a href="inc/bos-il-excel.php"
+                       class="btn btn-warning fw-bold px-2 px-sm-3 d-flex align-items-center justify-content-center btn-sm"
+                       title="Sistemde onaylı üyesi bulunmayan illerin listesi"
+                       target="_blank">
+                        <i class="fa-solid fa-map-location-dot me-1"></i> Üyesiz İller
+                    </a>
+                    <?php endif; ?>
                     <?php endif; ?>
                 </div>
             </div>
