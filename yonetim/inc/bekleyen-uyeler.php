@@ -189,8 +189,9 @@ function formatDogum(array $b): string
 /* Kart grid */
 .bub-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(360px, 100%), 1fr));
     gap: 1.25rem;
+    width: 100%;
 }
 
 /* Tekil başvuru kartı */
