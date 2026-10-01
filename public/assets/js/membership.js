@@ -239,7 +239,7 @@
       hataGoster(elTelefon, HATALAR.telefon.rakam);
       return false;
     }
-    if (deger.length !== 9) {
+    if (deger.length !== 10) {
       hataGoster(elTelefon, HATALAR.telefon.uzunluk);
       return false;
     }
@@ -416,7 +416,7 @@
    */
   if (elTelefon) {
     elTelefon.addEventListener('input', function () {
-      const temiz = this.value.replace(/\D/g, '').slice(0, 9);
+      const temiz = this.value.replace(/\D/g, '').slice(0, 10);
       this.value  = temiz;
     });
 
@@ -441,7 +441,7 @@
     elTelefon.addEventListener('paste', function (e) {
       e.preventDefault();
       const yapisTirilanMetin = (e.clipboardData || window.clipboardData).getData('text');
-      const sadeceSayilar     = yapisTirilanMetin.replace(/\D/g, '').slice(0, 9);
+      const sadeceSayilar     = yapisTirilanMetin.replace(/\D/g, '').slice(0, 10);
       this.value = sadeceSayilar;
     });
 
@@ -451,7 +451,7 @@
 
       const deger = elTelefon.value.trim();
 
-      // Tam 9 rakam varsa sunucuda unique kontrolü yap
+      // Tam 10 rakam varsa sunucuda unique kontrolü yap
       fetch('/uye-ol/telefon-kontrol?telefon=' + encodeURIComponent(deger))
         .then(function (res) { return res.json(); })
         .then(function (veri) {
