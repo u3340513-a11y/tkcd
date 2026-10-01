@@ -363,7 +363,20 @@ if (
     exit;
 }
 
+// ── DOSYA İNDİRME SAYFALARI: header/sidebar öncesinde yakala ────────────
+// Bu sayfalar Content-Disposition header'ı gönderir; HTML template'i başlamadan
+// önce çalışmaları gerekir.
+$dosya_indirme_sayfalari = [
+    'bos-il-excel'        => 'inc/bos-il-excel.php',
+    'kadin-notsuz-excel'  => 'inc/kadin-notsuz-excel.php',
+];
+if (array_key_exists($sayfa, $dosya_indirme_sayfalari)) {
+    include $dosya_indirme_sayfalari[$sayfa];
+    exit;
+}
+
 include 'inc/header.php';
+
 include 'inc/sidebar.php';
 echo '<div class="panel-content">';
 include 'inc/topbar.php';
