@@ -67,7 +67,13 @@ if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'basvuru_onayla' && isset($_
                 )->execute([$uyeId, '✅ ONAY NOTU: ' . $onayNotu]);
             }
 
-            log_kaydet($db_baglanti, 'uye_onayla', $onayAdi . ' adlı başvuru onaylandı.', 'dernek_uyeler', $uyeId);
+            log_kaydet(
+                $db_baglanti,
+                'uye_onayla',
+                $onayAdi . ' adlı başvuru onaylandı.' . ($onayNotu !== '' ? ' | Onay Notu: ' . $onayNotu : ''),
+                'dernek_uyeler',
+                $uyeId
+            );
             echo "<script>window.location.href='index.php?sayfa=bekleyen-uyeler&mesaj_durum=onaylandi';</script>";
             exit;
         }
