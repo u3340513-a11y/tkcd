@@ -226,17 +226,17 @@ $calismaSekilleri = ['Kadrolu', 'Yarı Zamanlı', 'Sözleşmeli', 'Emekli Kamu �
                         Telefon Numarası <span class="ub-form__zorunlu" aria-label="zorunlu">*</span>
                     </label>
                     <div class="ub-form__telefon-grup">
-                        <span class="ub-form__telefon-prefix" aria-hidden="true">05</span>
+                        <span class="ub-form__telefon-prefix" aria-hidden="true">0</span>
                         <input
                             class="ub-form__girdi"
                             type="tel"
                             id="ub-telefon"
                             name="telefon"
-                            placeholder="XX XXX XX XX"
+                            placeholder="5XX XXX XX XX"
                             autocomplete="tel-national"
-                            minlength="9"
-                            maxlength="9"
-                            pattern="[0-9]{9}"
+                            minlength="10"
+                            maxlength="10"
+                            pattern="[0-9]{10}"
                             inputmode="numeric"
                             required
                             aria-required="true"
@@ -246,7 +246,7 @@ $calismaSekilleri = ['Kadrolu', 'Yarı Zamanlı', 'Sözleşmeli', 'Emekli Kamu �
                         >
                     </div>
                     <span id="ub-telefon-ipucu" class="gorsel-gizli">
-                        Başında 05 olmadan 9 rakam giriniz (örn: 532 123 45 67 → 532123456).
+                        Başında 0 olmadan 10 rakam giriniz (örn: 0532 123 45 67 → 5321234567).
                     </span>
                 </div>
 

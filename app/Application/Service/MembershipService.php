@@ -17,7 +17,7 @@ use App\Domain\Membership\MembershipRepositoryInterface;
  * Doğrulama:
  *  - Ad zorunlu, 2–60 karakter
  *  - Soyad zorunlu, 2–60 karakter (DB'de "Ad Soyad" olarak birleştirilerek saklanır)
- *  - Telefon zorunlu; "05" prefix + 9 rakam → normalize edilip tam numaray verir
+ *  - Telefon zorunlu; "0" prefix + 10 rakam → normalize edilip tam numaray verir
  *  - E-posta zorunlu; filter_var ile RFC-5321 uyumluluğu
  *  - İkamet ili zorunlu
  *  - Doğum tarihi (eğer girilmişse) date() uyumlu format
@@ -70,7 +70,7 @@ final class MembershipService
         // Ad + Soyad birleştirilerek kaydedilir
         $adiSoyadi = $ad . ' ' . $soyad;
 
-        if ($telefonSuffix === '' || !preg_match('/^[0-9]{9}$/', $telefonSuffix)) {
+        if ($telefonSuffix === '' || !preg_match('/^[0-9]{10}$/', $telefonSuffix)) {
             throw new \InvalidArgumentException('Telefon numarası geçersiz.');
         }
 
@@ -106,8 +106,8 @@ final class MembershipService
             throw new \InvalidArgumentException('Çalışma şekli seçimi zorunludur.');
         }
 
-        // Telefonu tam, boşluksuz forma çevir: "05" + 9 rakam
-        $telefonTam = '05' . $telefonSuffix;
+        // Telefonu tam, boşluksuz forma çevir: "0" + 10 rakam
+        $telefonTam = '0' . $telefonSuffix;
 
         // Telefon unique kontrolü: aynı numara zaten kayıtlıysa reddet
         // (existsByTelefon içinde REPLACE ile boşluklu eski kayıtlar da yakalanır)
