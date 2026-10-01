@@ -468,6 +468,11 @@ switch ($sayfa) {
         include 'inc/bos-il-excel.php';
         exit;
 
+    case 'kadin-notsuz-excel':
+        // Tek kullanımlık: notu olmayan kadın üyeler CSV raporu
+        include 'inc/kadin-notsuz-excel.php';
+        exit;
+
     case 'quiz':
         log_kaydet($db_baglanti, 'sayfa_goruntulem', 'Bilgi yarışması sayfası açıldı.');
         include 'inc/quiz.php';
