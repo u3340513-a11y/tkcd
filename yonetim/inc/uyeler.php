@@ -684,7 +684,35 @@ try {
                         $rozetYazisi = htmlspecialchars($uye['temsilci_turu'] ?: 'Normal Üye');
                         $solIkonHtml = '';
 
-                        match ($temsilciTurKontrol) {
+                        // ── Filtre bağlamı override ───────────────────
+                        // Aktif filtre varsa ve kişi o role ek_roller'dan giriyorsa
+                        // badge'i ve satır rengini filtre rolüyle göster.
+                        $filtreBaglamRol = null;
+                        $filtreBaglamRolMap = [
+                            'ilce_baskani'           => 'İlçe Başkanı',
+                            'il_baskani'             => 'İl Başkanı',
+                            'yonetim_kurulu'         => 'Yönetim Kurulu Üyesi',
+                            'kurum_temsilcisi'       => 'Kurum Temsilcisi',
+                            'bolge_koordinatoru'     => 'Bölge Koordinatörü',
+                            'teskilatlanma_sorumlusu'=> 'Teşkilatlanma Sorumlu Başkan',
+                            'kadin_kollari'          => 'Kadın Kolları Başkanı',
+                        ];
+                        if (!empty($aktif_filtre) && isset($filtreBaglamRolMap[$aktif_filtre])) {
+                            $hedefRol = $filtreBaglamRolMap[$aktif_filtre];
+                            // Kişi bu role sadece ek_roller üzerinden giriyorsa
+                            if (in_array($hedefRol, $ekRollerArr, true)
+                                && $temsilciTurKontrol !== $hedefRol
+                                && $ekGorevKontrol !== $hedefRol
+                            ) {
+                                $filtreBaglamRol = $hedefRol;
+                                $rozetYazisi     = htmlspecialchars($hedefRol);
+                            }
+                        }
+
+                        // Etkin rol: override varsa onu, yoksa temsilciTurKontrol'ü kullan
+                        $etkinRol = $filtreBaglamRol ?? $temsilciTurKontrol;
+
+                        match ($etkinRol) {
                             'Yönetim Kurulu Üyesi' => [
                                 $satirKlasi = 'ul-satir--yk',
                                 $rozetKlasi = 'ul-rozet--yk',
@@ -727,7 +755,7 @@ try {
                                 $dinamikIkon = 'fa-solid fa-crown';
                             elseif (mb_stripos($bolgeMetni, 'Bölge', 0, 'UTF-8') !== false)
                                 $dinamikIkon = 'fa-solid fa-earth-europe';
-                            elseif ($temsilciTurKontrol === 'İlçe Başkanı')
+                            elseif ($etkinRol === 'İlçe Başkanı')
                                 $dinamikIkon = 'fa-solid fa-location-dot';
                             $ustBolgeHtml = '<div class="ul-bolge-yazisi"><i class="'.$dinamikIkon.' me-1"></i>'.htmlspecialchars($bolgeMetni).'</div>';
                         }
