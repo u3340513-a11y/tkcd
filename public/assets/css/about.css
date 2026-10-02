@@ -540,6 +540,10 @@
 }
 
 /* Galeri sütunu */
+.da-galeri {
+  overflow: hidden; /* Sol sütunu aşmasını engeller */
+}
+
 .da-galeri__baslik {
   font-size: var(--olcek-sm);
   font-weight: 700;
@@ -549,12 +553,13 @@
   margin-bottom: var(--bosluk-4);
 }
 
-/* Mozaik ızgara: 3 sütun; ilk görsel 2 sütun kaplar */
+/* Mozaik ızgara: 2 sütun; ilk görsel 2 sütun kaplar */
 .da-galeri-mozaik {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   grid-template-rows: auto;
   gap: var(--bosluk-3);
+  align-content: start;
 }
 
 .da-galeri-mozaik__oge {

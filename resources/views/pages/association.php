@@ -280,7 +280,7 @@ $sayilar = [
 <?php
 /** @var list<array{dosya:string,alt:string,boyut:'buyuk'|'normal'}> $galeriVerisi */
 $galeriVerisi    = require dirname(__DIR__, 3) . '/resources/data/gallery.php';
-$galeriGorseller = array_slice($galeriVerisi, 0, 6);
+$galeriGorseller = array_slice($galeriVerisi, 0, 4);
 foreach ($galeriGorseller as $gorsel):
     $src   = '/assets/img/' . $gorsel['dosya'];
     $buyuk = ($gorsel['boyut'] === 'buyuk');
