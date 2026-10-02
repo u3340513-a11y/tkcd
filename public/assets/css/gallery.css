@@ -380,12 +380,18 @@
 .gl-lightbox__nav--onceki:hover { transform: scale(1.1) translateX(-3px); }
 .gl-lightbox__nav--sonraki:hover { transform: scale(1.1) translateX(3px); }
 
-.gl-lightbox__nav .icon {
-  width: 1.5rem;
-  height: 1.5rem;
-  stroke-width: 2.5;
-  display: block;
-  color: #1a0a0f;
+.gl-lightbox__nav .icon,
+.gl-lightbox__nav svg {
+  display: block !important;
+  visibility: visible !important;
+  width: 1.5rem !important;
+  height: 1.5rem !important;
+  min-width: 1.5rem !important;
+  min-height: 1.5rem !important;
+  stroke: #1a0a0f !important;
+  stroke-width: 2.5 !important;
+  color: #1a0a0f !important;
+  opacity: 1 !important;
 }
 
 @media (max-width: 600px) {
