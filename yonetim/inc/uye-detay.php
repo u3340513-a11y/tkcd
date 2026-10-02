@@ -68,6 +68,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['uye_bilgi_guncelle'])
     $guncelle_temsilci_turu = trim($_POST['guncelle_temsilci_turu'] ?? '');
     $guncelle_sorumlu_bolge = trim($_POST['guncelle_sorumlu_bolge'] ?? '');
 
+    // Ek Roller (JSON dizi) — checkbox dizisinden oluşturulur
+    $guncelle_ek_roller_input = $_POST['guncelle_ek_roller'] ?? [];
+    $gecerli_roller_listesi = [
+        'Normal Üye', 'Yönetim Kurulu Üyesi', 'Yönetim Kurulu Üyesi Yedek',
+        'İl Başkanı', 'İlçe Başkanı', 'Kurum Temsilcisi', 'Bölge Koordinatörü',
+        'Kadın Kolları Başkanı', 'Teşkilatlanma Sorumlu Başkan',
+    ];
+    $guncelle_ek_roller_temiz = [];
+    foreach ($guncelle_ek_roller_input as $rol) {
+        $rol = trim($rol);
+        if (in_array($rol, $gecerli_roller_listesi, true)) {
+            $guncelle_ek_roller_temiz[] = $rol;
+        }
+    }
+    $guncelle_ek_roller_json = empty($guncelle_ek_roller_temiz)
+        ? null
+        : json_encode(array_values($guncelle_ek_roller_temiz), JSON_UNESCAPED_UNICODE);
+
     // Doğum tarihi: GG/AA/YYYY → YYYY-MM-DD
     $dogum_input = trim($_POST['guncelle_dogum_tarihi'] ?? '');
     $guncelle_dogum = null;
@@ -97,7 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['uye_bilgi_guncelle'])
                 dogum_tarihi = ?, ikamet_ili = ?, ikamet_ilcesi = ?,
                 trabzon_ilcesi = ?, kurum = ?, gorev_unvan = ?,
                 calisma_sekli = ?, cinsiyet = ?, temsilci_turu = ?, sorumlu_bolge = ?,
-                uyelik_tarihi = ?
+                uyelik_tarihi = ?, ek_roller = ?
                 WHERE id = ?";
 
             $guncelle_sorgu = $db_baglanti->prepare($sql);
@@ -108,7 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['uye_bilgi_guncelle'])
                 $guncelle_kurum, $guncelle_gorev_unvan, $guncelle_calisma_sekli,
                 $guncelle_cinsiyet ?: null,
                 $guncelle_temsilci_turu, $guncelle_sorumlu_bolge ?: null,
-                $guncelle_uyelik_tarihi, $uye_id
+                $guncelle_uyelik_tarihi, $guncelle_ek_roller_json, $uye_id
             ]);
 
             $guncelleme_kaynak = $is_yonetim_hk ? 'yonetim_hk' : 'Geliştirici';
@@ -655,7 +673,47 @@ if (!empty($uye['uyelik_tarihi']) && $uye['uyelik_tarihi'] !== '0000-00-00') {
                     <label class="form-label fw-semibold">Sorumlu Bölge / İlçe</label>
                     <input type="text" name="guncelle_sorumlu_bolge" class="form-control" placeholder="Örn: Üsküdar, Kadıköy" value="<?= htmlspecialchars($uye['sorumlu_bolge'] ?? ''); ?>">
                 </div>
+
+                <div class="col-12">
+                    <label class="form-label fw-semibold">
+                        <i class="fa-solid fa-layer-group me-1" style="color:#6366f1;"></i>
+                        Ek Roller <span class="text-muted fw-normal small">(birden fazla seçilebilir, Ana Statüyü etkilemez)</span>
+                    </label>
+                    <?php
+                    $mevcut_ek_roller = [];
+                    if (!empty($uye['ek_roller'])) {
+                        $parsed_modal = json_decode($uye['ek_roller'], true);
+                        if (is_array($parsed_modal)) {
+                            $mevcut_ek_roller = $parsed_modal;
+                        }
+                    }
+                    $tum_ek_roller_modal = [
+                        ['Yönetim Kurulu Üyesi',         '#0d6efd'],
+                        ['Yönetim Kurulu Üyesi Yedek',   '#0dcaf0'],
+                        ['Bölge Koordinatörü',           '#0dcaf0'],
+                        ['İl Başkanı',                   '#198754'],
+                        ['İlçe Başkanı',                 '#6a1b9a'],
+                        ['Kurum Temsilcisi',             '#b45309'],
+                        ['Kadın Kolları Başkanı',        '#d63384'],
+                        ['Teşkilatlanma Sorumlu Başkan', '#e65100'],
+                    ];
+                    ?>
+                    <div class="d-flex flex-wrap gap-2 p-3 border rounded-3" style="background:rgba(99,102,241,0.04);">
+                        <?php foreach ($tum_ek_roller_modal as [$rol_adi, $renk]): ?>
+                        <?php $aktif = in_array($rol_adi, $mevcut_ek_roller, true); ?>
+                        <label class="d-flex align-items-center gap-1 px-2 py-1 rounded-pill border fw-semibold"
+                               style="cursor:pointer;font-size:0.82rem;color:<?= $renk ?>;<?= $aktif ? 'background:rgba(99,102,241,0.1);border-color:'.$renk.'!important;' : 'background:#fff;' ?>">
+                            <input type="checkbox" name="guncelle_ek_roller[]" value="<?= htmlspecialchars($rol_adi) ?>"
+                                   <?= $aktif ? 'checked' : '' ?>
+                                   style="accent-color:<?= $renk ?>;width:14px;height:14px;">
+                            <?= htmlspecialchars($rol_adi) ?>
+                        </label>
+                        <?php endforeach; ?>
+                    </div>
+                    <small class="text-muted d-block mt-1">Hiçbir rol seçilmezse ek roller temizlenir.</small>
+                </div>
             </div>
+
           </div>
           <div class="modal-footer bg-light border-top">
             <button type="button" class="btn btn-secondary fw-bold px-3" data-bs-dismiss="modal">İptal</button>
