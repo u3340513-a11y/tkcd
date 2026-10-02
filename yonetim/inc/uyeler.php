@@ -474,16 +474,37 @@ try {
 
 /* Dropdown menu geliştirme */
 .ul-dropdown-menu {
-    min-width: 220px; font-size: 0.82rem;
+    min-width: 220px;
+    max-width: min(320px, calc(100vw - 1rem));
+    max-height: min(70vh, 520px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    font-size: 0.82rem;
     border: none; border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(0,0,0,.15);
+    box-shadow: 0 8px 32px rgba(0,0,0,.18);
     z-index: 999999 !important;
+    /* Momentum scroll iOS */
+    -webkit-overflow-scrolling: touch;
 }
-.ul-dropdown-menu .dropdown-item { padding: 0.4rem 1rem; }
+.ul-dropdown-menu .dropdown-item { padding: 0.4rem 1rem; white-space: normal; }
 .ul-dropdown-menu .dropdown-header {
     font-size: 0.68rem; font-weight: 800;
     text-transform: uppercase; letter-spacing: .06em; color: #adb5bd;
     padding: 0.5rem 1rem 0.25rem;
+}
+
+/* Mobil: dropdown sağa değil, ekranın ortasına/sola sabit */
+@media (max-width: 600px) {
+    .kucuk-yonet-menu {
+        position: fixed !important;
+        left: 0.5rem !important;
+        right: 0.5rem !important;
+        width: auto !important;
+        max-width: calc(100vw - 1rem) !important;
+        max-height: 65vh !important;
+        top: auto !important;
+        transform: none !important;
+    }
 }
 
 /* Sayfalama */
