@@ -17,6 +17,16 @@ return [
         'boyut' => 'buyuk',
     ],
     [
+        'dosya' => 'galeri/konka1.jpeg',
+        'alt'   => 'Konka etkinliğinden bir kare',
+        'boyut' => 'buyuk',
+    ],
+    [
+        'dosya' => 'galeri/konka2.jpeg',
+        'alt'   => 'Konka etkinliğinden bir an',
+        'boyut' => 'normal',
+    ],
+    [
         'dosya' => 'galeri/IMG_1278.JPG',
         'alt'   => 'Dernek etkinliğinden bir kare',
         'boyut' => 'buyuk',
