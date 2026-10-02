@@ -96,7 +96,10 @@ use App\Core\View\SeoMeta;
         <div class="gl-lightbox__arka" id="gl-lightbox-arka"></div>
         <div class="gl-lightbox__ic">
             <button class="gl-lightbox__kapat" id="gl-lightbox-kapat" type="button" aria-label="Kapat">
-                <?= $view->icon('x') ?>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true" focusable="false" style="width:1.2rem;height:1.2rem;display:block;">
+                    <line x1="4" y1="4" x2="20" y2="20"/>
+                    <line x1="20" y1="4" x2="4" y2="20"/>
+                </svg>
             </button>
             <button class="gl-lightbox__nav gl-lightbox__nav--onceki" id="gl-lightbox-onceki" type="button" aria-label="Önceki fotoğraf">
                 <?= $view->icon('chevron-left') ?>
