@@ -12,6 +12,11 @@ declare(strict_types=1);
  */
 return [
     [
+        'dosya' => 'galeri/kahvlti.jpeg',
+        'alt'   => 'Kahvaltı etkinliğimizden bir kare',
+        'boyut' => 'buyuk',
+    ],
+    [
         'dosya' => 'galeri/IMG_1278.JPG',
         'alt'   => 'Dernek etkinliğinden bir kare',
         'boyut' => 'buyuk',
