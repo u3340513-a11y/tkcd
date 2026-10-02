@@ -25,6 +25,7 @@ return [
     ['GET', '/hakkimizda/anlasmali-kurumlar', AboutController::class, 'partners', 'about.partners'],
     ['GET', '/hakkimizda/temsilci-agimiz', AboutController::class, 'representatives', 'about.representatives'],
     ['GET', '/hakkimizda/galeri', AboutController::class, 'gallery', 'about.gallery'],
+    ['GET', '/kvkk-aydinlatma-metni', AboutController::class, 'kvkk', 'about.kvkk'],
 
     ['GET', '/duyurular', AnnouncementController::class, 'index', 'announcements.index'],
     ['GET', '/etkinlikler/{slug}', EventController::class, 'show', 'events.show'],

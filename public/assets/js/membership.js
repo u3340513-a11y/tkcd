@@ -721,3 +721,62 @@
 
 })();
 
+/* ── KVKK Modal ─────────────────────────────────────────────── */
+(function () {
+  'use strict';
+
+  var modal   = document.getElementById('ub-kvkk-modal');
+  var acBtn   = document.getElementById('ub-kvkk-modal-ac');
+  var kapatBtn = document.getElementById('ub-kvkk-modal-kapat');
+  var onaylaBtn = document.getElementById('ub-kvkk-modal-onayla');
+  var kvkkKutu = document.getElementById('ub-kvkk');
+
+  if (!modal || !acBtn) return;
+
+  /** Modal aç */
+  function modalAc() {
+    modal.showModal();
+    document.body.style.overflow = 'hidden';
+    // İçeriği en başa getir
+    var icerik = modal.querySelector('.ub-kvkk-modal__icerik');
+    if (icerik) icerik.scrollTop = 0;
+  }
+
+  /** Modal kapat */
+  function modalKapat() {
+    modal.close();
+    document.body.style.overflow = '';
+  }
+
+  acBtn.addEventListener('click', function (e) {
+    e.preventDefault();
+    modalAc();
+  });
+
+  if (kapatBtn) kapatBtn.addEventListener('click', modalKapat);
+
+  /** "Okudum, Onaylıyorum" butonu → checkbox'ı işaretle + modal kapat */
+  if (onaylaBtn) {
+    onaylaBtn.addEventListener('click', function () {
+      if (kvkkKutu) {
+        kvkkKutu.checked = true;
+        // Validity güncelle
+        kvkkKutu.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+      modalKapat();
+    });
+  }
+
+  /** ESC tuşu ve backdrop tıklaması */
+  modal.addEventListener('cancel', function (e) {
+    e.preventDefault(); // native ESC default'u al, kendi kapamayı yap
+    modalKapat();
+  });
+
+  modal.addEventListener('click', function (e) {
+    // Backdrop tıklaması: tıklanan hedef doğrudan dialog ise kapat
+    if (e.target === modal) {
+      modalKapat();
+    }
+  });
+}());

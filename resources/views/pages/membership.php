@@ -437,22 +437,111 @@ $calismaSekilleri = ['Kadrolu', 'Yarı Zamanlı', 'Sözleşmeli', 'Emekli Kamu �
                     </select>
                 </div>
 
-                <!-- KVKK Onayı -->
-                <div class="ub-kvkk">
-                    <input
-                        class="ub-kvkk__kutu"
-                        type="checkbox"
-                        id="ub-kvkk"
-                        name="kvkk"
-                        value="1"
-                        required
-                        aria-required="true"
-                    >
-                    <label class="ub-kvkk__etiket" for="ub-kvkk">
-                        <strong>KVKK Onayı</strong> <span style="color:var(--bordo-500)">*</span><br>
-                        Kişisel verilerimin işlenmesini kabul ediyorum.
-                    </label>
+                <!-- KVKK Onayları -->
+                <div class="ub-kvkk-grup">
+
+                    <!-- 1. Aydınlatma (zorunlu) -->
+                    <div class="ub-kvkk">
+                        <input
+                            class="ub-kvkk__kutu"
+                            type="checkbox"
+                            id="ub-kvkk"
+                            name="kvkk"
+                            value="1"
+                            required
+                            aria-required="true"
+                        >
+                        <label class="ub-kvkk__etiket" for="ub-kvkk">
+                            <strong>KVKK Aydınlatma Metni</strong> <span style="color:var(--bordo-500)">*</span><br>
+                            <button type="button" class="ub-kvkk__link" id="ub-kvkk-modal-ac" aria-haspopup="dialog">
+                                KVKK Aydınlatma Metni
+                            </button>'ni okudum ve kişisel verilerimin işlenmesi hakkında bilgilendirildim.
+                        </label>
+                    </div>
+
+                    <!-- 2. Açık rıza (isteğe bağlı) -->
+                    <div class="ub-kvkk">
+                        <input
+                            class="ub-kvkk__kutu"
+                            type="checkbox"
+                            id="ub-acik-riza"
+                            name="acik_riza"
+                            value="1"
+                        >
+                        <label class="ub-kvkk__etiket" for="ub-acik-riza">
+                            Kişisel verilerimin tarafıma sunulan Açık Rıza Metni'nde belirtilen amaçlarla işlenmesine açık rıza veriyorum.
+                        </label>
+                    </div>
+
+                    <!-- 3. E-posta bilgilendirme (isteğe bağlı) -->
+                    <div class="ub-kvkk">
+                        <input
+                            class="ub-kvkk__kutu"
+                            type="checkbox"
+                            id="ub-eposta-riza"
+                            name="eposta_riza"
+                            value="1"
+                        >
+                        <label class="ub-kvkk__etiket" for="ub-eposta-riza">
+                            Dernek tarafından gerçekleştirilecek etkinlik, eğitim ve faaliyetler hakkında <strong>e-posta yoluyla bilgilendirme</strong> yapılmasına açık rıza veriyorum.
+                        </label>
+                    </div>
+
+                    <!-- 4. SMS bilgilendirme (isteğe bağlı) -->
+                    <div class="ub-kvkk">
+                        <input
+                            class="ub-kvkk__kutu"
+                            type="checkbox"
+                            id="ub-sms-riza"
+                            name="sms_riza"
+                            value="1"
+                        >
+                        <label class="ub-kvkk__etiket" for="ub-sms-riza">
+                            Dernek tarafından gerçekleştirilecek etkinlik, eğitim ve faaliyetler hakkında <strong>SMS yoluyla bilgilendirme</strong> yapılmasına açık rıza veriyorum.
+                        </label>
+                    </div>
                 </div>
+
+                <!-- KVKK Modal -->
+                <dialog class="ub-kvkk-modal" id="ub-kvkk-modal" aria-labelledby="ub-kvkk-modal-baslik" aria-modal="true">
+                    <div class="ub-kvkk-modal__ic">
+                        <div class="ub-kvkk-modal__ust">
+                            <h2 class="ub-kvkk-modal__baslik" id="ub-kvkk-modal-baslik">KVKK Aydınlatma Metni</h2>
+                            <button type="button" class="ub-kvkk-modal__kapat" id="ub-kvkk-modal-kapat" aria-label="Kapat">✕</button>
+                        </div>
+                        <div class="ub-kvkk-modal__icerik" tabindex="0">
+                            <p class="ub-kvkk-modal__ust-baslik"><strong>TRABZONLU KAMU ÇALIŞANLARI DERNEĞİ — KİŞİSEL VERİLERİN KORUNMASI KANUNU KAPSAMINDA AYDINLATMA METNİ</strong></p>
+
+                            <h3>1. Veri Sorumlusu</h3>
+                            <p>6698 sayılı Kişisel Verilerin Korunması Kanunu kapsamında kişisel verileriniz, veri sorumlusu sıfatıyla <strong>Trabzonlu Kamu Çalışanları Derneği</strong> tarafından işlenmektedir.</p>
+
+                            <h3>2. İşlenen Kişisel Veriler</h3>
+                            <p>İnternet sitemizi ziyaret etmeniz, iletişim formu aracılığıyla bizimle iletişime geçmeniz, etkinlik veya faaliyetlere başvurmanız ya da Dernek ile herhangi bir şekilde iletişim kurmanız halinde; ad ve soyad, telefon numarası, e-posta adresi, meslek ve görev bilgileri, dernek üyeliğine ilişkin bilgiler, başvuru ve iletişim içerikleri, IP adresi, log kayıtları ve çerezler aracılığıyla elde edilen bilgiler işlenebilecektir.</p>
+
+                            <h3>3. Kişisel Verilerin İşlenme Amaçları</h3>
+                            <p>Kişisel verileriniz; dernek faaliyetlerinin yürütülmesi, üyelik ve başvuru süreçlerinin yürütülmesi, iletişim faaliyetlerinin yürütülmesi, etkinlik ve organizasyonların gerçekleştirilmesi, internet sitesinin güvenliğinin sağlanması ve hukuki yükümlülüklerin yerine getirilmesi amaçlarıyla işlenebilecektir.</p>
+
+                            <h3>4. Hukuki Sebepler</h3>
+                            <p>Kişisel verileriniz; kanunlarda açıkça öngörülmesi, hukuki yükümlülüğün yerine getirilmesi, sözleşmenin kurulması veya ifasıyla doğrudan ilgili olması, meşru menfaat ve/veya açık rıza hukuki sebeplerine dayanılarak işlenebilecektir.</p>
+
+                            <h3>5. Toplanma Yöntemi</h3>
+                            <p>Kişisel verileriniz; internet sitesi formları, e-posta, telefon, elektronik ve fiziki başvurular, üyelik işlemleri ve çerezler aracılığıyla otomatik veya otomatik olmayan yöntemlerle toplanabilecektir.</p>
+
+                            <h3>6. Aktarılması</h3>
+                            <p>Kişisel verileriniz; yetkili kamu kurum ve kuruluşlarına, hukuki/mali/teknik hizmet alınan kuruluşlara ve internet sitesi altyapı hizmet sağlayıcılarına, KVKK'nın 8. ve 9. maddelerindeki şartlar çerçevesinde aktarılabilecektir.</p>
+
+                            <h3>7. Haklarınız (KVKK Md. 11)</h3>
+                            <p>Kişisel verilerinizin işlenip işlenmediğini öğrenme, işlenmişse bilgi talep etme, aktarıldığı üçüncü kişileri öğrenme, düzeltilmesini ve silinmesini isteme, otomatik sistemler vasıtasıyla aleyhinize sonuç çıkmasına itiraz etme ve zarara uğramanız halinde tazminat talep etme haklarına sahipsiniz.</p>
+
+                            <h3>8. Başvuru</h3>
+                            <p>Haklarınıza ilişkin taleplerinizi yazılı başvuru, e-posta veya KEP aracılığıyla Derneğimize iletebilirsiniz.</p>
+                        </div>
+                        <div class="ub-kvkk-modal__alt">
+                            <a href="/kvkk-aydinlatma-metni" target="_blank" class="ub-kvkk-modal__tam-metin">Tam Metni Görüntüle →</a>
+                            <button type="button" class="ub-kvkk-modal__onayla" id="ub-kvkk-modal-onayla">Okudum, Onaylıyorum</button>
+                        </div>
+                    </div>
+                </dialog>
 
                 <!-- Matematik Doğrulama -->
                 <div class="ub-form__alan">

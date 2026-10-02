@@ -110,6 +110,26 @@ final class AboutController
     }
 
     /**
+     * KVKK Aydınlatma Metni, Açık Rıza Metni ve Çerez Politikası sayfası.
+     */
+    public function kvkk(): Response
+    {
+        $seo = $this->responder->seo(
+            title: 'KVKK Aydınlatma Metni',
+            description: 'Trabzonlu Kamu Çalışanları Derneği KVKK Aydınlatma Metni, '
+                . 'Açık Rıza Metni ve Çerez Politikası.',
+            canonicalPath: '/kvkk-aydinlatma-metni',
+            breadcrumbs: [
+                ['label' => 'KVKK Aydınlatma Metni', 'path' => '/kvkk-aydinlatma-metni'],
+            ],
+        );
+
+        return $this->responder->page('pages/kvkk', $seo, [
+            'styles' => ['kvkk.css'],
+        ]);
+    }
+
+    /**
      * Veritabanındaki İl Başkanı rolündeki üyeleri plaka koduna göre indekslenmiş
      * temsilci dizisine dönüştürür.
      *
