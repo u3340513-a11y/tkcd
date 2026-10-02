@@ -24,7 +24,7 @@ $isKisitliRol     = ($isIlBaskani || $isIlceBaskani || $isKurumTemsilci || $isKa
 $yalnızcaSayimKullanicilari = ['yonetim_ukk','yonetim_mh','yonetim_mb','yonetim_he','yonetim_hk','kk_by'];
 $isYalnızcaSayim = in_array($oturumKullaniciAdi, $yalnızcaSayimKullanicilari, true);
 
-$onayYetkiliKullanicilari = ['yonetim_ukk','yonetim_mh','yonetim_hk','yonetim_mb','kk_by','admin61'];
+$onayYetkiliKullanicilari = ['yonetim_ukk','yonetim_mh','yonetim_hk','yonetim_mb','kk_by','admin61','yonetim_kby'];
 $isOnayYetkili = ($kullaniciRolu === 'gelistirici')
     || in_array($oturumKullaniciAdi, $onayYetkiliKullanicilari, true);
 
