@@ -516,8 +516,12 @@ switch ($sayfa) {
         break;
 
     case 'il-ilce-yonetimi':
-        $ily_izinli = $is_admin || $is_yonetim || $is_gelistirici
-            || in_array($_SESSION['kullanici_adi'] ?? '', ['yonetim_oc', 'yonetim_kby', 'yonetim_ac'], true);
+        $ily_izinli = $is_gelistirici
+            || in_array(
+                $_SESSION['kullanici_adi'] ?? '',
+                ['admin61', 'yonetim_hk', 'yonetim_oc', 'yonetim_kby', 'yonetim_ac'],
+                true
+            );
         if (!$ily_izinli) {
             echo '<div class="container py-5"><div class="alert alert-danger text-center fw-bold"><i class="fa-solid fa-lock me-2"></i>Erişim Engellendi: İl-İlçe Yönetimi sayfası yalnızca yetkili yöneticilere açıktır.</div></div>';
         } else {
@@ -525,6 +529,7 @@ switch ($sayfa) {
             include 'inc/il-ilce-yonetimi.php';
         }
         break;
+
 
 
 
