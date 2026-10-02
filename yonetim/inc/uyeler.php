@@ -117,6 +117,72 @@ if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'ek_gorev_degistir' && isset
     }
 }
 
+// --- ÇOK STATÜLÜ EK ROLLER TOGGLE MOTORU ---
+// ek_roller sütunu JSON dizisi tutar: ["Kurum Temsilcisi","İlçe Başkanı"]
+// Bu handler rol ekler ya da (zaten varsa) kaldırır.
+if (isset($_GET['aksiyon']) && $_GET['aksiyon'] === 'ek_roller_toggle' && isset($_GET['id']) && isset($_GET['rol'])) {
+    if ($is_kisitli_rol) {
+        die("Erişim Engellendi: Bu işlemi yapmaya yetkiniz yok!");
+    }
+    $uye_id   = intval($_GET['id']);
+    $hedef_rol = trim($_GET['rol']);
+
+    $gecerli_roller = [
+        'Normal Üye', 'Yönetim Kurulu Üyesi', 'Yönetim Kurulu Üyesi Yedek',
+        'İl Başkanı', 'İlçe Başkanı', 'Kurum Temsilcisi', 'Bölge Koordinatörü',
+        'Kadın Kolları Başkanı', 'Teşkilatlanma Sorumlu Başkan',
+    ];
+
+    if (!in_array($hedef_rol, $gecerli_roller, true)) {
+        die("Geçersiz rol değeri.");
+    }
+
+    try {
+        $sorgu = $db_baglanti->prepare("SELECT adi_soyadi, ek_roller FROM dernek_uyeler WHERE id = ?");
+        $sorgu->execute([$uye_id]);
+        $satir = $sorgu->fetch(PDO::FETCH_ASSOC);
+        $uye_adi = $satir['adi_soyadi'] ?? ('Bilinmeyen #' . $uye_id);
+
+        // Mevcut roller dizisini çöz
+        $mevcutRoller = [];
+        if (!empty($satir['ek_roller'])) {
+            $parsed = json_decode($satir['ek_roller'], true);
+            if (is_array($parsed)) {
+                $mevcutRoller = $parsed;
+            }
+        }
+
+        // Toggle: varsa çıkar, yoksa ekle
+        $idx = array_search($hedef_rol, $mevcutRoller, true);
+        $islem = '';
+        if ($idx !== false) {
+            array_splice($mevcutRoller, $idx, 1);
+            $islem = 'kaldırıldı';
+        } else {
+            $mevcutRoller[] = $hedef_rol;
+            $islem = 'eklendi';
+        }
+
+        $yeni_json = empty($mevcutRoller) ? null : json_encode(array_values($mevcutRoller), JSON_UNESCAPED_UNICODE);
+
+        $guncelle = $db_baglanti->prepare("UPDATE dernek_uyeler SET ek_roller = ? WHERE id = ?");
+        if ($guncelle->execute([$yeni_json, $uye_id])) {
+            log_kaydet(
+                $db_baglanti,
+                'temsilci_ata',
+                $uye_adi . ' — Ek rol "' . $hedef_rol . '" ' . $islem . '.',
+                'dernek_uyeler',
+                $uye_id
+            );
+            echo "<script>window.location.href='" . $geri_link . "';</script>";
+            exit;
+        }
+    } catch (\PDOException $e) {
+        $mesaj     = "Hata: " . $e->getMessage();
+        $mesaj_turu = "danger";
+    }
+}
+
 // --- DASHBOARD KARTLARINDAN GELEN RADAR FİLTRESİNİ YAKALAMA MOTORU ---
 $aktif_filtre = isset($_GET['filtre']) ? trim($_GET['filtre']) : '';
 
@@ -591,6 +657,15 @@ try {
                         $temsilciTurKontrol = trim($uye['temsilci_turu']);
                         $ekGorevKontrol     = trim($uye['ek_gorev'] ?? '');
 
+                        // ── Çok statülü ek_roller JSON parse ──────────
+                        $ekRollerArr = [];
+                        if (!empty($uye['ek_roller'])) {
+                            $parsed = json_decode($uye['ek_roller'], true);
+                            if (is_array($parsed)) {
+                                $ekRollerArr = $parsed;
+                            }
+                        }
+
                         // ── Cinsiyet tespiti ──────────────────────────
                         $cinsiyetDb = mb_strtolower(trim($uye['cinsiyet'] ?? ''), 'UTF-8');
                         if (in_array($cinsiyetDb, ['kadın','kadin','female','k'], true)) {
@@ -745,6 +820,12 @@ try {
                                 <i class="fa-solid fa-plus-circle me-1" style="color:#00c9a7;"></i><?= htmlspecialchars($ekGorevKontrol) ?>
                             </span>
                             <?php endif; ?>
+                            <?php foreach ($ekRollerArr as $ekRol): ?>
+                            <br>
+                            <span class="ul-ek-rozet" style="background:rgba(99,102,241,0.12);color:#6366f1;border:1px solid rgba(99,102,241,0.3);">
+                                <i class="fa-solid fa-circle-plus me-1"></i><?= htmlspecialchars($ekRol) ?>
+                            </span>
+                            <?php endforeach; ?>
                         </td>
 
                         <!-- İşlemler -->
@@ -808,8 +889,43 @@ try {
                                     <?php endif; ?>
 
                                     <?php if(!empty($ekGorevKontrol)): ?>
-                                    <li><a class="dropdown-item text-danger py-1" href="index.php?sayfa=uyeler&aksiyon=ek_gorev_degistir&id=<?= $uye['id'] ?>&gorev=sil"><i class="fa-solid fa-xmark me-1"></i>Görevi İptal Et</a></li>
+                                    <li><a class="dropdown-item text-danger py-1" href="index.php?sayfa=uyeler&aksiyon=ek_gorev_degistir&id=<?= $uye['id'] ?>&gorev=sil"><i class="fa-solid fa-xmark me-1"></i>Eski Ek Görevi İptal Et</a></li>
                                     <?php endif; ?>
+
+                                    <li><hr class="dropdown-divider my-1"></li>
+                                    <li><h6 class="dropdown-header" style="color:#6366f1;font-weight:700;">
+                                        <i class="fa-solid fa-layer-group me-1"></i>Ek Roller (Çok Statü)
+                                    </h6></li>
+                                    <?php
+                                    $tumRoller = [
+                                        ['Yönetim Kurulu Üyesi',          'fa-user-shield',       '#0d6efd'],
+                                        ['Yönetim Kurulu Üyesi Yedek',    'fa-user-shield',       '#0dcaf0'],
+                                        ['Bölge Koordinatörü',            'fa-earth-americas',    '#0dcaf0'],
+                                        ['İl Başkanı',                    'fa-building-flag',     '#198754'],
+                                        ['İlçe Başkanı',                  'fa-map-location-dot',  '#6a1b9a'],
+                                        ['Kurum Temsilcisi',              'fa-building-user',     '#b45309'],
+                                        ['Kadın Kolları Başkanı',         'fa-venus',             '#d63384'],
+                                        ['Teşkilatlanma Sorumlu Başkan',  'fa-sitemap',           '#e65100'],
+                                    ];
+                                    foreach ($tumRoller as [$rolAdi, $ikon, $renk]):
+                                        $rolAktif = in_array($rolAdi, $ekRollerArr, true);
+                                    ?>
+                                    <li>
+                                        <a class="dropdown-item py-1 d-flex align-items-center gap-2"
+                                           style="color:<?= $renk ?>;<?= $rolAktif ? 'background:rgba(99,102,241,0.08);font-weight:700;' : '' ?>"
+                                           href="index.php?sayfa=uyeler&aksiyon=ek_roller_toggle&id=<?= $uye['id'] ?>&rol=<?= rawurlencode($rolAdi) ?>">
+                                            <?php if ($rolAktif): ?>
+                                            <i class="fa-solid fa-circle-check" style="color:#6366f1;"></i>
+                                            <?php else: ?>
+                                            <i class="fa-solid fa-<?= $ikon ?>"></i>
+                                            <?php endif; ?>
+                                            <?= htmlspecialchars($rolAdi) ?>
+                                            <?php if ($rolAktif): ?>
+                                            <span class="ms-auto badge" style="background:#6366f1;font-size:0.6rem;">Aktif</span>
+                                            <?php endif; ?>
+                                        </a>
+                                    </li>
+                                    <?php endforeach; ?>
 
                                     <li><hr class="dropdown-divider my-1"></li>
                                     <li>

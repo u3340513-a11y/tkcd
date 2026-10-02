@@ -375,6 +375,17 @@ if (array_key_exists($sayfa, $dosya_indirme_sayfalari)) {
     exit;
 }
 
+// ── DOSYA İNDİRME / TEMPLATE-ÖNCESI SAYFALAR ────────────────────────────
+// (Bu dizi daha önce dosya_indirme_sayfalari olarak tanımlanmıştı; buraya ekliyoruz)
+if (!isset($dosya_indirme_sayfalari)) {
+    $dosya_indirme_sayfalari = [];
+}
+$dosya_indirme_sayfalari['migration-ek-roller'] = 'inc/migration-ek-roller.php';
+if (array_key_exists($sayfa, $dosya_indirme_sayfalari)) {
+    include $dosya_indirme_sayfalari[$sayfa];
+    exit;
+}
+
 include 'inc/header.php';
 
 include 'inc/sidebar.php';
