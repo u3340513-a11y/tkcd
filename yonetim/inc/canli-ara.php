@@ -94,6 +94,16 @@ try {
             $temsilci_turu_kontrol = trim($uye['temsilci_turu']);
             $ek_gorev_kontrol     = trim($uye['ek_gorev'] ?? '');
 
+            // Çok statülü ek_roller JSON parse
+            $ek_roller_arr = [];
+            if (!empty($uye['ek_roller'])) {
+                $parsed = json_decode($uye['ek_roller'], true);
+                if (is_array($parsed)) {
+                    $ek_roller_arr = $parsed;
+                }
+            }
+
+
             if ($temsilci_turu_kontrol === 'Yönetim Kurulu Üyesi') {
                 $satir_klasi = 'class="table-primary"'; 
                 $rozet_klasi = "bg-primary text-white";
@@ -187,9 +197,41 @@ try {
                         }
 
                         if (!empty($ek_gorev_kontrol)) {
-                            $islem_icerik .= '<li><a class="dropdown-item text-danger py-1" href="index.php?sayfa=uyeler&aksiyon=ek_gorev_degistir&id='.$uye['id'].'&gorev=sil"><i class="fa-solid fa-xmark me-1.5"></i>Görev İptal Et/Sil</a></li>';
+                            $islem_icerik .= '<li><a class="dropdown-item text-danger py-1" href="index.php?sayfa=uyeler&aksiyon=ek_gorev_degistir&id='.$uye['id'].'&gorev=sil"><i class="fa-solid fa-xmark me-1.5"></i>Eski Ek Görevi İptal Et</a></li>';
                         }
-                        
+
+                        // ── EK ROLLER (ÇOK STATÜ) TOGGLE BÖLÜMÜ ────────────────
+                        $islem_icerik .= '<li><hr class="dropdown-divider my-1"></li>';
+                        $islem_icerik .= '<li><h6 class="dropdown-header fw-bold py-1" style="color:#6366f1;font-size:0.72rem;"><i class="fa-solid fa-layer-group me-1"></i>Ek Roller (Çok Statü)</h6></li>';
+
+                        $tum_roller = [
+                            ['Yönetim Kurulu Üyesi',         'fa-user-shield',      '#0d6efd'],
+                            ['Yönetim Kurulu Üyesi Yedek',   'fa-user-shield',      '#0dcaf0'],
+                            ['Bölge Koordinatörü',           'fa-earth-americas',   '#0dcaf0'],
+                            ['İl Başkanı',                   'fa-building-flag',    '#198754'],
+                            ['İlçe Başkanı',                 'fa-map-location-dot', '#6a1b9a'],
+                            ['Kurum Temsilcisi',             'fa-building-user',    '#b45309'],
+                            ['Kadın Kolları Başkanı',        'fa-venus',            '#d63384'],
+                            ['Teşkilatlanma Sorumlu Başkan', 'fa-sitemap',          '#e65100'],
+                        ];
+
+                        foreach ($tum_roller as [$rol_adi, $ikon, $renk]) {
+                            $rol_aktif = in_array($rol_adi, $ek_roller_arr, true);
+                            $bg_stili  = $rol_aktif ? 'background:rgba(99,102,241,0.08);font-weight:700;' : '';
+                            $ikon_html = $rol_aktif
+                                ? '<i class="fa-solid fa-circle-check" style="color:#6366f1;"></i>'
+                                : '<i class="fa-solid ' . $ikon . '"></i>';
+                            $badge_html = $rol_aktif
+                                ? '<span class="ms-auto badge" style="background:#6366f1;font-size:0.6rem;">Aktif</span>'
+                                : '';
+
+                            $islem_icerik .= '<li><a class="dropdown-item py-1 d-flex align-items-center gap-2"'
+                                . ' style="color:' . $renk . ';' . $bg_stili . '"'
+                                . ' href="index.php?sayfa=uyeler&aksiyon=ek_roller_toggle&id=' . $uye['id'] . '&rol=' . rawurlencode($rol_adi) . '">'
+                                . $ikon_html . htmlspecialchars($rol_adi) . $badge_html
+                                . '</a></li>';
+                        }
+
                         $islem_icerik .= '<li><hr class="dropdown-divider my-1"></li>
                         <li><a class="dropdown-item text-danger fw-bold py-1" href="index.php?sayfa=uyeler&aksiyon=uye_sil&id='.$uye['id'].'" onclick="return confirm(\''.htmlspecialchars($uye['adi_soyadi']).' isimli üyeyi tamamen silmek istediğinize emin misiniz?\');"><i class="fa-solid fa-trash-can me-1.5"></i> Üyeyi Sil</a></li>
                     </ul>
