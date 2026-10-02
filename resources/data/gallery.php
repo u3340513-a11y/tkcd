@@ -11,11 +11,7 @@ declare(strict_types=1);
  * @return list<array{dosya:string,alt:string,boyut:'buyuk'|'normal'}>
  */
 return [
-    [
-        'dosya' => 'galeri/kahvlti.jpeg',
-        'alt'   => 'Kahvaltı etkinliğimizden bir kare',
-        'boyut' => 'buyuk',
-    ],
+    // ── En yeni eklemeler en üstte ──────────────────────────────
     [
         'dosya' => 'galeri/konka1.jpeg',
         'alt'   => 'Konka etkinliğinden bir kare',
@@ -26,6 +22,12 @@ return [
         'alt'   => 'Konka etkinliğinden bir an',
         'boyut' => 'normal',
     ],
+    [
+        'dosya' => 'galeri/kahvlti.jpeg',
+        'alt'   => 'Kahvaltı etkinliğimizden bir kare',
+        'boyut' => 'buyuk',
+    ],
+    // ── Önceki etkinlikler ──────────────────────────────────────
     [
         'dosya' => 'galeri/IMG_1278.JPG',
         'alt'   => 'Dernek etkinliğinden bir kare',
@@ -67,3 +69,4 @@ return [
         'boyut' => 'normal',
     ],
 ];
+
