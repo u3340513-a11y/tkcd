@@ -72,6 +72,13 @@ function il_baskanini_bul(PDO $db, string $il): ?array
 /**
  * Belirtilen il ve ilçedeki ilçe başkanını veritabanından çeker.
  *
+ * Eşleşme öncelik sırası:
+ *   1. sorumlu_bolge alanı (kişi farklı ilde ikamet etse bile)
+ *   2. ikamet_ilcesi veya trabzon_ilcesi (kişi o ilde ikamet ediyorsa)
+ *
+ * Neden sorumlu_bolge öncelikli: İlçe başkanları kendi ilçelerinde
+ * ikamet etmeyebilir; yetkili oldukları ilçe sorumlu_bolge alanına yazılır.
+ *
  * @param PDO    $db    Veritabanı bağlantısı
  * @param string $il    İl adı
  * @param string $ilce  İlçe adı
@@ -80,20 +87,28 @@ function il_baskanini_bul(PDO $db, string $il): ?array
 function ilce_baskanini_bul(PDO $db, string $il, string $ilce): ?array
 {
     $sql = "SELECT id, adi_soyadi, telefon, ikamet_ili, ikamet_ilcesi,
-                   temsilci_turu, ek_gorev, ek_roller, kurum
+                   temsilci_turu, ek_gorev, ek_roller, kurum, sorumlu_bolge
               FROM dernek_uyeler
              WHERE onay_durumu = 'onayli'
-               AND LOWER(TRIM(ikamet_ili)) = LOWER(:il)
-               AND (
-                   LOWER(TRIM(ikamet_ilcesi)) = LOWER(:ilce)
-                   OR LOWER(TRIM(trabzon_ilcesi)) = LOWER(:ilce2)
-               )
                AND (
                    temsilci_turu IN ('İlçe Başkanı', 'İlçe Temsilcisi')
                    OR ek_gorev IN ('İlçe Başkanı', 'İlçe Temsilcisi')
                    OR JSON_CONTAINS(ek_roller, '\"İlçe Başkanı\"')
                )
+               AND (
+                   /* sorumlu_bolge — kişi farklı ilde yaşıyor olsa bile */
+                   LOWER(TRIM(sorumlu_bolge)) = LOWER(:ilce_sb)
+                   /* ikamet ilçesi eşleşmesi — ikamet ili de eşleşmeli */
+                   OR (
+                       LOWER(TRIM(ikamet_ili)) = LOWER(:il)
+                       AND (
+                           LOWER(TRIM(ikamet_ilcesi)) = LOWER(:ilce)
+                           OR LOWER(TRIM(trabzon_ilcesi)) = LOWER(:ilce2)
+                       )
+                   )
+               )
              ORDER BY
+               CASE WHEN LOWER(TRIM(sorumlu_bolge)) = LOWER(:ilce_sb2) THEN 0 ELSE 1 END,
                CASE
                  WHEN temsilci_turu = 'İlçe Başkanı' THEN 1
                  WHEN ek_gorev = 'İlçe Başkanı' THEN 2
@@ -103,11 +118,18 @@ function ilce_baskanini_bul(PDO $db, string $il, string $ilce): ?array
              LIMIT 1";
 
     $stmt = $db->prepare($sql);
-    $stmt->execute([':il' => $il, ':ilce' => $ilce, ':ilce2' => $ilce]);
+    $stmt->execute([
+        ':il'       => $il,
+        ':ilce'     => $ilce,
+        ':ilce2'    => $ilce,
+        ':ilce_sb'  => $ilce,
+        ':ilce_sb2' => $ilce,
+    ]);
     $sonuc = $stmt->fetch(PDO::FETCH_ASSOC);
 
     return $sonuc ?: null;
 }
+
 
 /**
  * Belirtilen ildeki toplam onaylı üye sayısını döndürür.
