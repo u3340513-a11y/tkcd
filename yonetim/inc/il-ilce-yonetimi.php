@@ -529,8 +529,16 @@ $bas_harfler = static function (string $ad): string {
         ?>
         <div class="col-sm-6 col-lg-4 ily-ilce-karti"
              data-ilce="<?= htmlspecialchars(mb_strtolower($ilce_adi, 'UTF-8')) ?>">
-            <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden"
-                 style="transition:transform 0.2s,box-shadow 0.2s;">
+            <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden ily-ilce-kart-ic"
+                 style="transition:transform 0.2s,box-shadow 0.2s;<?= $ilce_uye_s > 0 ? 'cursor:pointer;' : '' ?>"
+                 <?php if ($ilce_uye_s > 0): ?>
+                 data-il="<?= htmlspecialchars($secili_il, ENT_QUOTES) ?>"
+                 data-ilce="<?= htmlspecialchars($ilce_adi, ENT_QUOTES) ?>"
+                 data-uye="<?= $ilce_uye_s ?>"
+                 role="button"
+                 tabindex="0"
+                 title="<?= htmlspecialchars($ilce_adi) ?> ilçesi üyelerini gör"
+                 <?php endif; ?>>
                 <div style="height:3px;background:<?= $ilce_baskan_veri ? 'linear-gradient(90deg,#6a1b9a,#ab47bc)' : 'linear-gradient(90deg,#ef5350,#e53935)' ?>;"></div>
 
                 <div class="card-body p-3">
@@ -542,6 +550,7 @@ $bas_harfler = static function (string $ad): string {
                         <?php if ($ilce_uye_s > 0): ?>
                             <span class="badge rounded-pill px-2 py-1"
                                   style="background:rgba(106,27,154,0.08);color:#6a1b9a;font-size:0.68rem;">
+                                <i class="fa-solid fa-users me-1" style="font-size:0.6rem;"></i>
                                 <?= $ilce_uye_s ?> üye
                             </span>
                         <?php endif; ?>
@@ -564,7 +573,8 @@ $bas_harfler = static function (string $ad): string {
                             <a href="index.php?sayfa=uye-detay&id=<?= (int) $ilce_baskan_veri['id'] ?>"
                                class="btn btn-sm p-0 text-primary flex-shrink-0"
                                style="font-size:0.72rem;"
-                               title="Üye Kartı">
+                               title="Üye Kartı"
+                               onclick="event.stopPropagation();">
                                 <i class="fa-solid fa-arrow-up-right-from-square"></i>
                             </a>
                         </div>
@@ -580,6 +590,14 @@ $bas_harfler = static function (string $ad): string {
                             </span>
                         </div>
                     <?php endif; ?>
+
+                    <?php if ($ilce_uye_s > 0): ?>
+                    <div class="mt-2 pt-2 border-top d-flex align-items-center gap-1"
+                         style="font-size:0.7rem;color:#94a3b8;">
+                        <i class="fa-solid fa-eye" style="font-size:0.65rem;"></i>
+                        Üyeleri görüntülemek için tıklayın
+                    </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -592,30 +610,247 @@ $bas_harfler = static function (string $ad): string {
         <p class="text-muted mb-0">Aramanıza uygun ilçe bulunamadı.</p>
     </div>
 
+    <!-- ── İLÇE ÜYE LİSTESİ MODAL ──────────────────────────────────── -->
+    <div class="modal fade" id="ilyUyeModal" tabindex="-1"
+         aria-labelledby="ilyUyeModalLabel" aria-modal="true" role="dialog">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+
+                <!-- Başlık -->
+                <div class="modal-header border-0 pb-0"
+                     style="background:linear-gradient(135deg,#6a1b9a,#9c27b0);padding:1.2rem 1.5rem;">
+                    <div class="d-flex align-items-center gap-2 flex-grow-1">
+                        <i class="fa-solid fa-users text-white" style="font-size:1.1rem;"></i>
+                        <h5 class="modal-title text-white fw-bold mb-0" id="ilyUyeModalLabel">
+                            <span id="ilyModalIlce">İlçe</span> Üyeleri
+                        </h5>
+                        <span id="ilyModalBadge"
+                              class="badge rounded-pill ms-2"
+                              style="background:rgba(255,255,255,0.2);color:#fff;font-size:0.75rem;">
+                        </span>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white ms-2"
+                            data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+
+                <!-- Gövde -->
+                <div class="modal-body p-0">
+
+                    <!-- Yükleniyor -->
+                    <div id="ilyModalYukleniyor" class="text-center py-5">
+                        <div class="spinner-border text-purple" role="status"
+                             style="color:#6a1b9a;width:2.5rem;height:2.5rem;">
+                            <span class="visually-hidden">Yükleniyor…</span>
+                        </div>
+                        <div class="text-muted mt-2" style="font-size:0.85rem;">Üyeler getiriliyor…</div>
+                    </div>
+
+                    <!-- Hata -->
+                    <div id="ilyModalHata" class="d-none text-center py-5">
+                        <i class="fa-solid fa-circle-exclamation text-danger mb-2" style="font-size:2rem;"></i>
+                        <p class="text-danger mb-0" style="font-size:0.85rem;">Veriler yüklenemedi.</p>
+                    </div>
+
+                    <!-- Boş -->
+                    <div id="ilyModalBos" class="d-none text-center py-5">
+                        <i class="fa-solid fa-user-slash text-muted mb-2" style="font-size:2rem;opacity:0.4;"></i>
+                        <p class="text-muted mb-0" style="font-size:0.85rem;">Bu ilçede kayıtlı üye bulunamadı.</p>
+                    </div>
+
+                    <!-- Üye tablosu -->
+                    <div id="ilyModalTablo" class="d-none">
+                        <!-- İçi arama -->
+                        <div class="px-3 pt-3 pb-2">
+                            <input type="text" id="ilyModalArama"
+                                   class="form-control form-control-sm rounded-pill"
+                                   placeholder="Ad, kurum veya unvan ile ara…"
+                                   autocomplete="off">
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0" id="ilyModalUyeTable">
+                                <thead style="background:#f8fafc;">
+                                    <tr>
+                                        <th class="ps-3 py-2" style="font-size:0.75rem;font-weight:600;color:#64748b;white-space:nowrap;">#</th>
+                                        <th class="py-2" style="font-size:0.75rem;font-weight:600;color:#64748b;">Ad Soyad</th>
+                                        <th class="py-2" style="font-size:0.75rem;font-weight:600;color:#64748b;">Kurum</th>
+                                        <th class="py-2" style="font-size:0.75rem;font-weight:600;color:#64748b;">Ünvan</th>
+                                        <th class="py-2" style="font-size:0.75rem;font-weight:600;color:#64748b;">Statü</th>
+                                        <th class="pe-3 py-2"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ilyModalTbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- ─────────────────────────────────────────────────────────────── -->
+
     <script>
     (function() {
         'use strict';
+
+        /* ── Arama ── */
         var aramaInput = document.getElementById('ily-ilce-arama');
         var kartlar    = document.querySelectorAll('.ily-ilce-karti');
         var sonucYok   = document.getElementById('ily-ilce-sonuc-yok');
 
-        if (!aramaInput || kartlar.length === 0) return;
+        if (aramaInput && kartlar.length > 0) {
+            aramaInput.addEventListener('input', function() {
+                var filtre     = this.value.toLowerCase().trim();
+                var gorunenSay = 0;
+                kartlar.forEach(function(kart) {
+                    var ilceAdi = kart.getAttribute('data-ilce') || '';
+                    var eslesme = filtre === '' || ilceAdi.indexOf(filtre) !== -1;
+                    kart.style.display = eslesme ? '' : 'none';
+                    if (eslesme) gorunenSay++;
+                });
+                if (sonucYok) sonucYok.classList.toggle('d-none', gorunenSay > 0);
+            });
+        }
 
-        aramaInput.addEventListener('input', function() {
-            var filtre     = this.value.toLowerCase().trim();
-            var gorunenSay = 0;
+        /* ── Modal ── */
+        var modal        = document.getElementById('ilyUyeModal');
+        var bsModal      = modal ? new bootstrap.Modal(modal) : null;
+        var modalIlce    = document.getElementById('ilyModalIlce');
+        var modalBadge   = document.getElementById('ilyModalBadge');
+        var modalYuk     = document.getElementById('ilyModalYukleniyor');
+        var modalHata    = document.getElementById('ilyModalHata');
+        var modalBos     = document.getElementById('ilyModalBos');
+        var modalTablo   = document.getElementById('ilyModalTablo');
+        var modalTbody   = document.getElementById('ilyModalTbody');
+        var modalArama   = document.getElementById('ilyModalArama');
 
-            kartlar.forEach(function(kart) {
-                var ilceAdi = kart.getAttribute('data-ilce') || '';
-                var eslesme = filtre === '' || ilceAdi.indexOf(filtre) !== -1;
-                kart.style.display = eslesme ? '' : 'none';
-                if (eslesme) gorunenSay++;
+        if (!bsModal) return;
+
+        /**
+         * Belirtilen bölümü göster, diğerlerini gizle.
+         * @param {'yukleniyor'|'hata'|'bos'|'tablo'} durum
+         */
+        function goster(durum) {
+            modalYuk.classList.toggle('d-none',   durum !== 'yukleniyor');
+            modalHata.classList.toggle('d-none',  durum !== 'hata');
+            modalBos.classList.toggle('d-none',   durum !== 'bos');
+            modalTablo.classList.toggle('d-none', durum !== 'tablo');
+        }
+
+        /**
+         * Baş harfleri hesaplar.
+         * @param {string} ad
+         * @returns {string}
+         */
+        function basHarf(ad) {
+            var parcalar = ad.trim().split(/\s+/).slice(0, 2);
+            return parcalar.map(function(p) { return p.charAt(0).toUpperCase(); }).join('');
+        }
+
+        /**
+         * Belirleyici bir avatar rengi döndürür.
+         * @param {string} ad
+         * @returns {string}
+         */
+        function avatarRenk(ad) {
+            var renkler = ['#c62828','#1565c0','#2e7d32','#6a1b9a','#e65100','#00838f','#37474f','#ad1457'];
+            var hash = 0;
+            for (var i = 0; i < ad.length; i++) { hash = ad.charCodeAt(i) + ((hash << 5) - hash); }
+            return renkler[Math.abs(hash) % renkler.length];
+        }
+
+        /**
+         * Tüm tıklanabilir ilçe kartlarına event listener ekler.
+         */
+        document.querySelectorAll('.ily-ilce-kart-ic[data-il]').forEach(function(kart) {
+            kart.addEventListener('click', function() {
+                var il   = this.getAttribute('data-il')   || '';
+                var ilce = this.getAttribute('data-ilce') || '';
+                var uye  = this.getAttribute('data-uye')  || '0';
+
+                // Modal başlığı güncelle
+                modalIlce.textContent = ilce;
+                modalBadge.textContent = uye + ' üye';
+                if (modalArama) modalArama.value = '';
+
+                goster('yukleniyor');
+                bsModal.show();
+
+                // AJAX isteği
+                var xhr = new XMLHttpRequest();
+                var url = '/yonetim/api/ilce-uyeler.php?il=' + encodeURIComponent(il)
+                        + '&ilce=' + encodeURIComponent(ilce);
+                xhr.open('GET', url, true);
+                xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+                xhr.onload = function() {
+                    if (xhr.status !== 200) { goster('hata'); return; }
+                    var veri;
+                    try { veri = JSON.parse(xhr.responseText); } catch(e) { goster('hata'); return; }
+                    if (veri.hata) { goster('hata'); return; }
+                    if (!veri.uyeler || veri.uyeler.length === 0) { goster('bos'); return; }
+
+                    // Tabloyu doldur
+                    var satirlar = veri.uyeler.map(function(u, i) {
+                        var renk    = avatarRenk(u.ad);
+                        var harfler = basHarf(u.ad);
+                        var statüHtml = u['statü']
+                            ? '<span class="badge rounded-pill px-2 py-1" style="background:rgba(106,27,154,0.1);color:#6a1b9a;font-size:0.68rem;">'
+                              + u['statü'] + '</span>'
+                            : '<span class="text-muted" style="font-size:0.75rem;">—</span>';
+                        return '<tr data-ara="' + (u.ad + ' ' + u.kurum + ' ' + u.unvan).toLowerCase() + '">' +
+                            '<td class="ps-3" style="font-size:0.78rem;color:#94a3b8;">' + (i + 1) + '</td>' +
+                            '<td>' +
+                              '<div class="d-flex align-items-center gap-2">' +
+                                '<div class="rounded-circle d-flex align-items-center justify-content-center fw-bold flex-shrink-0" '
+                                  + 'style="width:32px;height:32px;background:' + renk + '18;color:' + renk + ';font-size:0.68rem;">' +
+                                  harfler +
+                                '</div>' +
+                                '<span class="fw-semibold" style="font-size:0.82rem;">' + u.ad + '</span>' +
+                              '</div>' +
+                            '</td>' +
+                            '<td style="font-size:0.78rem;color:#475569;">' + (u.kurum || '<span class="text-muted">—</span>') + '</td>' +
+                            '<td style="font-size:0.78rem;color:#475569;">' + (u.unvan || '<span class="text-muted">—</span>') + '</td>' +
+                            '<td>' + statüHtml + '</td>' +
+                            '<td class="pe-3">' +
+                              '<a href="index.php?sayfa=uye-detay&id=' + u.id + '" '
+                                + 'class="btn btn-sm rounded-pill px-2 py-0" '
+                                + 'style="font-size:0.7rem;background:rgba(21,101,192,0.08);color:#1565c0;" '
+                                + 'title="Üye Kartı" target="_blank">' +
+                                '<i class="fa-solid fa-arrow-up-right-from-square me-1"></i>Kart' +
+                              '</a>' +
+                            '</td>' +
+                            '</tr>';
+                    }).join('');
+
+                    modalTbody.innerHTML = satirlar;
+                    goster('tablo');
+
+                    // Modal içi arama
+                    if (modalArama) {
+                        modalArama.oninput = function() {
+                            var f = this.value.toLowerCase().trim();
+                            modalTbody.querySelectorAll('tr').forEach(function(tr) {
+                                var ara = tr.getAttribute('data-ara') || '';
+                                tr.style.display = (f === '' || ara.indexOf(f) !== -1) ? '' : 'none';
+                            });
+                        };
+                    }
+                };
+
+                xhr.onerror = function() { goster('hata'); };
+                xhr.send();
             });
 
-            if (sonucYok) {
-                sonucYok.classList.toggle('d-none', gorunenSay > 0);
-            }
+            // Klavye erişilebilirliği
+            kart.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    this.click();
+                }
+            });
         });
+
     })();
     </script>
 
@@ -635,4 +870,12 @@ $bas_harfler = static function (string $ad): string {
     transform: translateY(-2px);
     box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
 }
+
+/* Tıklanabilir kart vurgusu */
+.ily-ilce-kart-ic[data-il]:hover {
+    box-shadow: 0 0 0 2px #6a1b9a44 !important;
+}
+
+/* Modal başlık gradient */
+#ilyUyeModal .modal-header { border-radius: 0; }
 </style>
