@@ -13,6 +13,51 @@ declare(strict_types=1);
 return [
     // ── En yeni eklemeler en üstte ──────────────────────────────
     [
+        'dosya' => 'galeri/etkinlik_1.jpeg',
+        'alt'   => 'Etkinlikten bir kare',
+        'boyut' => 'normal',
+    ],
+    [
+        'dosya' => 'galeri/etkinlik_2.jpeg',
+        'alt'   => 'Etkinlikten bir kare',
+        'boyut' => 'normal',
+    ],
+    [
+        'dosya' => 'galeri/etkinlik_3.jpeg',
+        'alt'   => 'Etkinlikten bir kare',
+        'boyut' => 'normal',
+    ],
+    [
+        'dosya' => 'galeri/etkinlik_4.jpeg',
+        'alt'   => 'Etkinlikten bir kare',
+        'boyut' => 'normal',
+    ],
+    [
+        'dosya' => 'galeri/etkinlik_5.jpeg',
+        'alt'   => 'Etkinlikten bir kare',
+        'boyut' => 'normal',
+    ],
+    [
+        'dosya' => 'galeri/etkinlik_6.jpeg',
+        'alt'   => 'Etkinlikten bir kare',
+        'boyut' => 'normal',
+    ],
+    [
+        'dosya' => 'galeri/etkinlik_7.jpeg',
+        'alt'   => 'Etkinlikten bir kare',
+        'boyut' => 'normal',
+    ],
+    [
+        'dosya' => 'galeri/etkinlik_8.jpeg',
+        'alt'   => 'Etkinlikten bir kare',
+        'boyut' => 'normal',
+    ],
+    [
+        'dosya' => 'galeri/etkinlik_9.jpeg',
+        'alt'   => 'Etkinlikten bir kare',
+        'boyut' => 'normal',
+    ],
+    [
         'dosya' => 'galeri/konka1.jpeg',
         'alt'   => 'Konka etkinliğinden bir kare',
         'boyut' => 'buyuk',
