@@ -1,10 +1,9 @@
 /* ==========================================================================
    Galeri sayfa stilleri  (gl-)
-   Premium yeniden tasarım — masonry grid + glassmorphism
    ========================================================================== */
 
 /* ============================================================
-   1. HERO — Sinematik başlık şeridi
+   1. HERO
    ============================================================ */
 
 .gl-hero {
@@ -20,7 +19,6 @@
   background-attachment: fixed;
 }
 
-/* Dekoratif noktalar */
 .gl-hero::before {
   content: '';
   position: absolute;
@@ -30,7 +28,6 @@
   pointer-events: none;
 }
 
-/* Işık halkası */
 .gl-hero::after {
   content: '';
   position: absolute;
@@ -74,7 +71,6 @@
 
 .gl-hero .da-hero__breadcrumb-list a:hover { color: #fff; }
 
-/* Etiket şeridi */
 .gl-hero__etiket {
   display: inline-flex;
   align-items: center;
@@ -117,48 +113,17 @@
   margin: 0;
 }
 
-/* Sayaç şeridi */
-.gl-hero__sayac {
-  display: flex;
-  gap: clamp(1.5rem, 4vw, 3rem);
-  margin-top: var(--bosluk-3, 0.75rem);
-  padding-top: var(--bosluk-5, 1.25rem);
-  border-top: 1px solid rgba(255,255,255,0.12);
-}
-
-.gl-hero__sayac-oge {
-  display: flex;
-  flex-direction: column;
-}
-
-.gl-hero__sayac-sayi {
-  font-size: 1.8rem;
-  font-weight: 800;
-  color: #fff;
-  line-height: 1;
-}
-
-.gl-hero__sayac-etiket {
-  font-size: var(--olcek-xs, 0.75rem);
-  color: rgba(255,255,255,0.5);
-  margin-top: 0.2rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
 /* ============================================================
-   2. BÖLÜM — Galeri ızgara alanı
+   2. BÖLÜM
    ============================================================ */
 
 .gl-bolum {
   padding-block: clamp(3rem, 6vw, 5rem);
-  background: #f8f7f9;
-  background-image: radial-gradient(circle at 20% 50%, rgba(180,83,107,0.04) 0%, transparent 50%),
-                    radial-gradient(circle at 80% 20%, rgba(74,18,30,0.03) 0%, transparent 50%);
+  background: #f0f0f3;
 }
 
 /* ============================================================
-   3. IZGARA — CSS Grid, soldan sağa satır sıralaması
+   3. IZGARA — Uniform 3 sütun grid
    ============================================================ */
 
 .gl-izgara {
@@ -167,21 +132,21 @@
   margin: 0;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: clamp(0.6rem, 1.5vw, 1rem);
+  gap: 6px;
 }
 
+/* Tüm kartlar aynı boyutta — buyuk/normal farkı yok */
 .gl-kart {
   display: block;
-  border-radius: 12px;
   overflow: hidden;
   background: #1a0a0f;
   position: relative;
-  cursor: zoom-in;
+  aspect-ratio: 4 / 3;
 }
 
-/* Geniş kart: 2 sütun kaplar */
 .gl-kart--genis {
   grid-column: span 2;
+  aspect-ratio: 16 / 9;
 }
 
 /* ============================================================
@@ -191,34 +156,27 @@
 .gl-kart__btn {
   display: block;
   width: 100%;
+  height: 100%;
   padding: 0;
   margin: 0;
   border: none;
   background: none;
-  cursor: zoom-in;
+  cursor: pointer;
   text-align: left;
 }
 
 .gl-kart__btn:focus-visible {
   outline: 3px solid var(--renk-marka, #7c1d32);
-  outline-offset: 2px;
+  outline-offset: -3px;
 }
 
 .gl-kart__cerceve {
   position: relative;
-  margin: 0;
   width: 100%;
+  height: 100%;
   display: block;
   overflow: hidden;
-}
-
-/* Sabit oran: normal 4/3, geniş 16/9 */
-.gl-kart .gl-kart__cerceve {
-  aspect-ratio: 4 / 3;
-}
-
-.gl-kart--genis .gl-kart__cerceve {
-  aspect-ratio: 16 / 9;
+  margin: 0;
 }
 
 .gl-kart__gorsel {
@@ -227,33 +185,25 @@
   display: block;
   object-fit: cover;
   object-position: center;
-  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: transform 0.5s ease;
 }
 
-/* Hover: yakınlaştır */
+/* Hover: hafif yakınlaştır */
 .gl-kart:hover .gl-kart__gorsel {
-  transform: scale(1.06);
+  transform: scale(1.05);
 }
 
-/* Glassmorphism overlay — hover'da çıkar */
+/* Koyu overlay — hover'da belirer, ikon yok */
 .gl-kart__zum {
   position: absolute;
   inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  background: linear-gradient(
-    to top,
-    rgba(22, 8, 14, 0.65) 0%,
-    rgba(22, 8, 14, 0.15) 50%,
-    transparent 100%
-  );
+  background: rgba(10, 4, 8, 0.35);
   opacity: 0;
   transition: opacity 0.3s ease;
   pointer-events: none;
-  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .gl-kart__btn:hover .gl-kart__zum,
@@ -261,58 +211,22 @@
   opacity: 1;
 }
 
+/* İkon gizli — kullanıcı istemedi */
 .gl-kart__zum-ic {
-  width: 3rem;
-  height: 3rem;
-  border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.7);
-  background: rgba(255,255,255,0.12);
-  backdrop-filter: blur(6px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transform: scale(0.7);
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.gl-kart__btn:hover .gl-kart__zum-ic {
-  transform: scale(1);
+  display: none;
 }
 
 .gl-kart__zum .icon {
-  width: 1.1rem;
-  height: 1.1rem;
+  display: none;
 }
 
-/* Alt yazı overlay */
-.gl-kart__altyazi {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 0.6rem 0.85rem;
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: rgba(255,255,255,0.85);
-  letter-spacing: 0.01em;
-  transform: translateY(4px);
-  opacity: 0;
-  transition: opacity 0.25s, transform 0.25s;
-}
-
-.gl-kart:hover .gl-kart__altyazi,
-.gl-kart:focus-within .gl-kart__altyazi {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Yedek görsel (dosya bulunamazsa) */
+/* Yedek görsel */
 .gl-kart__yedek {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
-  aspect-ratio: 4 / 3;
+  height: 100%;
   background: linear-gradient(135deg, #3d0a16, #1a2a4a);
   color: rgba(255,255,255,0.25);
 }
@@ -326,9 +240,10 @@
    RESPONSIVE
    ============================================================ */
 
-@media (max-width: 900px) {
+@media (max-width: 768px) {
   .gl-izgara {
     grid-template-columns: repeat(2, 1fr);
+    gap: 4px;
   }
 
   .gl-kart--genis {
@@ -336,18 +251,19 @@
   }
 }
 
-@media (max-width: 500px) {
+@media (max-width: 480px) {
   .gl-izgara {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3px;
   }
 
   .gl-kart--genis {
-    grid-column: span 1;
+    grid-column: span 2;
   }
 }
 
 /* ============================================================
-   LIGHTBOX MODAL — Geliştirilmiş
+   LIGHTBOX MODAL
    ============================================================ */
 
 .gl-lightbox {
@@ -372,9 +288,9 @@
 .gl-lightbox__arka {
   position: absolute;
   inset: 0;
-  background: rgba(8, 3, 6, 0.94);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: rgba(6, 2, 4, 0.96);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   cursor: pointer;
 }
 
@@ -403,8 +319,8 @@
   width: auto;
   height: auto;
   object-fit: contain;
-  border-radius: 10px;
-  box-shadow: 0 32px 100px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.06);
+  border-radius: 6px;
+  box-shadow: 0 32px 100px rgba(0,0,0,0.8);
   display: block;
   transform: scale(0.92) translateY(8px);
   opacity: 0;
@@ -416,7 +332,6 @@
   opacity: 1;
 }
 
-/* Kapat butonu */
 .gl-lightbox__kapat {
   position: absolute;
   top: clamp(0.75rem, 2vw, 1.25rem);
@@ -446,7 +361,6 @@
   height: 1.2rem;
 }
 
-/* Önceki / Sonraki okları */
 .gl-lightbox__nav {
   flex-shrink: 0;
   width: 3rem;
@@ -475,7 +389,6 @@
   height: 1.4rem;
 }
 
-/* Mobil */
 @media (max-width: 600px) {
   .gl-lightbox__ic {
     gap: var(--bosluk-2);
