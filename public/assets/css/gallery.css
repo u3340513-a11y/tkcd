@@ -142,11 +142,12 @@
   background: #1a0a0f;
   position: relative;
   aspect-ratio: 4 / 3;
+  border-radius: 8px;
 }
 
+/* buyuk kart da 1 sütun kaplıyor — boşluk oluşmasın */
 .gl-kart--genis {
-  grid-column: span 2;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 4 / 3;
 }
 
 /* ============================================================
@@ -177,6 +178,7 @@
   display: block;
   overflow: hidden;
   margin: 0;
+  border-radius: 8px;
 }
 
 .gl-kart__gorsel {
@@ -245,20 +247,12 @@
     grid-template-columns: repeat(2, 1fr);
     gap: 4px;
   }
-
-  .gl-kart--genis {
-    grid-column: span 2;
-  }
 }
 
 @media (max-width: 480px) {
   .gl-izgara {
     grid-template-columns: repeat(2, 1fr);
     gap: 3px;
-  }
-
-  .gl-kart--genis {
-    grid-column: span 2;
   }
 }
 
