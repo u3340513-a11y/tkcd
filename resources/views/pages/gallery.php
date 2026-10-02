@@ -13,8 +13,6 @@ use App\Core\View\SeoMeta;
  * @var list<array{dosya:string,alt:string,boyut:'buyuk'|'normal'}> $gorseller
  */
 
-$toplam_gorsel = count($gorseller);
-
 ?>
 
 <!-- ╔══════════════════════════════════════════════════════╗ -->
@@ -44,17 +42,6 @@ $toplam_gorsel = count($gorseller);
         <p class="gl-hero__alt belirme">
             Etkinliklerimizden, buluşmalarımızdan ve kültürel programlarımızdan kareler.
         </p>
-
-        <div class="gl-hero__sayac belirme">
-            <div class="gl-hero__sayac-oge">
-                <span class="gl-hero__sayac-sayi"><?= $toplam_gorsel ?>+</span>
-                <span class="gl-hero__sayac-etiket">Fotoğraf</span>
-            </div>
-            <div class="gl-hero__sayac-oge">
-                <span class="gl-hero__sayac-sayi">2024</span>
-                <span class="gl-hero__sayac-etiket">Etkinlik Yılı</span>
-            </div>
-        </div>
     </div>
 </section>
 
