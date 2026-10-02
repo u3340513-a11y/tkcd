@@ -515,6 +515,16 @@ switch ($sayfa) {
         }
         break;
 
+    case 'il-ilce-yonetimi':
+        if (!$is_admin && !$is_yonetim && !$is_gelistirici) {
+            echo '<div class="container py-5"><div class="alert alert-danger text-center fw-bold"><i class="fa-solid fa-lock me-2"></i>Erişim Engellendi: İl-İlçe Yönetimi sayfası yalnızca yetkili yöneticilere açıktır.</div></div>';
+        } else {
+            log_kaydet($db_baglanti, 'sayfa_goruntulem', 'İl-İlçe Yönetimi sayfası açıldı.' . (!empty($_GET['il']) ? ' İl: ' . htmlspecialchars(trim($_GET['il'])) : ''));
+            include 'inc/il-ilce-yonetimi.php';
+        }
+        break;
+
+
     case 'dashboard':
     default:
         // ─── KISITLI ROLLER İÇİN ÖZEL DASHBOARD ─────────────────────────

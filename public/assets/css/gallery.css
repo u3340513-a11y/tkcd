@@ -282,6 +282,7 @@
 .gl-lightbox__arka {
   position: absolute;
   inset: 0;
+  z-index: 0;
   background: rgba(6, 2, 4, 0.96);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -291,20 +292,25 @@
 .gl-lightbox__ic {
   position: absolute;
   inset: 0;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--bosluk-3);
   padding: clamp(3rem, 5vw, 4.5rem) clamp(1rem, 4vw, 3rem);
+  pointer-events: none;
 }
 
 .gl-lightbox__gorsel-kap {
   position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
   max-width: 88vw;
   max-height: 88vh;
   display: flex;
   align-items: center;
   justify-content: center;
+  pointer-events: auto;
 }
 
 .gl-lightbox__gorsel {
@@ -341,6 +347,7 @@
   background: rgba(255,255,255,0.1);
   color: #fff;
   cursor: pointer;
+  pointer-events: auto;
   backdrop-filter: blur(6px);
   transition: background 0.2s, transform 0.2s;
 }
@@ -367,6 +374,7 @@
   background: rgba(255, 255, 255, 0.95);
   color: #1a0a0f;
   cursor: pointer;
+  pointer-events: auto;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45), 0 1px 4px rgba(0, 0, 0, 0.3);
   transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }

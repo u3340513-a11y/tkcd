@@ -84,6 +84,14 @@ if (!$is_kisitli_rol) {
             </a>
             <?php endif; ?>
 
+            <?php if ($is_admin || $is_yonetim || $is_gelistirici): ?>
+            <a class="sb-link <?= $sayfa === 'il-ilce-yonetimi' ? 'sb-link--active' : '' ?>" href="index.php?sayfa=il-ilce-yonetimi">
+                <i class="sb-link__icon fa-solid fa-map-location-dot"></i>
+                <span>İl-İlçe Yönetimi</span>
+            </a>
+            <?php endif; ?>
+
+
             <a class="sb-link sb-link--disabled" href="#" aria-disabled="true" tabindex="-1">
                 <i class="sb-link__icon fa-solid fa-building-columns"></i>
                 <span>Kurullar</span>
