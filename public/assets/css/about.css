@@ -467,22 +467,23 @@
 }
 
 .da-faaliyet__izgara {
-  display: grid;
-  gap: clamp(3rem, 6vw, 5rem);
-  align-items: start;
+  display: block; /* Tek kolon — galeri mozaiği kaldırıldı */
+  max-width: 900px;
 }
 
-@media (min-width: 960px) {
-  .da-faaliyet__izgara {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
-  }
-}
 
-/* Faaliyet madde listesi */
+/* Faaliyet madde listesi — 2 sütunlu yatay grid */
 .da-faaliyet-liste {
   display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: var(--bosluk-3);
   margin-top: var(--bosluk-6);
+}
+
+@media (max-width: 640px) {
+  .da-faaliyet-liste {
+    grid-template-columns: 1fr;
+  }
 }
 
 .da-faaliyet-item {
@@ -543,6 +544,42 @@
 .da-galeri {
   overflow: hidden; /* Sol sütunu aşmasını engeller */
 }
+
+/* Faaliyet bölümü galeri linki */
+.da-faaliyet__galeri-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: var(--bosluk-6);
+  padding: 0.85rem 1.5rem;
+  border-radius: var(--yuvarlak-lg);
+  border: 2px solid var(--bordo-200, #f4c4cf);
+  background: linear-gradient(135deg, var(--bordo-50, #fbf4f6), #fff);
+  font-size: var(--olcek-base);
+  font-weight: 700;
+  color: var(--renk-marka, #7c1d32);
+  text-decoration: none;
+  transition: background 0.25s, border-color 0.25s, transform 0.2s, box-shadow 0.2s;
+}
+
+.da-faaliyet__galeri-link:hover {
+  background: var(--degrade-marka);
+  border-color: transparent;
+  color: #fff;
+  transform: translateX(4px);
+  box-shadow: var(--golge-md);
+}
+
+.da-faaliyet__galeri-link .icon {
+  width: 1.1rem;
+  height: 1.1rem;
+  transition: transform 0.2s;
+}
+
+.da-faaliyet__galeri-link:hover .icon {
+  transform: translateX(4px);
+}
+
 
 .da-galeri__baslik {
   font-size: var(--olcek-sm);

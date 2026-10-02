@@ -272,36 +272,16 @@ $sayilar = [
                 </li>
 <?php endforeach; ?>
             </ul>
-        </div>
 
-        <div class="da-galeri belirme" aria-label="Faaliyetlerimizden kareler">
-            <p class="da-galeri__baslik">Faaliyetlerimizden Kareler</p>
-            <ul class="da-galeri-mozaik">
-<?php
-/** @var list<array{dosya:string,alt:string,boyut:'buyuk'|'normal'}> $galeriVerisi */
-$galeriVerisi    = require dirname(__DIR__, 3) . '/resources/data/gallery.php';
-$galeriGorseller = array_slice($galeriVerisi, 0, 4);
-foreach ($galeriGorseller as $gorsel):
-    $src   = '/assets/img/' . $gorsel['dosya'];
-    $buyuk = ($gorsel['boyut'] === 'buyuk');
-?>
-                <li class="da-galeri-mozaik__oge<?= $buyuk ? ' da-galeri-mozaik__oge--buyuk' : '' ?>">
-<?= $view->partial('components/gorsel', [
-    'src'       => $src,
-    'alt'       => $gorsel['alt'],
-    'yedekIkon' => 'camera',
-]) ?>
-                </li>
-<?php endforeach; ?>
-            </ul>
-            <a class="ok-baglanti da-galeri__link" href="<?= $view->link('/hakkimizda/galeri') ?>">
-                Tüm Galeriyi Gör
+            <a class="ok-baglanti da-faaliyet__galeri-link belirme" href="<?= $view->link('/hakkimizda/galeri') ?>">
+                <span>Faaliyetlerimizden Kareler</span>
                 <?= $view->icon('arrow-right') ?>
             </a>
         </div>
 
     </div>
 </section>
+
 
 <!-- ===== 6. RAKAMLAR ===== -->
 <section class="da-rakamlar" aria-label="Derneğimiz rakamlarla">
