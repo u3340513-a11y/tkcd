@@ -343,7 +343,7 @@ function kisi_bilgisi_gorebilir(): bool
     }
 
     /** @var string[] İzin verilen kullanıcı adları (rol bağımsız) */
-    $izinli_kullanicilar = ['admin61', 'yonetim_hk', 'kk_by'];
+    $izinli_kullanicilar = ['admin61', 'yonetim_hk', 'kk_by', 'yonetim_kby'];
 
     // Hesap geçişi (impersonation) modunda MEVCUT kullanıcının rolü kullanılır.
     // Geliştirici başka hesaba geçiş yaptığında, o hesabın kısıtlamaları geçerli olur.
