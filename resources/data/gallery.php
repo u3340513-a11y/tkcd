@@ -13,6 +13,26 @@ declare(strict_types=1);
 return [
     // ── En yeni eklemeler en üstte ──────────────────────────────
     [
+        'dosya' => 'galeri/etkinlik_10.jpeg',
+        'alt'   => 'Etkinlikten bir kare',
+        'boyut' => 'normal',
+    ],
+    [
+        'dosya' => 'galeri/etkinlik_11.jpeg',
+        'alt'   => 'Etkinlikten bir kare',
+        'boyut' => 'normal',
+    ],
+    [
+        'dosya' => 'galeri/etkinlik_12.jpeg',
+        'alt'   => 'Etkinlikten bir kare',
+        'boyut' => 'normal',
+    ],
+    [
+        'dosya' => 'galeri/etkinlik_13.jpeg',
+        'alt'   => 'Etkinlikten bir kare',
+        'boyut' => 'normal',
+    ],
+    [
         'dosya' => 'galeri/etkinlik_1.jpeg',
         'alt'   => 'Etkinlikten bir kare',
         'boyut' => 'normal',
