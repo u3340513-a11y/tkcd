@@ -693,18 +693,17 @@ $bas_harfler = static function (string $ad): string {
     (function() {
         'use strict';
 
-        /* ── Arama ── */
+        /* ── İlçe arama ── */
         var aramaInput = document.getElementById('ily-ilce-arama');
         var kartlar    = document.querySelectorAll('.ily-ilce-karti');
         var sonucYok   = document.getElementById('ily-ilce-sonuc-yok');
 
         if (aramaInput && kartlar.length > 0) {
             aramaInput.addEventListener('input', function() {
-                var filtre     = this.value.toLowerCase().trim();
+                var filtre = this.value.toLowerCase().trim();
                 var gorunenSay = 0;
                 kartlar.forEach(function(kart) {
-                    var ilceAdi = kart.getAttribute('data-ilce') || '';
-                    var eslesme = filtre === '' || ilceAdi.indexOf(filtre) !== -1;
+                    var eslesme = filtre === '' || (kart.getAttribute('data-ilce') || '').indexOf(filtre) !== -1;
                     kart.style.display = eslesme ? '' : 'none';
                     if (eslesme) gorunenSay++;
                 });
@@ -712,46 +711,62 @@ $bas_harfler = static function (string $ad): string {
             });
         }
 
-        /* ── Modal ── */
-        var modal        = document.getElementById('ilyUyeModal');
-        var bsModal      = modal ? new bootstrap.Modal(modal) : null;
-        var modalIlce    = document.getElementById('ilyModalIlce');
-        var modalBadge   = document.getElementById('ilyModalBadge');
-        var modalYuk     = document.getElementById('ilyModalYukleniyor');
-        var modalHata    = document.getElementById('ilyModalHata');
-        var modalBos     = document.getElementById('ilyModalBos');
-        var modalTablo   = document.getElementById('ilyModalTablo');
-        var modalTbody   = document.getElementById('ilyModalTbody');
-        var modalArama   = document.getElementById('ilyModalArama');
+        /* ── Modal yönetimi (Bootstrap JS'ye bağımsız) ── */
+        var modalEl   = document.getElementById('ilyUyeModal');
+        if (!modalEl) return;
 
-        if (!bsModal) return;
+        var modalIlce  = document.getElementById('ilyModalIlce');
+        var modalBadge = document.getElementById('ilyModalBadge');
+        var modalYuk   = document.getElementById('ilyModalYukleniyor');
+        var modalHata  = document.getElementById('ilyModalHata');
+        var modalBos   = document.getElementById('ilyModalBos');
+        var modalTablo = document.getElementById('ilyModalTablo');
+        var modalTbody = document.getElementById('ilyModalTbody');
+        var modalArama = document.getElementById('ilyModalArama');
 
-        /**
-         * Belirtilen bölümü göster, diğerlerini gizle.
-         * @param {'yukleniyor'|'hata'|'bos'|'tablo'} durum
-         */
+        /** Modal'ı açar */
+        function modalAc() {
+            document.body.classList.add('modal-open');
+            document.body.style.overflow = 'hidden';
+            modalEl.style.display = 'block';
+            /* Bir tick sonra sınıf ekle ki CSS transition çalışsın */
+            requestAnimationFrame(function() {
+                requestAnimationFrame(function() {
+                    modalEl.classList.add('show');
+                });
+            });
+            /* Overlay */
+            var ov = document.createElement('div');
+            ov.className = 'modal-backdrop fade show';
+            ov.id = 'ilyBackdrop';
+            document.body.appendChild(ov);
+        }
+
+        /** Modal'ı kapar */
+        function modalKapat() {
+            modalEl.classList.remove('show');
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            setTimeout(function() { modalEl.style.display = 'none'; }, 200);
+            var ov = document.getElementById('ilyBackdrop');
+            if (ov) ov.parentNode.removeChild(ov);
+        }
+
+        /** İçerik bölümünü göster */
         function goster(durum) {
-            modalYuk.classList.toggle('d-none',   durum !== 'yukleniyor');
-            modalHata.classList.toggle('d-none',  durum !== 'hata');
-            modalBos.classList.toggle('d-none',   durum !== 'bos');
+            modalYuk.classList.toggle('d-none', durum !== 'yukleniyor');
+            modalHata.classList.toggle('d-none', durum !== 'hata');
+            modalBos.classList.toggle('d-none',  durum !== 'bos');
             modalTablo.classList.toggle('d-none', durum !== 'tablo');
         }
 
-        /**
-         * Baş harfleri hesaplar.
-         * @param {string} ad
-         * @returns {string}
-         */
+        /** Baş harfler */
         function basHarf(ad) {
-            var parcalar = ad.trim().split(/\s+/).slice(0, 2);
-            return parcalar.map(function(p) { return p.charAt(0).toUpperCase(); }).join('');
+            return ad.trim().split(/\s+/).slice(0, 2)
+                .map(function(p) { return p.charAt(0).toUpperCase(); }).join('');
         }
 
-        /**
-         * Belirleyici bir avatar rengi döndürür.
-         * @param {string} ad
-         * @returns {string}
-         */
+        /** Avatar rengi */
         function avatarRenk(ad) {
             var renkler = ['#c62828','#1565c0','#2e7d32','#6a1b9a','#e65100','#00838f','#37474f','#ad1457'];
             var hash = 0;
@@ -759,80 +774,65 @@ $bas_harfler = static function (string $ad): string {
             return renkler[Math.abs(hash) % renkler.length];
         }
 
-        /**
-         * Tüm tıklanabilir ilçe kartlarına event listener ekler.
-         */
+        /* Kart tıklama olayları */
         document.querySelectorAll('.ily-ilce-kart-ic[data-il]').forEach(function(kart) {
             kart.addEventListener('click', function() {
                 var il   = this.getAttribute('data-il')   || '';
                 var ilce = this.getAttribute('data-ilce') || '';
                 var uye  = this.getAttribute('data-uye')  || '0';
 
-                // Modal başlığı güncelle
-                modalIlce.textContent = ilce;
-                modalBadge.textContent = uye + ' üye';
+                /* Başlık ve spinner */
+                if (modalIlce)  modalIlce.textContent  = ilce;
+                if (modalBadge) modalBadge.textContent = uye + ' üye';
                 if (modalArama) modalArama.value = '';
 
                 goster('yukleniyor');
-                bsModal.show();
+                modalAc();
 
-                // AJAX isteği
+                /* AJAX */
                 var xhr = new XMLHttpRequest();
-                var url = '/yonetim/api/ilce-uyeler.php?il=' + encodeURIComponent(il)
-                        + '&ilce=' + encodeURIComponent(ilce);
-                xhr.open('GET', url, true);
+                xhr.open('GET',
+                    '/yonetim/api/ilce-uyeler.php'
+                    + '?il='   + encodeURIComponent(il)
+                    + '&ilce=' + encodeURIComponent(ilce),
+                    true
+                );
                 xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
                 xhr.onload = function() {
                     if (xhr.status !== 200) { goster('hata'); return; }
                     var veri;
-                    try { veri = JSON.parse(xhr.responseText); } catch(e) { goster('hata'); return; }
-                    if (veri.hata) { goster('hata'); return; }
-                    if (!veri.uyeler || veri.uyeler.length === 0) { goster('bos'); return; }
+                    try { veri = JSON.parse(xhr.responseText); } catch (e) { goster('hata'); return; }
+                    if (veri.hata || !veri.uyeler) { goster('hata'); return; }
+                    if (veri.uyeler.length === 0)  { goster('bos');  return; }
 
-                    // Tabloyu doldur
-                    var satirlar = veri.uyeler.map(function(u, i) {
-                        var renk    = avatarRenk(u.ad);
-                        var harfler = basHarf(u.ad);
-                        var statüHtml = u['statü']
-                            ? '<span class="badge rounded-pill px-2 py-1" style="background:rgba(106,27,154,0.1);color:#6a1b9a;font-size:0.68rem;">'
-                              + u['statü'] + '</span>'
-                            : '<span class="text-muted" style="font-size:0.75rem;">—</span>';
-                        return '<tr data-ara="' + (u.ad + ' ' + u.kurum + ' ' + u.unvan).toLowerCase() + '">' +
-                            '<td class="ps-3" style="font-size:0.78rem;color:#94a3b8;">' + (i + 1) + '</td>' +
-                            '<td>' +
-                              '<div class="d-flex align-items-center gap-2">' +
-                                '<div class="rounded-circle d-flex align-items-center justify-content-center fw-bold flex-shrink-0" '
-                                  + 'style="width:32px;height:32px;background:' + renk + '18;color:' + renk + ';font-size:0.68rem;">' +
-                                  harfler +
-                                '</div>' +
-                                '<span class="fw-semibold" style="font-size:0.82rem;">' + u.ad + '</span>' +
-                              '</div>' +
-                            '</td>' +
-                            '<td style="font-size:0.78rem;color:#475569;">' + (u.kurum || '<span class="text-muted">—</span>') + '</td>' +
-                            '<td style="font-size:0.78rem;color:#475569;">' + (u.unvan || '<span class="text-muted">—</span>') + '</td>' +
-                            '<td>' + statüHtml + '</td>' +
-                            '<td class="pe-3">' +
-                              '<a href="index.php?sayfa=uye-detay&id=' + u.id + '" '
-                                + 'class="btn btn-sm rounded-pill px-2 py-0" '
-                                + 'style="font-size:0.7rem;background:rgba(21,101,192,0.08);color:#1565c0;" '
-                                + 'title="Üye Kartı" target="_blank">' +
-                                '<i class="fa-solid fa-arrow-up-right-from-square me-1"></i>Kart' +
-                              '</a>' +
-                            '</td>' +
-                            '</tr>';
+                    modalTbody.innerHTML = veri.uyeler.map(function(u, idx) {
+                        var renk   = avatarRenk(u.ad);
+                        var harf   = basHarf(u.ad);
+                        var stHtml = u['stat\u00fc']
+                            ? '<span class="badge rounded-pill px-2 py-1" style="background:rgba(106,27,154,0.1);color:#6a1b9a;font-size:0.68rem;">' + u['stat\u00fc'] + '</span>'
+                            : '<span class="text-muted" style="font-size:0.75rem;">\u2014</span>';
+                        return '<tr data-ara="' + (u.ad + ' ' + u.kurum + ' ' + u.unvan).toLowerCase() + '">'
+                            + '<td class="ps-3" style="font-size:0.78rem;color:#94a3b8;">' + (idx + 1) + '</td>'
+                            + '<td><div class="d-flex align-items-center gap-2">'
+                            + '<div class="rounded-circle d-flex align-items-center justify-content-center fw-bold flex-shrink-0" style="width:32px;height:32px;background:' + renk + '18;color:' + renk + ';font-size:0.68rem;">' + harf + '</div>'
+                            + '<span class="fw-semibold" style="font-size:0.82rem;">' + u.ad + '</span>'
+                            + '</div></td>'
+                            + '<td style="font-size:0.78rem;color:#475569;">' + (u.kurum || '<span class="text-muted">\u2014</span>') + '</td>'
+                            + '<td style="font-size:0.78rem;color:#475569;">' + (u.unvan || '<span class="text-muted">\u2014</span>') + '</td>'
+                            + '<td>' + stHtml + '</td>'
+                            + '<td class="pe-3"><a href="index.php?sayfa=uye-detay&id=' + u.id + '" class="btn btn-sm rounded-pill px-2 py-0" style="font-size:0.7rem;background:rgba(21,101,192,0.08);color:#1565c0;" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square me-1"></i>Kart</a></td>'
+                            + '</tr>';
                     }).join('');
 
-                    modalTbody.innerHTML = satirlar;
                     goster('tablo');
 
-                    // Modal içi arama
+                    /* Modal içi arama */
                     if (modalArama) {
                         modalArama.oninput = function() {
                             var f = this.value.toLowerCase().trim();
                             modalTbody.querySelectorAll('tr').forEach(function(tr) {
-                                var ara = tr.getAttribute('data-ara') || '';
-                                tr.style.display = (f === '' || ara.indexOf(f) !== -1) ? '' : 'none';
+                                tr.style.display = (!f || (tr.getAttribute('data-ara') || '').indexOf(f) !== -1) ? '' : 'none';
                             });
                         };
                     }
@@ -842,13 +842,23 @@ $bas_harfler = static function (string $ad): string {
                 xhr.send();
             });
 
-            // Klavye erişilebilirliği
+            /* Klavye erişilebilirliği */
             kart.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    this.click();
-                }
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.click(); }
             });
+        });
+
+        /* Modal kapatma: X butonu */
+        modalEl.querySelector('[data-bs-dismiss="modal"]').addEventListener('click', modalKapat);
+
+        /* Modal kapatma: dışına tıklama */
+        modalEl.addEventListener('click', function(e) {
+            if (e.target === modalEl) modalKapat();
+        });
+
+        /* Modal kapatma: Escape */
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modalEl.classList.contains('show')) modalKapat();
         });
 
     })();
@@ -879,3 +889,4 @@ $bas_harfler = static function (string $ad): string {
 /* Modal başlık gradient */
 #ilyUyeModal .modal-header { border-radius: 0; }
 </style>
+
