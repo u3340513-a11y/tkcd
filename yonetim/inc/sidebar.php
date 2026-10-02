@@ -84,7 +84,14 @@ if (!$is_kisitli_rol) {
             </a>
             <?php endif; ?>
 
-            <?php if ($is_admin || $is_yonetim || $is_gelistirici): ?>
+            <?php
+            $ily_izinli_kullanici = in_array(
+                $_SESSION['kullanici_adi'] ?? '',
+                ['yonetim_oc', 'yonetim_kby', 'yonetim_ac'],
+                true
+            );
+            ?>
+            <?php if ($is_admin || $is_yonetim || $is_gelistirici || $ily_izinli_kullanici): ?>
             <a class="sb-link <?= $sayfa === 'il-ilce-yonetimi' ? 'sb-link--active' : '' ?>" href="index.php?sayfa=il-ilce-yonetimi">
                 <i class="sb-link__icon fa-solid fa-map-location-dot"></i>
                 <span>İl-İlçe Yönetimi</span>
