@@ -84,7 +84,7 @@ $kategoriler = [
                 </p>
 
                 <div class="da-hero__eylemler">
-                    <a class="dugme" href="mailto:<?= $view->e($contact['email'] ?? '') ?>">
+                    <a class="dugme" href="<?= $view->link('/iletisim') ?>">
                         <?= $view->icon('mail') ?>
                         Kurumunuzu Ekleyin
                     </a>
