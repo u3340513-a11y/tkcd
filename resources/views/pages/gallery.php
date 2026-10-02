@@ -6,16 +6,14 @@ use App\Core\View\PhpViewRenderer;
 use App\Core\View\SeoMeta;
 
 /**
- * Galeri sayfası.
- *
- * Bölümler:
- *   1. Hero   : Markalı başlık şeridi
- *   2. Izgara : CSS grid masonry — büyük görseller geniş span alır
+ * Galeri sayfası — Premium masonry tasarım.
  *
  * @var PhpViewRenderer $view
  * @var SeoMeta         $seo
  * @var list<array{dosya:string,alt:string,boyut:'buyuk'|'normal'}> $gorseller
  */
+
+$toplam_gorsel = count($gorseller);
 
 ?>
 
@@ -38,15 +36,30 @@ use App\Core\View\SeoMeta;
         </nav>
         <?php endif; ?>
 
-        <h1 class="gl-hero__baslik belirme" id="gl-hero-baslik">Galeri</h1>
+        <span class="gl-hero__etiket">📸 Etkinlik Galerisi</span>
+
+        <h1 class="gl-hero__baslik belirme" id="gl-hero-baslik">
+            Anılarımız,<br><em>fotoğraflarımızda.</em>
+        </h1>
         <p class="gl-hero__alt belirme">
             Etkinliklerimizden, buluşmalarımızdan ve kültürel programlarımızdan kareler.
         </p>
+
+        <div class="gl-hero__sayac belirme">
+            <div class="gl-hero__sayac-oge">
+                <span class="gl-hero__sayac-sayi"><?= $toplam_gorsel ?>+</span>
+                <span class="gl-hero__sayac-etiket">Fotoğraf</span>
+            </div>
+            <div class="gl-hero__sayac-oge">
+                <span class="gl-hero__sayac-sayi">2024</span>
+                <span class="gl-hero__sayac-etiket">Etkinlik Yılı</span>
+            </div>
+        </div>
     </div>
 </section>
 
 <!-- ╔══════════════════════════════════════════════════════╗ -->
-<!-- ║  2. FOTOĞRAF IZGARASI                                ║ -->
+<!-- ║  2. FOTOĞRAF IZGARASI — Masonry                      ║ -->
 <!-- ╚══════════════════════════════════════════════════════╝ -->
 <section class="gl-bolum" aria-label="Galeri fotoğrafları">
     <div class="kapsayici">
@@ -69,11 +82,13 @@ use App\Core\View\SeoMeta;
                             class="gl-kart__gorsel"
                             src="<?= $view->e($view->asset($src)) ?>"
                             alt="<?= $view->e($gorsel['alt']) ?>"
-                            loading="<?= $idx < 2 ? 'eager' : 'lazy' ?>"
+                            loading="<?= $idx < 4 ? 'eager' : 'lazy' ?>"
                             decoding="async"
                         >
                         <span class="gl-kart__zum" aria-hidden="true">
-                            <?= $view->icon('zoom-in') ?>
+                            <span class="gl-kart__zum-ic">
+                                <?= $view->icon('zoom-in') ?>
+                            </span>
                         </span>
                     </figure>
                 </button>
