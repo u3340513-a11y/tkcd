@@ -1126,13 +1126,44 @@ switch ($sayfa) {
             $toplam_uye = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli'")->fetchColumn();
             $toplam_il  = $db_baglanti->query("SELECT COUNT(DISTINCT ikamet_ili) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND ikamet_ili IS NOT NULL AND ikamet_ili != ''")->fetchColumn();
             
-            $yonetim_kurulu = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu LIKE '%Yönetim Kurulu%' OR temsilci_turu = 'Yönetici' OR ek_gorev LIKE '%Yönetim Kurulu%' OR ek_gorev = 'Yönetici')")->fetchColumn();
-            $bolge_koordinatorleri = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Bölge Koordinatörü' OR ek_gorev = 'Bölge Koordinatörü')")->fetchColumn();
-            $il_baskanlari = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'İl Başkanı' OR temsilci_turu = 'İl Temsilcisi' OR ek_gorev = 'İl Başkanı' OR ek_gorev = 'İl Temsilcisi')")->fetchColumn();
-            $ilce_baskanlari = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'İlçe Başkanı' OR temsilci_turu = 'İlçe Temsilcisi' OR ek_gorev = 'İlçe Başkanı' OR ek_gorev = 'İlçe Temsilcisi')")->fetchColumn();
-            $kurum_temsilcileri = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Kurum Temsilcisi' OR ek_gorev = 'Kurum Temsilcisi')")->fetchColumn();
-            $teskilatlanma_sorumlusu = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Teşkilatlanma Sorumlu Başkan' OR ek_gorev = 'Teşkilatlanma Sorumlu Başkan')")->fetchColumn();
-            $kadin_kollari_baskanlari = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND temsilci_turu = 'Kadın Kolları Başkanı'")->fetchColumn();
+            $yonetim_kurulu = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (
+                temsilci_turu LIKE '%Yönetim Kurulu%' OR temsilci_turu = 'Yönetici'
+                OR ek_gorev LIKE '%Yönetim Kurulu%' OR ek_gorev = 'Yönetici'
+                OR JSON_CONTAINS(ek_roller, '\"Yönetim Kurulu Üyesi\"')
+                OR JSON_CONTAINS(ek_roller, '\"Yönetim Kurulu Üyesi Yedek\"')
+            )")->fetchColumn();
+
+            $bolge_koordinatorleri = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (
+                temsilci_turu = 'Bölge Koordinatörü' OR ek_gorev = 'Bölge Koordinatörü'
+                OR JSON_CONTAINS(ek_roller, '\"Bölge Koordinatörü\"')
+            )")->fetchColumn();
+
+            $il_baskanlari = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (
+                temsilci_turu = 'İl Başkanı' OR temsilci_turu = 'İl Temsilcisi'
+                OR ek_gorev = 'İl Başkanı' OR ek_gorev = 'İl Temsilcisi'
+                OR JSON_CONTAINS(ek_roller, '\"İl Başkanı\"')
+            )")->fetchColumn();
+
+            $ilce_baskanlari = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (
+                temsilci_turu = 'İlçe Başkanı' OR temsilci_turu = 'İlçe Temsilcisi'
+                OR ek_gorev = 'İlçe Başkanı' OR ek_gorev = 'İlçe Temsilcisi'
+                OR JSON_CONTAINS(ek_roller, '\"İlçe Başkanı\"')
+            )")->fetchColumn();
+
+            $kurum_temsilcileri = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (
+                temsilci_turu = 'Kurum Temsilcisi' OR ek_gorev = 'Kurum Temsilcisi'
+                OR JSON_CONTAINS(ek_roller, '\"Kurum Temsilcisi\"')
+            )")->fetchColumn();
+
+            $teskilatlanma_sorumlusu = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (
+                temsilci_turu = 'Teşkilatlanma Sorumlu Başkan' OR ek_gorev = 'Teşkilatlanma Sorumlu Başkan'
+                OR JSON_CONTAINS(ek_roller, '\"Teşkilatlanma Sorumlu Başkan\"')
+            )")->fetchColumn();
+
+            $kadin_kollari_baskanlari = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (
+                temsilci_turu = 'Kadın Kolları Başkanı'
+                OR JSON_CONTAINS(ek_roller, '\"Kadın Kolları Başkanı\"')
+            )")->fetchColumn();
 
             $bekleyen_uye_sayisi = $db_baglanti->query("SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'bekleyen'")->fetchColumn();
 
