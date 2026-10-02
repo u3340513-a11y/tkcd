@@ -213,12 +213,12 @@
   opacity: 1;
 }
 
-/* İkon gizli — kullanıcı istemedi */
+/* Kart hover ikonunu gizle — sadece kart zoom alanındakiler */
 .gl-kart__zum-ic {
   display: none;
 }
 
-.gl-kart__zum .icon {
+.gl-kart__zum > .icon {
   display: none;
 }
 
@@ -384,6 +384,8 @@
   width: 1.5rem;
   height: 1.5rem;
   stroke-width: 2.5;
+  display: block;
+  color: #1a0a0f;
 }
 
 @media (max-width: 600px) {
