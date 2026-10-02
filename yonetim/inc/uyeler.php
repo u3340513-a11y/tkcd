@@ -212,54 +212,54 @@ if ($is_il_baskani && !empty($_SESSION['sorumlu_il'])) {
 
 try {
     if ($aktif_filtre === 'kurum_temsilcisi') {
-        $say_sql = "SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Kurum Temsilcisi' OR ek_gorev = 'Kurum Temsilcisi')" . $rol_ek_where;
+        $say_sql = "SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Kurum Temsilcisi' OR ek_gorev = 'Kurum Temsilcisi' OR JSON_CONTAINS(ek_roller, '\"Kurum Temsilcisi\"'))" . $rol_ek_where;
         $say_sorgu = $db_baglanti->prepare($say_sql);
         $say_sorgu->execute($rol_ek_parametreler);
         $toplam_onayli = $say_sorgu->fetchColumn();
         $toplam_sayfa = ceil($toplam_onayli / $limit);
-        $sorgu = $db_baglanti->prepare("SELECT * FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Kurum Temsilcisi' OR ek_gorev = 'Kurum Temsilcisi')" . $rol_ek_where . " ORDER BY adi_soyadi ASC LIMIT ? OFFSET ?");
+        $sorgu = $db_baglanti->prepare("SELECT * FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Kurum Temsilcisi' OR ek_gorev = 'Kurum Temsilcisi' OR JSON_CONTAINS(ek_roller, '\"Kurum Temsilcisi\"'))" . $rol_ek_where . " ORDER BY adi_soyadi ASC LIMIT ? OFFSET ?");
     } elseif ($aktif_filtre === 'yonetim_kurulu') {
-        $say_sql = "SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Yönetim Kurulu Üyesi' OR temsilci_turu = 'Yönetim Kurulu Üyesi Yedek' OR temsilci_turu = 'Yönetici' OR ek_gorev = 'Yönetim Kurulu Üyesi' OR ek_gorev = 'Yönetim Kurulu Üyesi Yedek' OR ek_gorev = 'Yönetici')" . $rol_ek_where;
+        $say_sql = "SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Yönetim Kurulu Üyesi' OR temsilci_turu = 'Yönetim Kurulu Üyesi Yedek' OR temsilci_turu = 'Yönetici' OR ek_gorev = 'Yönetim Kurulu Üyesi' OR ek_gorev = 'Yönetim Kurulu Üyesi Yedek' OR ek_gorev = 'Yönetici' OR JSON_CONTAINS(ek_roller, '\"Yönetim Kurulu Üyesi\"') OR JSON_CONTAINS(ek_roller, '\"Yönetim Kurulu Üyesi Yedek\"'))" . $rol_ek_where;
         $say_sorgu = $db_baglanti->prepare($say_sql);
         $say_sorgu->execute($rol_ek_parametreler);
         $toplam_onayli = $say_sorgu->fetchColumn();
         $toplam_sayfa = ceil($toplam_onayli / $limit);
-        $sorgu = $db_baglanti->prepare("SELECT * FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Yönetim Kurulu Üyesi' OR temsilci_turu = 'Yönetim Kurulu Üyesi Yedek' OR temsilci_turu = 'Yönetici' OR ek_gorev = 'Yönetim Kurulu Üyesi' OR ek_gorev = 'Yönetim Kurulu Üyesi Yedek' OR ek_gorev = 'Yönetici')" . $rol_ek_where . " ORDER BY adi_soyadi ASC LIMIT ? OFFSET ?");
+        $sorgu = $db_baglanti->prepare("SELECT * FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Yönetim Kurulu Üyesi' OR temsilci_turu = 'Yönetim Kurulu Üyesi Yedek' OR temsilci_turu = 'Yönetici' OR ek_gorev = 'Yönetim Kurulu Üyesi' OR ek_gorev = 'Yönetim Kurulu Üyesi Yedek' OR ek_gorev = 'Yönetici' OR JSON_CONTAINS(ek_roller, '\"Yönetim Kurulu Üyesi\"') OR JSON_CONTAINS(ek_roller, '\"Yönetim Kurulu Üyesi Yedek\"'))" . $rol_ek_where . " ORDER BY adi_soyadi ASC LIMIT ? OFFSET ?");
     } elseif ($aktif_filtre === 'bolge_koordinatoru') {
-        $say_sql = "SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Bölge Koordinatörü' OR ek_gorev = 'Bölge Koordinatörü')" . $rol_ek_where;
+        $say_sql = "SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Bölge Koordinatörü' OR ek_gorev = 'Bölge Koordinatörü' OR JSON_CONTAINS(ek_roller, '\"Bölge Koordinatörü\"'))" . $rol_ek_where;
         $say_sorgu = $db_baglanti->prepare($say_sql);
         $say_sorgu->execute($rol_ek_parametreler);
         $toplam_onayli = $say_sorgu->fetchColumn();
         $toplam_sayfa = ceil($toplam_onayli / $limit);
-        $sorgu = $db_baglanti->prepare("SELECT * FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Bölge Koordinatörü' OR ek_gorev = 'Bölge Koordinatörü')" . $rol_ek_where . " ORDER BY adi_soyadi ASC LIMIT ? OFFSET ?");
+        $sorgu = $db_baglanti->prepare("SELECT * FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Bölge Koordinatörü' OR ek_gorev = 'Bölge Koordinatörü' OR JSON_CONTAINS(ek_roller, '\"Bölge Koordinatörü\"'))" . $rol_ek_where . " ORDER BY adi_soyadi ASC LIMIT ? OFFSET ?");
     } elseif ($aktif_filtre === 'il_baskani') {
-        $say_sql = "SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'İl Başkanı' OR temsilci_turu = 'İl Temsilcisi' OR ek_gorev = 'İl Başkanı' OR ek_gorev = 'İl Temsilcisi')" . $rol_ek_where;
+        $say_sql = "SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'İl Başkanı' OR temsilci_turu = 'İl Temsilcisi' OR ek_gorev = 'İl Başkanı' OR ek_gorev = 'İl Temsilcisi' OR JSON_CONTAINS(ek_roller, '\"İl Başkanı\"'))" . $rol_ek_where;
         $say_sorgu = $db_baglanti->prepare($say_sql);
         $say_sorgu->execute($rol_ek_parametreler);
         $toplam_onayli = $say_sorgu->fetchColumn();
         $toplam_sayfa = ceil($toplam_onayli / $limit);
-        $sorgu = $db_baglanti->prepare("SELECT * FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'İl Başkanı' OR temsilci_turu = 'İl Temsilcisi' OR ek_gorev = 'İl Başkanı' OR ek_gorev = 'İl Temsilcisi')" . $rol_ek_where . " ORDER BY adi_soyadi ASC LIMIT ? OFFSET ?");
+        $sorgu = $db_baglanti->prepare("SELECT * FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'İl Başkanı' OR temsilci_turu = 'İl Temsilcisi' OR ek_gorev = 'İl Başkanı' OR ek_gorev = 'İl Temsilcisi' OR JSON_CONTAINS(ek_roller, '\"İl Başkanı\"'))" . $rol_ek_where . " ORDER BY adi_soyadi ASC LIMIT ? OFFSET ?");
     } elseif ($aktif_filtre === 'ilce_baskani') {
-        $say_sql = "SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'İlçe Başkanı' OR temsilci_turu = 'İlçe Temsilcisi' OR ek_gorev = 'İlçe Başkanı' OR ek_gorev = 'İlçe Temsilcisi')" . $rol_ek_where;
+        $say_sql = "SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'İlçe Başkanı' OR temsilci_turu = 'İlçe Temsilcisi' OR ek_gorev = 'İlçe Başkanı' OR ek_gorev = 'İlçe Temsilcisi' OR JSON_CONTAINS(ek_roller, '\"İlçe Başkanı\"'))" . $rol_ek_where;
         $say_sorgu = $db_baglanti->prepare($say_sql);
         $say_sorgu->execute($rol_ek_parametreler);
         $toplam_onayli = $say_sorgu->fetchColumn();
         $toplam_sayfa = ceil($toplam_onayli / $limit);
-        $sorgu = $db_baglanti->prepare("SELECT * FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'İlçe Başkanı' OR temsilci_turu = 'İlçe Temsilcisi' OR ek_gorev = 'İlçe Başkanı' OR ek_gorev = 'İlçe Temsilcisi')" . $rol_ek_where . " ORDER BY adi_soyadi ASC LIMIT ? OFFSET ?");
+        $sorgu = $db_baglanti->prepare("SELECT * FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'İlçe Başkanı' OR temsilci_turu = 'İlçe Temsilcisi' OR ek_gorev = 'İlçe Başkanı' OR ek_gorev = 'İlçe Temsilcisi' OR JSON_CONTAINS(ek_roller, '\"İlçe Başkanı\"'))" . $rol_ek_where . " ORDER BY adi_soyadi ASC LIMIT ? OFFSET ?");
     } elseif ($aktif_filtre === 'teskilatlanma_sorumlusu') {
-        $say_sql = "SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Teşkilatlanma Sorumlu Başkan' OR ek_gorev = 'Teşkilatlanma Sorumlu Başkan')" . $rol_ek_where;
+        $say_sql = "SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Teşkilatlanma Sorumlu Başkan' OR ek_gorev = 'Teşkilatlanma Sorumlu Başkan' OR JSON_CONTAINS(ek_roller, '\"Teşkilatlanma Sorumlu Başkan\"'))" . $rol_ek_where;
         $say_sorgu = $db_baglanti->prepare($say_sql);
         $say_sorgu->execute($rol_ek_parametreler);
         $toplam_onayli = $say_sorgu->fetchColumn();
         $toplam_sayfa = ceil($toplam_onayli / $limit);
-        $sorgu = $db_baglanti->prepare("SELECT * FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Teşkilatlanma Sorumlu Başkan' OR ek_gorev = 'Teşkilatlanma Sorumlu Başkan')" . $rol_ek_where . " ORDER BY adi_soyadi ASC LIMIT ? OFFSET ?");
+        $sorgu = $db_baglanti->prepare("SELECT * FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Teşkilatlanma Sorumlu Başkan' OR ek_gorev = 'Teşkilatlanma Sorumlu Başkan' OR JSON_CONTAINS(ek_roller, '\"Teşkilatlanma Sorumlu Başkan\"'))" . $rol_ek_where . " ORDER BY adi_soyadi ASC LIMIT ? OFFSET ?");
     } elseif ($aktif_filtre === 'kadin_kollari') {
-        $say_sql = "SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND temsilci_turu = 'Kadın Kolları Başkanı'" . $rol_ek_where;
+        $say_sql = "SELECT COUNT(*) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Kadın Kolları Başkanı' OR JSON_CONTAINS(ek_roller, '\"Kadın Kolları Başkanı\"'))" . $rol_ek_where;
         $say_sorgu = $db_baglanti->prepare($say_sql);
         $say_sorgu->execute($rol_ek_parametreler);
         $toplam_onayli = $say_sorgu->fetchColumn();
         $toplam_sayfa = ceil($toplam_onayli / $limit);
-        $sorgu = $db_baglanti->prepare("SELECT * FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND temsilci_turu = 'Kadın Kolları Başkanı'" . $rol_ek_where . " ORDER BY adi_soyadi ASC LIMIT ? OFFSET ?");
+        $sorgu = $db_baglanti->prepare("SELECT * FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND (temsilci_turu = 'Kadın Kolları Başkanı' OR JSON_CONTAINS(ek_roller, '\"Kadın Kolları Başkanı\"'))" . $rol_ek_where . " ORDER BY adi_soyadi ASC LIMIT ? OFFSET ?");
     } elseif ($aktif_filtre === 'aktif_iller') {
         $iller_modu = true;
         $toplam_onayli = $db_baglanti->query("SELECT COUNT(DISTINCT ikamet_ili) FROM dernek_uyeler WHERE onay_durumu = 'onayli' AND ikamet_ili IS NOT NULL AND ikamet_ili != ''")->fetchColumn();

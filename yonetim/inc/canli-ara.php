@@ -39,19 +39,21 @@ try {
         $where_sartlari[] = "cinsiyet = 'Kadın'";
     }
 
-    // 1. Dashboard kart filtreleri (Hem ana statüye hem ek göreve bakar)
+    // 1. Dashboard kart filtreleri (Ana statü + ek_gorev + ek_roller JSON)
     if ($aktif_filtre === 'kurum_temsilcisi') {
-        $where_sartlari[] = "(temsilci_turu = 'Kurum Temsilcisi' OR ek_gorev = 'Kurum Temsilcisi')";
+        $where_sartlari[] = "(temsilci_turu = 'Kurum Temsilcisi' OR ek_gorev = 'Kurum Temsilcisi' OR JSON_CONTAINS(ek_roller, '\"Kurum Temsilcisi\"'))";
     } elseif ($aktif_filtre === 'yonetim_kurulu') {
-        $where_sartlari[] = "(temsilci_turu = 'Yönetim Kurulu Üyesi' OR temsilci_turu = 'Yönetim Kurulu Üyesi Yedek' OR temsilci_turu = 'Yönetici' OR ek_gorev = 'Yönetim Kurulu Üyesi' OR ek_gorev = 'Yönetim Kurulu Üyesi Yedek' OR ek_gorev = 'Yönetici')";
+        $where_sartlari[] = "(temsilci_turu = 'Yönetim Kurulu Üyesi' OR temsilci_turu = 'Yönetim Kurulu Üyesi Yedek' OR temsilci_turu = 'Yönetici' OR ek_gorev = 'Yönetim Kurulu Üyesi' OR ek_gorev = 'Yönetim Kurulu Üyesi Yedek' OR ek_gorev = 'Yönetici' OR JSON_CONTAINS(ek_roller, '\"Yönetim Kurulu Üyesi\"') OR JSON_CONTAINS(ek_roller, '\"Yönetim Kurulu Üyesi Yedek\"'))";
     } elseif ($aktif_filtre === 'bolge_koordinatoru') {
-        $where_sartlari[] = "(temsilci_turu = 'Bölge Koordinatörü' OR ek_gorev = 'Bölge Koordinatörü')";
+        $where_sartlari[] = "(temsilci_turu = 'Bölge Koordinatörü' OR ek_gorev = 'Bölge Koordinatörü' OR JSON_CONTAINS(ek_roller, '\"Bölge Koordinatörü\"'))";
     } elseif ($aktif_filtre === 'il_baskani') {
-        $where_sartlari[] = "(temsilci_turu = 'İl Başkanı' OR temsilci_turu = 'İl Temsilcisi' OR ek_gorev = 'İl Başkanı' OR ek_gorev = 'İl Temsilcisi')";
+        $where_sartlari[] = "(temsilci_turu = 'İl Başkanı' OR temsilci_turu = 'İl Temsilcisi' OR ek_gorev = 'İl Başkanı' OR ek_gorev = 'İl Temsilcisi' OR JSON_CONTAINS(ek_roller, '\"İl Başkanı\"'))";
     } elseif ($aktif_filtre === 'ilce_baskani') {
-        $where_sartlari[] = "(temsilci_turu = 'İlçe Başkanı' OR temsilci_turu = 'İlçe Temsilcisi' OR ek_gorev = 'İlçe Başkanı' OR ek_gorev = 'İlçe Temsilcisi')";
+        $where_sartlari[] = "(temsilci_turu = 'İlçe Başkanı' OR temsilci_turu = 'İlçe Temsilcisi' OR ek_gorev = 'İlçe Başkanı' OR ek_gorev = 'İlçe Temsilcisi' OR JSON_CONTAINS(ek_roller, '\"İlçe Başkanı\"'))";
     } elseif ($aktif_filtre === 'teskilatlanma_sorumlusu') {
-        $where_sartlari[] = "(temsilci_turu = 'Teşkilatlanma Sorumlu Başkan' OR ek_gorev = 'Teşkilatlanma Sorumlu Başkan')";
+        $where_sartlari[] = "(temsilci_turu = 'Teşkilatlanma Sorumlu Başkan' OR ek_gorev = 'Teşkilatlanma Sorumlu Başkan' OR JSON_CONTAINS(ek_roller, '\"Teşkilatlanma Sorumlu Başkan\"'))";
+    } elseif ($aktif_filtre === 'kadin_kollari') {
+        $where_sartlari[] = "(temsilci_turu = 'Kadın Kolları Başkanı' OR JSON_CONTAINS(ek_roller, '\"Kadın Kolları Başkanı\"'))";
     }
 
     // 2. Canlı arama kutusu
