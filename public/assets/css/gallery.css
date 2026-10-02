@@ -357,30 +357,33 @@
 
 .gl-lightbox__nav {
   flex-shrink: 0;
-  width: 3rem;
-  height: 3rem;
+  width: 3.25rem;
+  height: 3.25rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(255,255,255,0.15);
+  border: none;
   border-radius: 50%;
-  background: rgba(255,255,255,0.08);
-  color: #fff;
+  background: rgba(255, 255, 255, 0.95);
+  color: #1a0a0f;
   cursor: pointer;
-  backdrop-filter: blur(6px);
-  transition: background 0.2s, transform 0.2s;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45), 0 1px 4px rgba(0, 0, 0, 0.3);
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .gl-lightbox__nav:hover {
-  background: rgba(255,255,255,0.2);
+  background: #fff;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.55);
+  transform: scale(1.1);
 }
 
-.gl-lightbox__nav--onceki:hover { transform: translateX(-4px); }
-.gl-lightbox__nav--sonraki:hover { transform: translateX(4px); }
+.gl-lightbox__nav--onceki:hover { transform: scale(1.1) translateX(-3px); }
+.gl-lightbox__nav--sonraki:hover { transform: scale(1.1) translateX(3px); }
 
 .gl-lightbox__nav .icon {
-  width: 1.4rem;
-  height: 1.4rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  stroke-width: 2.5;
 }
 
 @media (max-width: 600px) {
