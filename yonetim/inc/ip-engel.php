@@ -41,9 +41,20 @@ if (!function_exists('istemci_ip_al')) {
 }
 
 if (!function_exists('ip_engel_sayfasi_goster')) {
-    /** Engellenmiş istemciye gösterilen yanıtı gönderir ve çalışmayı bitirir. */
+    /**
+     * Engellenmiş istemciye gösterilen yanıtı gönderir ve çalışmayı bitirir.
+     *
+     * Neden POST'ta yönlendirme: Engel sayfası bir form gönderiminin yanıtı
+     * olursa tarayıcı yenilemesi aynı kullanıcı adı/şifreyi yeniden gönderir
+     * ve engel kaldırıldığında IP anında tekrar engellenir (POST/Redirect/GET).
+     */
     function ip_engel_sayfasi_goster(): void
     {
+        if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
+            header('Location: /yonetim/', true, 303);
+            exit;
+        }
+
         http_response_code(403);
         header('Content-Type: text/html; charset=UTF-8');
         echo '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8">'
