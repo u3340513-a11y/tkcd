@@ -144,6 +144,8 @@ $islem_stilleri = [
     'sifre_sifirla'    => ['bg-dark text-white',      'fa-key',               'Şifre'],
     'excel_indir'      => ['bg-success text-white',   'fa-file-excel',        'Excel'],
     'pdf_indir'        => ['bg-danger text-white',    'fa-file-pdf',          'PDF'],
+    'ip_engellendi'    => ['bg-danger text-white',    'fa-ban',               'IP Engel'],
+    'ip_engel_kaldirildi' => ['bg-success text-white', 'fa-lock-open',        'Engel Kaldırıldı'],
 ];
 
 /**

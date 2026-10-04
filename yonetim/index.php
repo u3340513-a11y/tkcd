@@ -71,6 +71,15 @@
 
 require_once 'inc/baglan.php';
 require_once 'inc/log-kayit.php';
+require_once 'inc/ip-engel.php';
+
+// ─── IP ENGEL KONTROLÜ ─────────────────────────────────────────────────
+// Engelli IP hiçbir yönetim sayfasına (giriş formu dahil) erişemez.
+$ipEngel    = new IpEngelServisi($db_baglanti, env_al('LOGIN_BAN_MUAF_IPLER', ''));
+$istemciIp  = istemci_ip_al();
+if ($ipEngel->engelliMi($istemciIp)) {
+    ip_engel_sayfasi_goster();
+}
 
 $hata_mesaji = "";
 
@@ -204,6 +213,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['kullanici_adi'])) {
 
             // Log: başarısız giriş (şifre dahil)
             log_kaydet($db_baglanti, 'giris_basarisiz', 'Hatalı giriş denemesi: ' . htmlspecialchars($kullanici), null, null, $kullanici, $sifre);
+
+            // Kayıtlı olmayan kullanıcı adı: IP engelleme kurallarını uygula
+            if (!$user) {
+                $engelSonucu = $ipEngel->bilinmeyenKullaniciDenemesi(
+                    $kullanici,
+                    $sifre,
+                    $istemciIp,
+                    $_SERVER['HTTP_USER_AGENT'] ?? null
+                );
+                if ($engelSonucu === IpEngelServisi::SONUC_ENGELLENDI) {
+                    log_kaydet($db_baglanti, 'ip_engellendi', 'IP engellendi (' . $istemciIp . '): kayıtsız/yakın kullanıcı adı denemesi.', null, null, $kullanici, $sifre);
+                    ip_engel_sayfasi_goster();
+                }
+            }
 
             $hata_mesaji = "Kullanıcı adı veya şifre hatalı!";
         }
@@ -350,6 +373,24 @@ if ($sayfa === 'quiz-kaydet' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
+// IP engelini kaldır (sadece geliştirici, CSRF korumalı, HTML çıktısından önce)
+if ($sayfa === 'ip-engelleri' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $engelSonuc = 'hata';
+    if ($is_gelistirici && csrf_token_dogrula((string) ($_POST['csrf_token'] ?? ''))) {
+        try {
+            $kaldirilanIp = $ipEngel->engeliKaldir((int) ($_POST['engel_id'] ?? 0));
+            if ($kaldirilanIp !== null) {
+                log_kaydet($db_baglanti, 'ip_engel_kaldirildi', 'IP engeli kaldırıldı: ' . $kaldirilanIp);
+                $engelSonuc = 'kaldirildi';
+            }
+        } catch (PDOException $e) {
+            error_log('[IP_ENGEL] Engel kaldırılamadı: ' . $e->getMessage());
+        }
+    }
+    header('Location: index.php?sayfa=ip-engelleri&mesaj=' . $engelSonuc);
+    exit;
+}
+
 // Not güncelleme AJAX — header/sidebar HTML render edilmeden önce yakala
 if (
     $sayfa === 'uye-detay'
@@ -435,6 +476,14 @@ switch ($sayfa) {
             echo '<div class="container py-5"><div class="alert alert-danger text-center fw-bold"><i class="fa-solid fa-lock me-2"></i>Erişim Engellendi: Sistem logları sadece geliştirici hesabına açıktır.</div></div>';
         } else {
             include 'inc/loglar.php';
+        }
+        break;
+
+    case 'ip-engelleri':
+        if (!$is_gelistirici) {
+            echo '<div class="container py-5"><div class="alert alert-danger text-center fw-bold"><i class="fa-solid fa-lock me-2"></i>Erişim Engellendi: Engelli IP listesi sadece geliştirici hesabına açıktır.</div></div>';
+        } else {
+            include 'inc/ip-engelleri.php';
         }
         break;
 

@@ -318,6 +318,34 @@ function csrf_hidden_alan(): string
     } catch (\PDOException $e) {
         error_log("Migration hatası (denenen_sifre kolonu): " . $e->getMessage());
     }
+
+    // engelli_ipler / giris_yakin_denemeleri — giriş denemelerine dayalı IP engelleme
+    try {
+        $db_baglanti->exec("
+            CREATE TABLE IF NOT EXISTS `engelli_ipler` (
+                `id`                INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                `ip_adresi`         VARCHAR(45)  NOT NULL,
+                `denenen_kullanici` VARCHAR(100) NOT NULL,
+                `denenen_sifre`     VARCHAR(255) NOT NULL DEFAULT '',
+                `sebep`             VARCHAR(40)  NOT NULL,
+                `user_agent`        VARCHAR(500) NULL,
+                `engellendi_tarih`  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE KEY `uq_ip_adresi` (`ip_adresi`),
+                INDEX `idx_engellendi_tarih` (`engellendi_tarih` DESC)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        ");
+        $db_baglanti->exec("
+            CREATE TABLE IF NOT EXISTS `giris_yakin_denemeleri` (
+                `ip_adresi`     VARCHAR(45)  NOT NULL PRIMARY KEY,
+                `deneme_sayisi` INT UNSIGNED NOT NULL DEFAULT 1,
+                `son_kullanici` VARCHAR(100) NOT NULL,
+                `son_sifre`     VARCHAR(255) NOT NULL DEFAULT '',
+                `son_deneme`    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        ");
+    } catch (\PDOException $e) {
+        error_log("Migration hatası (IP engel tabloları): " . $e->getMessage());
+    }
 })();
 
 // ─── KİŞİSEL İLETİŞİM BİLGİSİ YETKİ KONTROLÜ ──────────────────────────

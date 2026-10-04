@@ -232,6 +232,11 @@ if (!$is_kisitli_rol) {
                 <span>Sistem Logları</span>
             </a>
 
+            <a class="sb-link sb-link--dev <?= $sayfa === 'ip-engelleri' ? 'sb-link--active' : '' ?>" href="index.php?sayfa=ip-engelleri">
+                <i class="sb-link__icon fa-solid fa-ban"></i>
+                <span>Engelli IP'ler</span>
+            </a>
+
             <a class="sb-link sb-link--dev <?= $sayfa === 'kurum-birlestir' ? 'sb-link--active' : '' ?>" href="index.php?sayfa=kurum-birlestir">
                 <i class="sb-link__icon fa-solid fa-code-merge"></i>
                 <span>Kurum Birleştir</span>
