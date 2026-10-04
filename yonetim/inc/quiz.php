@@ -20,11 +20,9 @@ $csrf_token = $_SESSION['csrf_token'];
 $tum_sorular = require __DIR__ . '/quiz-sorulari.php';
 $toplam = count($tum_sorular);
 
-// Tüm havuzu karıştır, ilk 8'i al
-$indexler = range(0, $toplam - 1);
-shuffle($indexler);
-shuffle($indexler); // Çift shuffle — daha iyi dağılım
-$secilen_indexler = array_slice($indexler, 0, 8);
+// Havuz tükenmeden aynı soru tekrar gelmesin: oturum destesinden 8 soru çek
+require_once __DIR__ . '/quiz-secici.php';
+$secilen_indexler = quizSoruIndeksleriSec($toplam, 8, $_SESSION);
 
 // JSON olarak hazırla (client'a sadece soru metni ve seçenekler gönderilir, cevap GÖNDERİLMEZ)
 // Şıklar da her soruda karışık sırada gelir
