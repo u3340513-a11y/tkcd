@@ -1053,7 +1053,8 @@ switch ($sayfa) {
             <?php endif; ?>
             <?php
             // ── KISITLI DASHBOARD — HAFTALIK QUİZ LİDERLİK TABLOSU ──────
-            $quiz_hafta_kodu = date('Y-W');
+            require_once __DIR__ . '/inc/quiz-hafta.php';
+            $quiz_hafta_kodu = quizHaftaKodu();
             $quiz_liderleri = [];
             try {
                 $quiz_sorgu = $db_baglanti->prepare(
@@ -1363,7 +1364,8 @@ switch ($sayfa) {
         ?>
         <?php
             // ── HAFTALIK QUİZ LİDERLİK TABLOSU ──────────────────
-            $quiz_hafta_kodu = date('Y-W');
+            require_once __DIR__ . '/inc/quiz-hafta.php';
+            $quiz_hafta_kodu = quizHaftaKodu();
             $quiz_liderleri = [];
             try {
                 $quiz_sorgu = $db_baglanti->prepare(

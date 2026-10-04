@@ -72,24 +72,9 @@ try {
     // Zaten varsa sessizce devam et
 }
 
-// ─── GÜNLÜK OYNAMA LİMİTİ (10 kez/gün) ─────────────────────────────────
-$bugun = date('Y-m-d');
-$hafta_kodu = date('Y-W');
-
-try {
-    $limit_sorgu = $db_baglanti->prepare(
-        "SELECT COUNT(*) FROM quiz_sonuclari WHERE kullanici_adi = ? AND DATE(oynama_tarihi) = ?"
-    );
-    $limit_sorgu->execute([$kullanici_adi, $bugun]);
-    $gunluk_sayi = (int) $limit_sorgu->fetchColumn();
-
-    if ($gunluk_sayi >= 10) {
-        echo json_encode(['ok' => false, 'mesaj' => 'Günlük oynama limitine (10) ulaştınız. Yarın tekrar deneyin!']);
-        exit;
-    }
-} catch (PDOException $e) {
-    // Devam et
-}
+// ─── HAFTALIK DÖNEM (her Pazar 00:00'da sıfırlanır; günlük limit yok) ───
+require_once __DIR__ . '/quiz-hafta.php';
+$hafta_kodu = quizHaftaKodu();
 
 // ─── SUNUCU TARAFINDA CEVAP DOĞRULAMA ────────────────────────────────────
 $sorular = require __DIR__ . '/quiz-sorulari.php';

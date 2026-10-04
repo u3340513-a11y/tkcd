@@ -70,8 +70,9 @@ try {
     // Tablo henüz yoksa 0
 }
 
-// Haftalık en iyi skor
-$hafta_kodu = date('Y-W');
+// Haftalık en iyi skor (her Pazar 00:00'da sıfırlanır)
+require_once __DIR__ . '/quiz-hafta.php';
+$hafta_kodu = quizHaftaKodu();
 $kisisel_en_iyi = 0;
 try {
     $ks = $db_baglanti->prepare("SELECT MAX(puan) FROM quiz_sonuclari WHERE kullanici_adi = ? AND hafta_kodu = ?");
@@ -472,7 +473,7 @@ try {
                     <div class="quiz-stat__label">Süre / Soru</div>
                 </div>
                 <div class="quiz-stat">
-                    <div class="quiz-stat__value"><?= $gunluk_oynama ?>/10</div>
+                    <div class="quiz-stat__value"><?= $gunluk_oynama ?></div>
                     <div class="quiz-stat__label">Bugün Oynadın</div>
                 </div>
             </div>
@@ -485,16 +486,9 @@ try {
                 <li><i class="fa-solid fa-trophy"></i> Haftalık en iyi puanınız: <strong><?= $kisisel_en_iyi ?></strong></li>
             </ul>
 
-            <?php if ($gunluk_oynama >= 10): ?>
-                <button class="btn-quiz-start" disabled>
-                    <i class="fa-solid fa-lock me-2"></i> Günlük Limit Doldu
-                </button>
-                <p style="color:rgba(255,255,255,0.5); margin-top:0.5rem; font-size:0.85rem;">Yarın tekrar oynayabilirsiniz.</p>
-            <?php else: ?>
-                <button class="btn-quiz-start" id="btnQuizStart" onclick="quizBasla()">
-                    <i class="fa-solid fa-play me-2"></i> Başla
-                </button>
-            <?php endif; ?>
+            <button class="btn-quiz-start" id="btnQuizStart" onclick="quizBasla()">
+                <i class="fa-solid fa-play me-2"></i> Başla
+            </button>
         </div>
 
         <!-- ── SORU EKRANI ─────────────────────────────────────── -->
