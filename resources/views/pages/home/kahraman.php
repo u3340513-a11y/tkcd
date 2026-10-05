@@ -89,9 +89,9 @@ use App\Core\View\PhpViewRenderer;
         <aside class="kahraman__kart belirme" aria-labelledby="uyelik-kart-baslik">
             <div class="kahraman__gorsel">
 <?= $view->partial('components/gorsel', [
-    'src' => '/assets/img/kahraman-uyelik.jpg',
-    'alt' => 'Derneğimizin Türkiye’nin 81 ilinde ve Avrupa’nın 18 noktasında büyüyen '
-        . 'temsilcilik ağını gösteren tanıtım görseli',
+    'src' => '/assets/img/herogorsel2.jpg',
+    'alt' => 'Güçlü temsil ağımızla büyüyoruz: derneğimizin Türkiye’nin 81 ilinde ve '
+        . 'Avrupa’nın 18 noktasında büyüyen temsilcilik ağını gösteren tanıtım görseli',
     'yedekIkon' => 'handshake',
     'yukleme' => 'eager',
 ]) ?>

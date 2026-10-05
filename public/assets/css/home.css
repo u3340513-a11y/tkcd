@@ -95,7 +95,7 @@
 
 @media (min-width: 1024px) {
   .kahraman__izgara {
-    grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     text-align: left;
   }
 }
@@ -265,7 +265,7 @@
 
 .kahraman__gorsel {
   position: relative;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 1 / 1;
   border-radius: var(--yuvarlak-lg);
   overflow: hidden;
   background: var(--degrade-marka);
