@@ -333,6 +333,48 @@
   color: var(--mavi-400);
 }
 
+/* Tablet (768–1279px): başlık, boşluklar, kart ve görsel orantılı küçültülür;
+   hero alanı tablet ekranını taşırmaz. */
+@media (min-width: 768px) and (max-width: 1279px) {
+  .kahraman {
+    padding-block: clamp(1.75rem, 3.5vw, 2.75rem);
+  }
+
+  .kahraman__izgara {
+    gap: clamp(1.5rem, 3vw, 2.25rem);
+  }
+
+  .kahraman__baslik {
+    margin-top: var(--bosluk-4);
+    font-size: clamp(2rem, 2.6vw + 1rem, 2.6rem);
+  }
+
+  .kahraman__ozet {
+    margin-top: var(--bosluk-4);
+    font-size: 1rem;
+  }
+
+  .kahraman__eylemler {
+    margin-top: var(--bosluk-5);
+  }
+
+  .kahraman__kart {
+    padding: var(--bosluk-4);
+  }
+
+  .kahraman__gorsel {
+    width: min(100%, 21rem, max(14rem, calc(100vh - 26rem)));
+    width: min(100%, 21rem, max(14rem, calc(100svh - 26rem)));
+  }
+}
+
+/* Dikey tablet (tek sütun): kart daha dar tutulur */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .kahraman__kart {
+    max-width: 26rem;
+  }
+}
+
 /* --------------------------- Duyuru şeridi ------------------------------- */
 
 .duyuru-serit {
