@@ -284,11 +284,10 @@
 .kahraman__gorsel {
   position: relative;
   aspect-ratio: 1 / 1;
-  /* Kare görsel, ekran yüksekliğine göre ölçeklenir (kart metni için pay
-     bırakılır); yatay tablette kart ekrandan taşmaz. Alt sınır: 16rem. */
-  width: min(100%, max(16rem, calc(100vh - 24rem)));
-  width: min(100%, max(16rem, calc(100svh - 24rem)));
-  margin-inline: auto;
+  /* Görsel her zaman kart iç genişliğini tam doldurur (sağda/solda boşluk
+     kalmaz); boyut, tablet aralığında kartın kendi genişliği sınırlanarak
+     ayarlanır. */
+  width: 100%;
   border-radius: var(--yuvarlak-lg);
   overflow: hidden;
   background: var(--degrade-marka);
@@ -359,12 +358,12 @@
   }
 
   .kahraman__kart {
+    /* Kart genişliği ekran yüksekliğine göre sınırlı; içindeki kare görsel
+       kartı yana tam oturur. Alt sınır: 16rem. */
+    max-width: min(100%, 23rem, max(16rem, calc(100vh - 24rem)));
+    max-width: min(100%, 23rem, max(16rem, calc(100svh - 24rem)));
+    margin-inline: auto;
     padding: var(--bosluk-4);
-  }
-
-  .kahraman__gorsel {
-    width: min(100%, 21rem, max(14rem, calc(100vh - 26rem)));
-    width: min(100%, 21rem, max(14rem, calc(100svh - 26rem)));
   }
 }
 
