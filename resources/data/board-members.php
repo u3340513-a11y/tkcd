@@ -20,7 +20,7 @@ return [
         ['ad' => 'Zeynep Hilal Umur',    'gorev' => 'Yönetim Kurulu Üyesi'],
         ['ad' => 'Hasan Ekinci',         'gorev' => 'Yönetim Kurulu Üyesi'],
         ['ad' => 'Mustafa Şahin',        'gorev' => 'Yönetim Kurulu Üyesi'],
-        ['ad' => 'Muhammet Ali Topçu',   'gorev' => 'Yönetim Kurulu Üyesi'],
+        ['ad' => 'Muhammet Ali Topcu',   'gorev' => 'Yönetim Kurulu Üyesi'],
         ['ad' => 'İlyas Demir',          'gorev' => 'Yönetim Kurulu Üyesi'],
         ['ad' => 'Hüseyin Koç',          'gorev' => 'Yönetim Kurulu Üyesi'],
         ['ad' => 'Fatma Demir',          'gorev' => 'Yönetim Kurulu Üyesi'],

@@ -128,7 +128,7 @@ return [
             kisi(slug: 'mehmet-volkan-yavuzturk', ad: 'Mehmet Volkan Yavuztürk', unvan: 'Yönetim Kurulu Üyesi', fotograf: 'mvy.png'),
             kisi(slug: 'enes-ustun',              ad: 'Enes Üstün',              unvan: 'Yönetim Kurulu Üyesi', fotograf: 'enes-ustn.png'),
             kisi(slug: 'selim-sandikci',          ad: 'Selim Sandıkçı',          unvan: 'Yönetim Kurulu Üyesi', fotograf: 'selim-sandikci.png'),
-            kisi(slug: 'muhammet-ali-topcu',      ad: 'Muhammet Ali Topçu',      unvan: 'Yönetim Kurulu Üyesi', fotograf: 'muhammed-ali-topcu.png'),
+            kisi(slug: 'muhammet-ali-topcu',      ad: 'Muhammet Ali Topcu',      unvan: 'Yönetim Kurulu Üyesi', fotograf: 'muhammed-ali-topcu.png'),
             kisi(slug: 'yunus-okutan',            ad: 'Yunus Okutan',            unvan: 'Yönetim Kurulu Üyesi', fotograf: 'yunus-okutan.png'),
             kisi(slug: 'dursun-ali-suleymanogl',  ad: 'Dursun Ali Süleymanoğlu', unvan: 'Yönetim Kurulu Üyesi'),
             kisi(slug: 'ahmet-yilmaz',            ad: 'Ahmet Yılmaz',            unvan: 'Yönetim Kurulu Üyesi', fotograf: 'ahmet-yilmaz.png'),
