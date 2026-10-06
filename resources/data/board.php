@@ -74,7 +74,7 @@ return [
         'uyeler' => [
             kisi(slug: 'ahmet-cihangir', ad: 'Ahmet Cihangir', unvan: 'Başkan Yardımcısı', fotograf: 'ahmet-cihangir.png'),
             kisi(slug: 'hasan-ekinci',   ad: 'Hasan Ekinci',   unvan: 'Başkan Yardımcısı', fotograf: 'hasan-ekinci.png'),
-            kisi(slug: 'sener-kurt',     ad: 'Şener Kurt',     unvan: 'Başkan Yardımcısı'),
+            kisi(slug: 'sener-kurt',     ad: 'Şener Kurt',     unvan: 'Başkan Yardımcısı', fotograf: 'sener-kurt.png'),
             kisi(slug: 'musa-eski',      ad: 'Musa Eski',      unvan: 'Başkan Yardımcısı', fotograf: 'musa-eski.png'),
         ],
     ],
