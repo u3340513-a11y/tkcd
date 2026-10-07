@@ -364,6 +364,8 @@ $is_kurum_temsilcisi = ($kullanici_rolu === 'kurum_temsilcisi');
 $is_kadin_kollari    = ($kullanici_rolu === 'kadin_kollari_baskani');
 $is_kisitli_rol      = ($is_il_baskani || $is_ilce_baskani || $is_kurum_temsilcisi || $is_kadin_kollari);
 $is_yetki_var        = ($is_admin || $is_yonetim || $is_gelistirici);
+// Yönetim düzeyi dashboard yetkisi: yonetim, geliştirici ve admin61 (geliştiriciden sonraki en yetkili hesap).
+$is_ust_yonetici    = ($is_yonetim || $is_gelistirici || (($_SESSION['kullanici_adi'] ?? '') === 'admin61'));
 
 $sayfa = isset($_GET['sayfa']) ? trim($_GET['sayfa']) : 'dashboard';
 
@@ -1379,10 +1381,8 @@ switch ($sayfa) {
         // İki ayrı sorgu: 1) Hesap listesi 2) Son giriş tarihleri → PHP'de birleştirilir.
         $son_giris_verileri = [];
 
-        // Yönetim ve geliştirici rollerine ek olarak admin61 hesabı da görür.
-        $son_giris_yetkili = $is_yonetim
-            || $is_gelistirici
-            || (($_SESSION['kullanici_adi'] ?? '') === 'admin61');
+        // Yönetim, geliştirici ve admin61 görür.
+        $son_giris_yetkili = $is_ust_yonetici;
 
         if ($son_giris_yetkili) {
             $son_giris_rolleri = ['yonetim', 'il_baskani', 'ilce_baskani'];

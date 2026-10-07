@@ -1000,8 +1000,8 @@ $genel_doluluk = empty($profil_doluluk) ? 0
             </div>
         </div>
     </div>
-    <!-- Sistem Durumu Kartı — sadece yönetim/geliştirici rolü -->
-    <?php if ($is_yonetim || $is_gelistirici): ?>
+    <!-- Sistem Durumu Kartı — yönetim/geliştirici rolü ve admin61 -->
+    <?php if (!empty($is_ust_yonetici)): ?>
     <?php
         // ── Sistem kontrolleri ───────────────────────────────────────────
         // 1. Veritabanı
