@@ -367,23 +367,71 @@ $genel_doluluk = empty($profil_doluluk) ? 0
      ═══════════════════════════════════════════════════════════════ -->
 <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3 mb-4">
 
-    <!-- Toplam Üye -->
+    <!-- Toplam Üye (sayı varsayılan olarak gizli; göz butonu ile açılır/kapanır) -->
     <div class="col">
-        <a href="index.php?sayfa=uyeler" class="text-decoration-none d-block h-100">
+        <div class="position-relative h-100">
             <div class="dash-stat-card" style="border-left-color: #3b82f6;">
                 <div class="dash-stat-card__info">
                     <h6>Toplam Üye</h6>
-                    <h3><?= number_format($toplam_uye) ?></h3>
+                    <h3 class="d-flex align-items-center gap-2">
+                        <span id="toplamUyeDeger"
+                              data-gizle-acik="<?= number_format($toplam_uye) ?>"
+                              data-gizle-kapali="***">***</span>
+                        <button type="button" id="toplamUyeToggle"
+                                class="btn btn-sm btn-link p-0 position-relative text-secondary"
+                                style="z-index: 2; font-size: 1rem;"
+                                aria-pressed="false"
+                                aria-controls="toplamUyeDeger toplamUyeSon30"
+                                aria-label="Toplam üye sayısını göster">
+                            <i class="fa-solid fa-eye-slash" aria-hidden="true"></i>
+                        </button>
+                    </h3>
                     <?php if ($admin_son30_sayisi > 0): ?>
-                    <span class="dash-stat-sub"><i class="fa-solid fa-arrow-up text-success me-1"></i>+<?= $admin_son30_sayisi ?> son 30 gün</span>
+                    <span id="toplamUyeSon30" class="dash-stat-sub"
+                          data-gizle-acik="+<?= (int) $admin_son30_sayisi ?> son 30 gün"
+                          data-gizle-kapali="+*** son 30 gün"><i class="fa-solid fa-arrow-up text-success me-1"></i>+*** son 30 gün</span>
                     <?php endif; ?>
                 </div>
                 <div class="dash-stat-card__icon" style="background: rgba(59,130,246,0.1); color: #3b82f6;">
                     <i class="fa-solid fa-users"></i>
                 </div>
+                <a href="index.php?sayfa=uyeler" class="stretched-link" aria-label="Üyeler sayfasına git"></a>
             </div>
-        </a>
+        </div>
     </div>
+    <script>
+    (function () {
+        'use strict';
+        var buton = document.getElementById('toplamUyeToggle');
+        if (!buton) { return; }
+
+        var hedefler = [document.getElementById('toplamUyeDeger'), document.getElementById('toplamUyeSon30')]
+            .filter(Boolean);
+        var acik = false; // her sayfa yüklemesinde kapalı başlar
+
+        function goster() {
+            hedefler.forEach(function (el) {
+                var metin = acik ? el.dataset.gizleAcik : el.dataset.gizleKapali;
+                var ikon = el.querySelector('i');
+                // Son 30 gün alanındaki ok ikonunu koru; yalnızca metin düğümünü güncelle
+                if (ikon) {
+                    el.lastChild.textContent = metin;
+                } else {
+                    el.textContent = metin;
+                }
+            });
+            buton.setAttribute('aria-pressed', acik ? 'true' : 'false');
+            buton.setAttribute('aria-label', acik ? 'Toplam üye sayısını gizle' : 'Toplam üye sayısını göster');
+            buton.querySelector('i').className = acik ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash';
+        }
+
+        buton.addEventListener('click', function (olay) {
+            olay.preventDefault();
+            acik = !acik;
+            goster();
+        });
+    })();
+    </script>
 
     <!-- Aktif İller -->
     <div class="col">
