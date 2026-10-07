@@ -410,6 +410,7 @@ if (
 $dosya_indirme_sayfalari = [
     'bos-il-excel'        => 'inc/bos-il-excel.php',
     'kadin-notsuz-excel'  => 'inc/kadin-notsuz-excel.php',
+    'notsuz-uyeler-excel' => 'inc/notsuz-uyeler-excel.php',
 ];
 if (array_key_exists($sayfa, $dosya_indirme_sayfalari)) {
     include $dosya_indirme_sayfalari[$sayfa];
@@ -545,6 +546,15 @@ switch ($sayfa) {
         // Tek kullanımlık: notu olmayan kadın üyeler CSV raporu
         include 'inc/kadin-notsuz-excel.php';
         exit;
+
+    case 'notsuz-uyeler':
+        if (!$is_yetki_var) {
+            echo '<div class="container py-5"><div class="alert alert-danger text-center fw-bold"><i class="fa-solid fa-lock me-2"></i>Erişim Engellendi.</div></div>';
+        } else {
+            log_kaydet($db_baglanti, 'sayfa_goruntulem', 'Notsuz üyeler sayfası açıldı.');
+            include 'inc/notsuz-uyeler.php';
+        }
+        break;
 
     case 'quiz':
         log_kaydet($db_baglanti, 'sayfa_goruntulem', 'Bilgi yarışması sayfası açıldı.');
