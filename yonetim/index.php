@@ -1379,7 +1379,12 @@ switch ($sayfa) {
         // İki ayrı sorgu: 1) Hesap listesi 2) Son giriş tarihleri → PHP'de birleştirilir.
         $son_giris_verileri = [];
 
-        if ($is_yonetim || $is_gelistirici) {
+        // Yönetim ve geliştirici rollerine ek olarak admin61 hesabı da görür.
+        $son_giris_yetkili = $is_yonetim
+            || $is_gelistirici
+            || (($_SESSION['kullanici_adi'] ?? '') === 'admin61');
+
+        if ($son_giris_yetkili) {
             $son_giris_rolleri = ['yonetim', 'il_baskani', 'ilce_baskani'];
 
             foreach ($son_giris_rolleri as $sg_rol) {

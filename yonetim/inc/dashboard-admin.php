@@ -1357,9 +1357,9 @@ $genel_doluluk = empty($profil_doluluk) ? 0
 </div>
 
 
-<?php if ($is_yonetim || $is_gelistirici): ?>
+<?php if (!empty($son_giris_yetkili)): ?>
 <!-- ═══════════════════════════════════════════════════════════════
-     SON GİRİŞ TAKİBİ (Yönetim/Geliştirici rolüne özel)
+     SON GİRİŞ TAKİBİ (Yönetim/Geliştirici rolü ve admin61 hesabına özel)
      ═══════════════════════════════════════════════════════════════ -->
 <?php if (!empty($son_giris_verileri)): ?>
 <div class="row g-4 mb-4">
