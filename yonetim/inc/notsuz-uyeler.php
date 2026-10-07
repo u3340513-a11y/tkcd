@@ -9,11 +9,11 @@ declare(strict_types=1);
  * listelenir ve Excel (CSV) olarak indirilebilir.
  *
  * @var PDO  $db_baglanti
- * @var bool $is_yetki_var  index.php'den (admin | yonetim | gelistirici)
+ * @var bool $is_gelistirici  index.php'den (yalnızca geliştirici rolü erişebilir)
  */
 
-if (!$is_yetki_var) {
-    echo '<div class="container py-5"><div class="alert alert-danger text-center fw-bold"><i class="fa-solid fa-lock me-2"></i>Erişim Engellendi.</div></div>';
+if (!$is_gelistirici) {
+    echo '<div class="container py-5"><div class="alert alert-danger text-center fw-bold"><i class="fa-solid fa-lock me-2"></i>Erişim Engellendi: Bu sayfa sadece geliştirici hesabına açıktır.</div></div>';
     return;
 }
 

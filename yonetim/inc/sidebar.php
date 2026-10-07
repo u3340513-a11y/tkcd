@@ -62,7 +62,7 @@ if (!$is_kisitli_rol) {
                 <span>Üyeler</span>
             </a>
 
-            <?php if ($is_yetki_var): ?>
+            <?php if ($is_gelistirici): ?>
             <a class="sb-link <?= $sayfa === 'notsuz-uyeler' ? 'sb-link--active' : '' ?>" href="index.php?sayfa=notsuz-uyeler">
                 <i class="sb-link__icon fa-solid fa-note-sticky"></i>
                 <span>Notsuz Üyeler</span>

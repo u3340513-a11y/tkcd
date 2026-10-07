@@ -14,13 +14,13 @@ declare(strict_types=1);
 require_once __DIR__ . '/baglan.php';
 require_once __DIR__ . '/notsuz-uyeler-sorgu.php';
 
-const NOTSUZ_RAPOR_IZINLI_ROLLER = ['admin', 'yonetim', 'gelistirici'];
+const NOTSUZ_RAPOR_IZINLI_ROL = 'gelistirici';
 
 if (!isset($_SESSION['oturum']) || $_SESSION['oturum'] !== true) {
     http_response_code(403);
     die('Yetkisiz erişim!');
 }
-if (!in_array($_SESSION['rol'] ?? '', NOTSUZ_RAPOR_IZINLI_ROLLER, true)) {
+if (($_SESSION['rol'] ?? '') !== NOTSUZ_RAPOR_IZINLI_ROL) {
     http_response_code(403);
     die('Bu raporu indirme yetkiniz yok.');
 }

@@ -548,8 +548,8 @@ switch ($sayfa) {
         exit;
 
     case 'notsuz-uyeler':
-        if (!$is_yetki_var) {
-            echo '<div class="container py-5"><div class="alert alert-danger text-center fw-bold"><i class="fa-solid fa-lock me-2"></i>Erişim Engellendi.</div></div>';
+        if (!$is_gelistirici) {
+            echo '<div class="container py-5"><div class="alert alert-danger text-center fw-bold"><i class="fa-solid fa-lock me-2"></i>Erişim Engellendi: Bu sayfa sadece geliştirici hesabına açıktır.</div></div>';
         } else {
             log_kaydet($db_baglanti, 'sayfa_goruntulem', 'Notsuz üyeler sayfası açıldı.');
             include 'inc/notsuz-uyeler.php';
