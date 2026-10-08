@@ -72,6 +72,7 @@
 require_once 'inc/baglan.php';
 require_once 'inc/log-kayit.php';
 require_once 'inc/ip-engel.php';
+require_once 'inc/dogum-gunu.php';
 
 // ─── IP ENGEL KONTROLÜ ─────────────────────────────────────────────────
 // Engelli IP hiçbir yönetim sayfasına (giriş formu dahil) erişemez.
@@ -670,19 +671,11 @@ switch ($sayfa) {
                              FROM dernek_uyeler
                             WHERE " . $kisitli_where . "
                               AND dogum_tarihi IS NOT NULL
-                              AND dogum_tarihi != '0000-00-00'
                               AND dogum_tarihi != ''
-                              AND LENGTH(dogum_tarihi) >= 8
-                              AND (
-                                  DATE_FORMAT(STR_TO_DATE(dogum_tarihi, '%Y-%m-%d'), '%m-%d') = ?
-                                  OR DATE_FORMAT(STR_TO_DATE(dogum_tarihi, '%d.%m.%Y'), '%m-%d') = ?
-                                  OR DATE_FORMAT(STR_TO_DATE(dogum_tarihi, '%d/%m/%Y'), '%m-%d') = ?
-                              )
                             ORDER BY adi_soyadi ASC";
-                $dg_params = array_merge($kisitli_parametreler, [$bugun_md, $bugun_md, $bugun_md]);
                 $dg_sorgu = $db_baglanti->prepare($dg_sql);
-                $dg_sorgu->execute($dg_params);
-                $dg_uyeler = $dg_sorgu->fetchAll(PDO::FETCH_ASSOC);
+                $dg_sorgu->execute($kisitli_parametreler);
+                $dg_uyeler = dogum_gunu_olanlari_filtrele($dg_sorgu->fetchAll(PDO::FETCH_ASSOC), $bugun_md);
 
                 // 4) Kan grubu dağılımı
                 $kan_sql = "SELECT kan_grubu, COUNT(*) as adet
@@ -1285,23 +1278,16 @@ switch ($sayfa) {
             // DB'de tarih üç formatta olabilir: YYYY-MM-DD, DD.MM.YYYY veya DD/MM/YYYY
             $bugun_ay_gun = date('m-d');   // "08-25"
 
-            $dogum_gunu_sorgu = $db_baglanti->prepare(
+            // Tarih ayrıştırma PHP'de yapılır (boşluk/ayraç toleransı için): inc/dogum-gunu.php
+            $dogum_gunu_adaylari = $db_baglanti->query(
                 "SELECT id, adi_soyadi, dogum_tarihi, ikamet_ili, kurum, temsilci_turu, ek_gorev
                    FROM dernek_uyeler
                   WHERE onay_durumu = 'onayli'
                     AND dogum_tarihi IS NOT NULL
-                    AND dogum_tarihi != '0000-00-00'
                     AND dogum_tarihi != ''
-                    AND LENGTH(dogum_tarihi) >= 8
-                    AND (
-                        DATE_FORMAT(STR_TO_DATE(dogum_tarihi, '%Y-%m-%d'), '%m-%d') = ?
-                        OR DATE_FORMAT(STR_TO_DATE(dogum_tarihi, '%d.%m.%Y'), '%m-%d') = ?
-                        OR DATE_FORMAT(STR_TO_DATE(dogum_tarihi, '%d/%m/%Y'), '%m-%d') = ?
-                    )
                   ORDER BY adi_soyadi ASC"
-            );
-            $dogum_gunu_sorgu->execute([$bugun_ay_gun, $bugun_ay_gun, $bugun_ay_gun]);
-            $dogum_gunu_uyeleri = $dogum_gunu_sorgu->fetchAll(PDO::FETCH_ASSOC);
+            )->fetchAll(PDO::FETCH_ASSOC);
+            $dogum_gunu_uyeleri = dogum_gunu_olanlari_filtrele($dogum_gunu_adaylari, $bugun_ay_gun);
 
             // Son eklenen 10 üye
             $admin_son_sorgu = $db_baglanti->query(
