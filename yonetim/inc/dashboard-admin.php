@@ -1012,8 +1012,14 @@ $genel_doluluk = empty($profil_doluluk) ? 0
                     || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
                     || (isset($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] === 443);
 
-        // 3. E-posta — mail() fonksiyonu mevcut mu
-        $eposta_durum = function_exists('mail');
+        // 3. E-posta — MailService'in kullandığı SMTP bilgileri (.env) tanımlı mı
+        $eposta_durum = true;
+        foreach (['MAIL_HOST', 'MAIL_USERNAME', 'MAIL_PASSWORD', 'MAIL_FROM_ADDRESS'] as $eposta_anahtar) {
+            if (trim(env_al($eposta_anahtar)) === '') {
+                $eposta_durum = false;
+                break;
+            }
+        }
 
         // 4. PHP sürümü
         $php_surumu   = PHP_VERSION;
