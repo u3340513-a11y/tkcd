@@ -94,7 +94,7 @@ if (!$is_kisitli_rol) {
             <?php
             $ily_izinli_kullanici = in_array(
                 $_SESSION['kullanici_adi'] ?? '',
-                ['admin61', 'yonetim_hk', 'yonetim_oc', 'yonetim_kby', 'yonetim_ac'],
+                ['admin61', 'yonetim_hk', 'yonetim_me', 'yonetim_oc', 'yonetim_kby', 'yonetim_ac'],
                 true
             );
             ?>

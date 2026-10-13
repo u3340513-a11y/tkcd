@@ -11,9 +11,9 @@ $uye_id = intval($_GET['id']);
 $kullanici_rolu      = isset($_SESSION['rol']) ? $_SESSION['rol'] : 'admin';
 $is_admin            = ($kullanici_rolu === 'admin');
 
-// yonetim_hk kullanıcı adına özel künyeyi düzenleme yetkisi
+// yonetim_hk ve yonetim_me kullanıcı adlarına özel künyeyi düzenleme yetkisi
 $oturum_kullanici_adi = isset($_SESSION['kullanici_adi']) ? $_SESSION['kullanici_adi'] : '';
-$is_yonetim_hk       = ($oturum_kullanici_adi === 'yonetim_hk');
+$is_yonetim_hk       = in_array($oturum_kullanici_adi, ['yonetim_hk', 'yonetim_me'], true);
 
 // Roller
 $is_yonetim          = ($kullanici_rolu === 'yonetim');
@@ -129,7 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['uye_bilgi_guncelle'])
                 $guncelle_uyelik_tarihi, $guncelle_ek_roller_json, $uye_id
             ]);
 
-            $guncelleme_kaynak = $is_yonetim_hk ? 'yonetim_hk' : 'Geliştirici';
+            $guncelleme_kaynak = $is_yonetim_hk ? $oturum_kullanici_adi : 'Geliştirici';
             log_kaydet($db_baglanti, 'uye_duzenle', $eski_ad . ' — Tüm bilgiler güncellendi (' . $guncelleme_kaynak . ').', 'dernek_uyeler', $uye_id);
             echo "<script>window.location.href='index.php?sayfa=uye-detay&id=".$uye_id."';</script>";
             exit;

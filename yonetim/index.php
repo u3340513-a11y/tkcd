@@ -581,7 +581,7 @@ switch ($sayfa) {
         $ily_izinli = $is_gelistirici
             || in_array(
                 $_SESSION['kullanici_adi'] ?? '',
-                ['admin61', 'yonetim_hk', 'yonetim_oc', 'yonetim_kby', 'yonetim_ac'],
+                ['admin61', 'yonetim_hk', 'yonetim_me', 'yonetim_oc', 'yonetim_kby', 'yonetim_ac'],
                 true
             );
         if (!$ily_izinli) {
