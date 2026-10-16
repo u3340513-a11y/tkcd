@@ -11,9 +11,9 @@ $uye_id = intval($_GET['id']);
 $kullanici_rolu      = isset($_SESSION['rol']) ? $_SESSION['rol'] : 'admin';
 $is_admin            = ($kullanici_rolu === 'admin');
 
-// yonetim_hk ve yonetim_me kullanıcı adlarına özel künyeyi düzenleme yetkisi
+// yonetim_hk, yonetim_me ve admin61 kullanıcı adlarına özel künyeyi düzenleme yetkisi
 $oturum_kullanici_adi = isset($_SESSION['kullanici_adi']) ? $_SESSION['kullanici_adi'] : '';
-$is_yonetim_hk       = in_array($oturum_kullanici_adi, ['yonetim_hk', 'yonetim_me'], true);
+$is_yonetim_hk       = in_array($oturum_kullanici_adi, ['yonetim_hk', 'yonetim_me', 'admin61'], true);
 
 // Roller
 $is_yonetim          = ($kullanici_rolu === 'yonetim');
