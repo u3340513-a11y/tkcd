@@ -21,10 +21,10 @@ $isKurumTemsilci  = ($kullaniciRolu === 'kurum_temsilcisi');
 $isKadinKollari   = ($kullaniciRolu === 'kadin_kollari_baskani');
 $isKisitliRol     = ($isIlBaskani || $isIlceBaskani || $isKurumTemsilci || $isKadinKollari);
 
-$yalnızcaSayimKullanicilari = ['yonetim_ukk','yonetim_mh','yonetim_mb','yonetim_he','yonetim_hk','yonetim_me','kk_by'];
+$yalnızcaSayimKullanicilari = ['yonetim_ukk','yonetim_mh','yonetim_mb','yonetim_he','yonetim_hk','yonetim_me','yonetim_oc','kk_by'];
 $isYalnızcaSayim = in_array($oturumKullaniciAdi, $yalnızcaSayimKullanicilari, true);
 
-$onayYetkiliKullanicilari = ['yonetim_ukk','yonetim_mh','yonetim_hk','yonetim_me','yonetim_mb','kk_by','admin61','yonetim_kby'];
+$onayYetkiliKullanicilari = ['yonetim_ukk','yonetim_mh','yonetim_hk','yonetim_me','yonetim_oc','yonetim_mb','kk_by','admin61','yonetim_kby'];
 $isOnayYetkili = ($kullaniciRolu === 'gelistirici')
     || in_array($oturumKullaniciAdi, $onayYetkiliKullanicilari, true);
 
