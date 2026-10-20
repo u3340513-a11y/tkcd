@@ -1,5 +1,6 @@
 <?php
 // Bu dosya inc/uyeler.php olarak kaydedilecek.
+require_once __DIR__ . '/cinsiyet.php';
 
 $mesaj = "";
 $mesaj_turu = "";
@@ -687,17 +688,8 @@ try {
                             }
                         }
 
-                        // ── Cinsiyet tespiti ──────────────────────────
-                        $cinsiyetDb = mb_strtolower(trim($uye['cinsiyet'] ?? ''), 'UTF-8');
-                        if (in_array($cinsiyetDb, ['kadın','kadin','female','k'], true)) {
-                            $isKadin = true;
-                        } elseif (in_array($cinsiyetDb, ['erkek','male','e'], true)) {
-                            $isKadin = false;
-                        } else {
-                            $ilkIsim = mb_strtoupper(explode(' ', trim($uye['adi_soyadi']))[0], 'UTF-8');
-                            $kadinIsimleri = ['SEMRA','AYŞEGÜL','BEGÜM','HATİCE','FATMA','AYŞE','EMİNE','ZEYNEP','MERYEM','ELİF','HÜLYA','GAMZE','MERVE','BÜŞRA','ESRA','SEDA','DERYA','KÜBRA','ASLI','PELİN','TUĞBA','DEMET','ÖZLEM','SİNEM','GÜL','NUR','MELİS','DİLAN','BURCU','CANAN','SULTAN','MELİKE','YASEMİN','EDA','BERNA','SELEN','PINAR','BANU','YEŞİM','EBRU','FADİME','NURAN','SELMA','DİLEK','FİLİZ','ARZU','LEYLA','SİBEL','HALE','JALE','GONCA','MÜGE','NESLİHAN','NAZLI','MİNE','SELİN','ESMA','FAZİLET','NESRİN','REYHAN','AHSEN','İPEK','ÖZGE','GÜLAY','SÜREYYA','DİDEM','HANDAN','NURTEN','ŞERİFE','SABİHA','ZEHRA','ÜMMÜHAN','RABİA','BÜŞRANUR','FATMANUR','GÜLSÜM','KÜBRANUR','ŞEYMA','BETÜL','SÜMEYYE','KADRİYE','HAVVA','SONGÜL','DÖNDÜ','NURAY','FİRDEVS','AYTEN','AYSEL','GÜLER','NURSEL','NURCAN','MELEK','NURHAN','PERİHAN','SUZAN','SUNA','ŞENNUR','İLKAY','GÜLDEN','GÜLŞAH','SEVAL','SEVİL','SEVİM','NİHAL','NİLÜFER','NİLAY','MELTEM','DUYGU','NURŞEN'];
-                            $isKadin = in_array($ilkIsim, $kadinIsimleri, true);
-                        }
+                        // ── Cinsiyet tespiti (inc/cinsiyet.php) ───────
+                        $isKadin = uye_kadin_mi($uye);
 
                         // ── Satır / Rozet sınıfı ─────────────────────
                         $satirKlasi  = '';

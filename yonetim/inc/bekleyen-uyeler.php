@@ -9,6 +9,8 @@ declare(strict_types=1);
  * korunmuştur. Yalnızca görsel katman yeniden tasarlandı.
  */
 
+require_once __DIR__ . '/cinsiyet.php';
+
 $mesaj    = '';
 $mesajTuru = '';
 
@@ -138,29 +140,6 @@ try {
 }
 
 $toplamBekleyen = count($bekleyenler);
-
-// ─── YARDIMCI: Cinsiyet Tespiti ──────────────────────────────────────────
-function cinsiyetTespit(array $b): bool /* true = kadın */
-{
-    $c = mb_strtolower(trim($b['cinsiyet'] ?? ''), 'UTF-8');
-    if (in_array($c, ['kadın', 'kadin', 'female', 'k'], true)) return true;
-    if (in_array($c, ['erkek', 'male', 'e'], true)) return false;
-    // fallback
-    $ilkIsim = mb_strtoupper(explode(' ', trim($b['adi_soyadi']))[0], 'UTF-8');
-    $kadinIsimleri = ['SEMRA','AYŞEGÜL','BEGÜM','HATİCE','FATMA','AYŞE','EMİNE','ZEYNEP',
-        'MERYEM','ELİF','HÜLYA','GAMZE','MERVE','BÜŞRA','ESRA','SEDA','DERYA','KÜBRA',
-        'ASLI','PELİN','TUĞBA','DEMET','ÖZLEM','SİNEM','GÜL','NUR','MELİS','DİLAN',
-        'BURCU','CANAN','SULTAN','MELİKE','YASEMİN','EDA','BERNA','SELEN','PINAR',
-        'BANU','YEŞİM','EBRU','FADİME','NURAN','SELMA','DİLEK','FİLİZ','ARZU','LEYLA',
-        'SİBEL','HALE','JALE','GONCA','MÜGE','NESLİHAN','NAZLI','MİNE','SELİN','ESMA',
-        'FAZİLET','NESRİN','REYHAN','AHSEN','İPEK','ÖZGE','GÜLAY','SÜREYYA','DİDEM',
-        'HANDAN','NURTEN','ŞERİFE','SABİHA','ZEHRA','ÜMMÜHAN','RABİA','GÜLSÜM','ŞEYMA',
-        'BETÜL','SÜMEYYE','KADRİYE','HAVVA','SONGÜL','DÖNDÜ','NURAY','FİRDEVS','AYTEN',
-        'AYSEL','GÜLER','NURSEL','NURCAN','MELEK','NURHAN','PERİHAN','SUZAN','SUNA',
-        'ŞENNUR','İLKAY','GÜLDEN','GÜLŞAH','SEVAL','SEVİL','SEVİM','NİHAL','NİLÜFER',
-        'NİLAY','MELTEM','ÜLKÜ','DUYGU','NURŞEN'];
-    return in_array($ilkIsim, $kadinIsimleri, true);
-}
 
 function formatDogum(array $b): string
 {
@@ -396,7 +375,7 @@ function formatDogum(array $b): string
     <div class="bub-grid">
         <?php if ($toplamBekleyen > 0): ?>
         <?php foreach ($bekleyenler as $b):
-            $isKadin   = cinsiyetTespit($b);
+            $isKadin   = uye_kadin_mi($b);
             $cinsiyet  = $isKadin ? 'kadin' : 'erkek';
             $ikonSekil = $isKadin ? 'fa-user-nurse' : 'fa-user';
             $kan       = !empty($b['kan_grubu']) ? $b['kan_grubu'] : null;

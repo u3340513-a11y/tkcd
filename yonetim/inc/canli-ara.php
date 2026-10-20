@@ -1,6 +1,7 @@
 <?php
 // Bu dosya yonetim/inc/canli-ara.php olarak kaydedilecektir.
 require_once __DIR__ . '/../inc/baglan.php';
+require_once __DIR__ . '/cinsiyet.php';
 
 if (!isset($_SESSION['oturum']) || $_SESSION['oturum'] !== true) {
     die("Yetkisiz erişim!");
@@ -80,12 +81,8 @@ try {
             $rozet_klasi = "bg-secondary";
             $ek_unvan_yazisi = "";
 
-            // --- CİNSİYET TESPİT MOTORU ---
-            $parcalar = explode(' ', trim($uye['adi_soyadi']));
-            $ilk_isim = mb_strtoupper($parcalar[0], 'UTF-8');
-            $kadin_isimleri = ['AYŞEGÜL', 'BEGÜM', 'HATİCE', 'FATMA', 'AYŞE', 'EMİNE', 'ZEYNEP', 'MERYEM', 'ELİF', 'HÜLYA', 'GAMZE', 'MERVE', 'BÜŞRA', 'ESRA', 'SEDA', 'DERYA', 'KÜBRA', 'ASLI', 'PELİN', 'TUĞBA', 'DEMET', 'ÖZLEM', 'SİNEM', 'GÜL', 'NUR', 'MELİS', 'DİLAN', 'BURCU', 'CANAN', 'SULTAN', 'MELİKE', 'YASEMİN', 'EDA', 'DİDIDEM', 'BERNA', 'SELEN', 'PINAR', 'BANU', 'YEŞİM', 'EBRU', 'FADİME', 'NURAN', 'SELMA', 'DİLEK', 'FİLİZ', 'ARZU', 'LEYLA', 'SİBEL', 'HALE', 'JALE', 'GONCA', 'MÜGE', 'NESLİHAN', 'NAZLI'];
-            
-            if (in_array($ilk_isim, $kadin_isimleri)) {
+            // --- CİNSİYET TESPİTİ: künyedeki cinsiyet alanı önceliklidir (inc/cinsiyet.php) ---
+            if (uye_kadin_mi($uye)) {
                 $ikon_renk = 'color: #e83e8c !important;'; 
                 $ikon_sekil = 'fa-user-nurse';
             } else {
