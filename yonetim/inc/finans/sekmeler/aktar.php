@@ -88,7 +88,7 @@ $gider = $onizleme['gider'];
                         Hiçbir tutar kendiliğinden eklenmez. Farkların NET toplamı pozitifse, aşağıdaki kutuyla tek bir "devir" kaydı olarak
                         kasaya ekleyebilirsiniz; böylece kasa sayfadaki toplamla birebir aynı olur.
                     </div>
-                    <div class="table-responsive">
+                    <div class="finans-tablo-kap">
                         <table class="table table-sm align-middle">
                             <caption class="visually-hidden">Aylık toplam farkları</caption>
                             <thead class="table-light">
@@ -145,7 +145,7 @@ $gider = $onizleme['gider'];
                     <p class="text-muted mb-0">Aktarılacak kayıt bulunamadı.</p>
                 <?php else: ?>
                     <p class="small text-muted">Örnek/şablon satırlar olabilir; istemediklerinizin işaretini kaldırın.</p>
-                    <div class="table-responsive">
+                    <div class="finans-tablo-kap">
                         <table class="table table-sm align-middle">
                             <caption class="visually-hidden"><?= finans_e($etiket) ?> önizleme listesi</caption>
                             <thead class="table-light">

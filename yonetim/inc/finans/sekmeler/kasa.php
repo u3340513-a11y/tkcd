@@ -60,7 +60,7 @@ if ($ozet['devir'] > 0) {
         <h5 class="fw-bold mb-0"><?= $yil ?> Aylık Kasa Özeti</h5>
         <?= finans_yil_secici('kasa', $yil, $yillar) ?>
     </div>
-    <div class="table-responsive">
+    <div class="finans-tablo-kap">
         <table class="table align-middle mb-0">
             <caption class="visually-hidden"><?= $yil ?> yılı aylık aidat, bağış, gider, net ve kümülatif kasa tablosu</caption>
             <thead class="table-light">

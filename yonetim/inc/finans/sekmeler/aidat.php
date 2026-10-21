@@ -132,11 +132,11 @@ foreach ($uyeler as $uye) {
             <span class="text-muted">Gri</span> vadesi gelmedi
         </p>
     </div>
-    <div class="table-responsive">
+    <div class="finans-tablo-kap">
         <?php if ($uyeler === []): ?>
             <div class="text-center text-muted py-5">Henüz kişi eklenmemiş. "Kişi Ekle" ile başlayın ya da Excel Aktarımı sekmesini kullanın.</div>
         <?php else: ?>
-            <table class="table table-sm align-middle mb-0 text-nowrap">
+            <table class="table table-sm align-middle mb-0 finans-matris">
                 <caption class="visually-hidden"><?= $yil ?> yılı kişi bazlı aylık aidat ödeme tablosu</caption>
                 <thead class="table-light">
                     <tr>

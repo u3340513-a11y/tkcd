@@ -42,7 +42,7 @@ $sayfaUrl = static fn (int $s): string => finans_url(['sekme' => $aktifSekme, 'y
             <i class="fa-regular fa-folder-open fs-2 d-block mb-2"></i>Bu yıl için henüz kayıt yok.
         </div>
     <?php else: ?>
-        <div class="table-responsive">
+        <div class="finans-tablo-kap">
             <table class="table table-hover align-middle mb-0">
                 <caption class="visually-hidden"><?= finans_e($tarafBasligi) ?> kayıt listesi</caption>
                 <thead class="table-light">

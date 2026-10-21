@@ -60,6 +60,19 @@ $flash = $_SESSION['finans_flash'] ?? null;
 unset($_SESSION['finans_flash']);
 ?>
 
+<style>
+    /* .table-responsive her zaman overflow açar ve iç içe kaydırma çubuğu üretir; geniş ekranda kapatıyoruz. */
+    .finans-tablo-kap { overflow: visible; }
+    @media (max-width: 991.98px) { .finans-tablo-kap { overflow-x: auto; -webkit-overflow-scrolling: touch; } }
+    .finans-matris { font-size: .8rem; }
+    .finans-matris th, .finans-matris td { padding: .3rem .4rem; }
+    .finans-matris tbody th { white-space: nowrap; }
+    .finans-matris td { white-space: nowrap; }
+    @media (max-width: 991.98px) { .finans-matris { min-width: 860px; } }
+    .finans-grafik { position: relative; height: 300px; }
+</style>
+
+
 <div class="container-fluid py-4 px-md-4">
     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-3">
         <div>
