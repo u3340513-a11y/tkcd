@@ -146,6 +146,9 @@ $islem_stilleri = [
     'pdf_indir'        => ['bg-danger text-white',    'fa-file-pdf',          'PDF'],
     'ip_engellendi'    => ['bg-danger text-white',    'fa-ban',               'IP Engel'],
     'ip_engel_kaldirildi' => ['bg-success text-white', 'fa-lock-open',        'Engel Kaldırıldı'],
+    'finans_kayit'     => ['bg-success text-white',   'fa-coins',             'Finans Kayıt'],
+    'finans_iptal'     => ['bg-warning text-dark',    'fa-rotate-left',       'Finans İptal'],
+    'finans_aktarim'   => ['bg-primary text-white',   'fa-file-import',       'Finans Aktarım'],
 ];
 
 /**

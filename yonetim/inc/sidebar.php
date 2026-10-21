@@ -174,11 +174,20 @@ if (!$is_kisitli_rol) {
         <div class="sb-section">
             <div class="sb-section__label">Finans & Raporlar</div>
 
+            <?php $sb_finans_yetkili = FinansYetki::menuGorunurMu();
+            $sb_finans_rapor = $sayfa === 'finans' && ($_GET['sekme'] ?? '') === 'raporlar'; ?>
+            <?php if ($sb_finans_yetkili): ?>
+            <a class="sb-link <?= ($sayfa === 'finans' && !$sb_finans_rapor) ? 'sb-link--active' : '' ?>" href="index.php?sayfa=finans">
+                <i class="sb-link__icon fa-solid fa-coins"></i>
+                <span>Finans / Aidat</span>
+            </a>
+            <?php else: ?>
             <a class="sb-link sb-link--disabled" href="#" aria-disabled="true" tabindex="-1">
                 <i class="sb-link__icon fa-solid fa-coins"></i>
                 <span>Finans / Aidat</span>
                 <span class="sb-link__badge sb-link__badge--soon">Yakında</span>
             </a>
+            <?php endif; ?>
 
             <a class="sb-link sb-link--disabled" href="#" aria-disabled="true" tabindex="-1">
                 <i class="sb-link__icon fa-solid fa-map-location-dot"></i>
@@ -186,11 +195,18 @@ if (!$is_kisitli_rol) {
                 <span class="sb-link__badge sb-link__badge--soon">Yakında</span>
             </a>
 
+            <?php if ($sb_finans_yetkili): ?>
+            <a class="sb-link <?= $sb_finans_rapor ? 'sb-link--active' : '' ?>" href="index.php?sayfa=finans&amp;sekme=raporlar">
+                <i class="sb-link__icon fa-solid fa-chart-bar"></i>
+                <span>Raporlar</span>
+            </a>
+            <?php else: ?>
             <a class="sb-link sb-link--disabled" href="#" aria-disabled="true" tabindex="-1">
                 <i class="sb-link__icon fa-solid fa-chart-bar"></i>
                 <span>Raporlar</span>
                 <span class="sb-link__badge sb-link__badge--soon">Yakında</span>
             </a>
+            <?php endif; ?>
         </div>
 
         <!-- Sistem -->

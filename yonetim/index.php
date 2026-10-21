@@ -73,6 +73,7 @@ require_once 'inc/baglan.php';
 require_once 'inc/log-kayit.php';
 require_once 'inc/ip-engel.php';
 require_once 'inc/dogum-gunu.php';
+require_once 'inc/finans/yetki.php';
 
 // ─── IP ENGEL KONTROLÜ ─────────────────────────────────────────────────
 // Engelli IP hiçbir yönetim sayfasına (giriş formu dahil) erişemez.
@@ -394,6 +395,12 @@ if ($sayfa === 'ip-engelleri' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
+// Finans formları (kayıt/iptal/aktarım): yetki + CSRF denetimi inc/finans-islem.php içinde
+if ($sayfa === 'finans' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    include 'inc/finans-islem.php';
+    exit;
+}
+
 // Not güncelleme AJAX — header/sidebar HTML render edilmeden önce yakala
 if (
     $sayfa === 'uye-detay'
@@ -414,6 +421,7 @@ $dosya_indirme_sayfalari = [
     'bos-il-excel'        => 'inc/bos-il-excel.php',
     'kadin-notsuz-excel'  => 'inc/kadin-notsuz-excel.php',
     'notsuz-uyeler-excel' => 'inc/notsuz-uyeler-excel.php',
+    'finans-disa-aktar'   => 'inc/finans-disa-aktar.php',
 ];
 if (array_key_exists($sayfa, $dosya_indirme_sayfalari)) {
     include $dosya_indirme_sayfalari[$sayfa];
@@ -481,6 +489,10 @@ switch ($sayfa) {
         } else {
             include 'inc/loglar.php';
         }
+        break;
+
+    case 'finans':
+        include 'inc/finans.php';
         break;
 
     case 'ip-engelleri':
