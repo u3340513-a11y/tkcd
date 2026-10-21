@@ -13,7 +13,7 @@ declare(strict_types=1);
  */
 
 $sayfaNo     = max(1, (int) ($_GET['s'] ?? 1));
-$iptalDahil  = ($_GET['iptal'] ?? '') === '1';
+$iptalDahil  = $iptalGorebilir && ($_GET['iptal'] ?? '') === '1';
 $toplamKayit = $finansDepo->hareketSayisi($tabloTuru, $yil, $iptalDahil);
 $toplamSayfa = max(1, (int) ceil($toplamKayit / FINANS_SAYFA_BOYUTU));
 $sayfaNo     = min($sayfaNo, $toplamSayfa);
@@ -28,12 +28,16 @@ $sayfaUrl = static fn (int $s): string => finans_url(['sekme' => $aktifSekme, 'y
     <div class="card-header bg-white border-0 pt-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
         <h5 class="fw-bold mb-0"><?= $yil ?> Kayıtları <span class="badge bg-secondary-subtle text-secondary-emphasis ms-1"><?= number_format($toplamKayit, 0, ',', '.') ?></span></h5>
         <div class="d-flex align-items-center gap-3 flex-wrap">
-            <a class="small" href="<?= finans_e(finans_url(['sekme' => $aktifSekme, 'yil' => $yil] + ($iptalDahil ? [] : ['iptal' => 1]))) ?>">
-                <?= $iptalDahil ? 'İptal edilenleri gizle' : 'İptal edilenleri göster' ?>
-            </a>
-            <a class="btn btn-sm btn-outline-success" href="<?= finans_e('index.php?' . http_build_query(['sayfa' => 'finans-disa-aktar', 'tur' => $tabloTuru, 'yil' => $yil])) ?>">
-                <i class="fa-solid fa-file-csv me-1"></i>CSV indir
-            </a>
+            <?php if ($iptalGorebilir): ?>
+                <a class="small" href="<?= finans_e(finans_url(['sekme' => $aktifSekme, 'yil' => $yil] + ($iptalDahil ? [] : ['iptal' => 1]))) ?>">
+                    <?= $iptalDahil ? 'İptal edilenleri gizle' : 'İptal edilenleri göster' ?>
+                </a>
+            <?php endif; ?>
+            <?php if ($disaAktarabilir): ?>
+                <a class="btn btn-sm btn-outline-success" href="<?= finans_e('index.php?' . http_build_query(['sayfa' => 'finans-disa-aktar', 'tur' => $tabloTuru, 'yil' => $yil])) ?>">
+                    <i class="fa-solid fa-file-csv me-1"></i>CSV indir
+                </a>
+            <?php endif; ?>
         </div>
     </div>
 

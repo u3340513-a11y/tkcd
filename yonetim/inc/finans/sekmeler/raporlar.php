@@ -48,10 +48,10 @@ $kartlar = [
 ];
 
 $disaAktarim = [
-    'tumu'  => ['Tüm hareketler', true],
-    'aidat' => ['Aidat', $aidatGorebilir],
-    'bagis' => ['Bağış', true],
-    'gider' => ['Gider', true],
+    'tumu'  => ['Tüm hareketler', $disaAktarabilir],
+    'aidat' => ['Aidat', $disaAktarabilir && $aidatGorebilir],
+    'bagis' => ['Bağış', $disaAktarabilir],
+    'gider' => ['Gider', $disaAktarabilir],
 ];
 
 $yilToplam = ['aidat' => 0, 'bagis' => 0, 'gider' => 0, 'adet_aidat' => 0, 'adet_bagis' => 0, 'adet_gider' => 0];

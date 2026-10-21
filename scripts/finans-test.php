@@ -60,7 +60,13 @@ esit(null, FinansDonem::tarihiNormallestir('abc'), 'tarih: metin');
 
 // ── Yetki ───────────────────────────────────────────────────────────────
 esit(true, FinansYetki::izinliMi(FinansYetki::KASA_GORUNTULE, 'gelistirici', 'x'), 'yetki: geliştirici kasa');
-esit(false, FinansYetki::izinliMi(FinansYetki::KASA_GORUNTULE, 'admin', 'admin61'), 'yetki: admin61 şimdilik yok');
+esit(true, FinansYetki::izinliMi(FinansYetki::KASA_GORUNTULE, 'admin', 'admin61'), 'yetki: admin61 kasa');
+esit(true, FinansYetki::izinliMi(FinansYetki::KAYIT_GIR, 'yonetim', 'yonetim_id'), 'yetki: yonetim_id giriş');
+foreach ([FinansYetki::DISA_AKTARIM, FinansYetki::IPTAL_GORUNTULE, FinansYetki::AKTARIM] as $kisitli) {
+    esit(false, FinansYetki::izinliMi($kisitli, 'admin', 'admin61'), 'yetki: admin61 ' . $kisitli . ' yok');
+    esit(false, FinansYetki::izinliMi($kisitli, 'yonetim', 'yonetim_id'), 'yetki: yonetim_id ' . $kisitli . ' yok');
+    esit(true, FinansYetki::izinliMi($kisitli, 'gelistirici', 'x'), 'yetki: geliştirici ' . $kisitli);
+}
 esit(false, FinansYetki::izinliMi(FinansYetki::AIDAT_GORUNTULE, 'yonetim', 'yonetim_hk'), 'yetki: yonetim_hk aidat yok');
 esit(false, FinansYetki::izinliMi('bilinmeyen', 'gelistirici', 'x'), 'yetki: bilinmeyen yetki reddedilir');
 

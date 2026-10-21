@@ -10,9 +10,10 @@ declare(strict_types=1);
  * genişletmek yalnızca KURALLAR tablosunu değiştirmeyi gerektirir; sayfa, işlem
  * ve menü kodlarına dokunulmaz.
  *
- * Şu an tüm yetkiler yalnızca `gelistirici` rolündedir. Planlanan genişletme:
- *   - KASA_GORUNTULE : 'kullanici_onekleri' => ['yonetim_']
- *   - AIDAT_GORUNTULE, KAYIT_GIR : 'kullanicilar' => ['admin61', 'yonetim_id']
+ * Yetki dağılımı:
+ *   - KASA_GORUNTULE, AIDAT_GORUNTULE, KAYIT_GIR : geliştirici + admin61 + yonetim_id
+ *   - DISA_AKTARIM, IPTAL_GORUNTULE, AKTARIM     : yalnızca geliştirici
+ * Planlanan genişletme: KASA_GORUNTULE için 'kullanici_onekleri' => ['yonetim_'].
  */
 final class FinansYetki
 {
@@ -28,11 +29,19 @@ final class FinansYetki
     /** Excel (CSV) aktarımı. */
     public const AKTARIM = 'aktarim';
 
+    /** Kayıtları CSV olarak indirme. */
+    public const DISA_AKTARIM = 'disa_aktarim';
+
+    /** İptal edilmiş kayıtları listede görme. */
+    public const IPTAL_GORUNTULE = 'iptal_goruntule';
+
     private const KURALLAR = [
-        self::KASA_GORUNTULE  => ['roller' => ['gelistirici'], 'kullanicilar' => [], 'kullanici_onekleri' => []],
-        self::AIDAT_GORUNTULE => ['roller' => ['gelistirici'], 'kullanicilar' => [], 'kullanici_onekleri' => []],
-        self::KAYIT_GIR       => ['roller' => ['gelistirici'], 'kullanicilar' => [], 'kullanici_onekleri' => []],
-        self::AKTARIM         => ['roller' => ['gelistirici'], 'kullanicilar' => [], 'kullanici_onekleri' => []],
+        self::KASA_GORUNTULE   => ['roller' => ['gelistirici'], 'kullanicilar' => ['admin61', 'yonetim_id'], 'kullanici_onekleri' => []],
+        self::AIDAT_GORUNTULE  => ['roller' => ['gelistirici'], 'kullanicilar' => ['admin61', 'yonetim_id'], 'kullanici_onekleri' => []],
+        self::KAYIT_GIR        => ['roller' => ['gelistirici'], 'kullanicilar' => ['admin61', 'yonetim_id'], 'kullanici_onekleri' => []],
+        self::AKTARIM          => ['roller' => ['gelistirici'], 'kullanicilar' => [], 'kullanici_onekleri' => []],
+        self::DISA_AKTARIM     => ['roller' => ['gelistirici'], 'kullanicilar' => [], 'kullanici_onekleri' => []],
+        self::IPTAL_GORUNTULE  => ['roller' => ['gelistirici'], 'kullanicilar' => [], 'kullanici_onekleri' => []],
     ];
 
     /**

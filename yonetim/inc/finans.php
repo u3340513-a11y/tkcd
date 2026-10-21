@@ -34,6 +34,8 @@ $kasaGorebilir  = FinansYetki::oturumIcinVarMi(FinansYetki::KASA_GORUNTULE);
 $aidatGorebilir = FinansYetki::oturumIcinVarMi(FinansYetki::AIDAT_GORUNTULE);
 $kayitGirebilir = FinansYetki::oturumIcinVarMi(FinansYetki::KAYIT_GIR);
 $aktarabilir    = FinansYetki::oturumIcinVarMi(FinansYetki::AKTARIM) && $aidatGorebilir && $kasaGorebilir;
+$disaAktarabilir = FinansYetki::oturumIcinVarMi(FinansYetki::DISA_AKTARIM);
+$iptalGorebilir  = FinansYetki::oturumIcinVarMi(FinansYetki::IPTAL_GORUNTULE);
 
 /** @var array<string, array{0:string, 1:string, 2:bool}> sekme => [etiket, ikon, görünür] */
 $sekmeler = [

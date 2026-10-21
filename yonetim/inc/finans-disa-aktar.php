@@ -19,7 +19,7 @@ if (($_SESSION['oturum'] ?? false) !== true) {
 
 require_once __DIR__ . '/finans/baslat.php';
 
-if (!FinansYetki::oturumIcinVarMi(FinansYetki::KASA_GORUNTULE)) {
+if (!FinansYetki::oturumIcinVarMi(FinansYetki::DISA_AKTARIM) || !FinansYetki::oturumIcinVarMi(FinansYetki::KASA_GORUNTULE)) {
     http_response_code(403);
     exit('Erişim Engellendi.');
 }
