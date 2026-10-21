@@ -147,12 +147,12 @@ if ($dsn !== false && $dsn !== '') {
     // Excel aktarımı: ilk seferde yazar, ikinci seferde mükerrer oluşturmaz
     $kayitlar = [['tarih' => '2026-02-03', 'taraf' => 'Firma', 'aciklama' => '', 'kurus' => 12345]];
     $oncekiBakiye = $servis->kasaOzeti()['bakiye'];
-    $s1 = $aktarim->uygula($a, ['2026-1'], $kayitlar, [], 'test');
+    $s1 = $aktarim->uygula($a, ['net'], $kayitlar, [], 'test');
     esit(3, $s1['aidat_eklendi'], 'aktarım: aidatlar eklenir');
     esit(1, $s1['devir_eklendi'], 'aktarım: seçilen fark devir olur');
     esit(1, $s1['bagis_eklendi'], 'aktarım: bağış eklenir');
     esit($oncekiBakiye + 100000 + 100000 + 150000 + 50000 + 12345, $servis->kasaOzeti()['bakiye'], 'aktarım: kasa doğru artar');
-    $s2 = $aktarim->uygula($a, ['2026-1'], $kayitlar, [], 'test');
+    $s2 = $aktarim->uygula($a, ['net'], $kayitlar, [], 'test');
     esit([0, 3, 1, 1], [$s2['aidat_eklendi'], $s2['aidat_zaten'], $s2['devir_zaten'], $s2['bagis_zaten']], 'aktarım: ikinci yükleme mükerrer üretmez');
 
     // Kasa toplamı kayıtlarla birebir tutarlı mı?

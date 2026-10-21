@@ -67,6 +67,7 @@ $gider = $onizleme['gider'];
 
     <?php if (is_array($aidat)):
         $odemeToplam = array_sum(array_column($aidat['odemeler'], 'kurus'));
+    $netFark = (int) array_sum(array_column($aidat['farklar'], 'fark'));
     ?>
         <div class="card border-0 shadow-sm rounded-4 mb-3">
             <div class="card-header bg-white border-0 pt-3"><h6 class="fw-bold mb-0">Aidat</h6></div>
@@ -84,8 +85,8 @@ $gider = $onizleme['gider'];
                 <?php if ($aidat['farklar'] !== []): ?>
                     <div class="alert alert-warning small">
                         <strong>Sayfadaki "AYLIK TOPLAM" ile kişi satırlarının toplamı uyuşmayan aylar var.</strong>
-                        Hiçbir tutar kendiliğinden eklenmez. Sayfadaki toplam daha yüksekse ve fark gerçek bir giriş ise,
-                        "Devir" olarak kasaya eklemek için işaretleyebilirsiniz.
+                        Hiçbir tutar kendiliğinden eklenmez. Farkların NET toplamı pozitifse, aşağıdaki kutuyla tek bir "devir" kaydı olarak
+                        kasaya ekleyebilirsiniz; böylece kasa sayfadaki toplamla birebir aynı olur.
                     </div>
                     <div class="table-responsive">
                         <table class="table table-sm align-middle">
@@ -96,33 +97,37 @@ $gider = $onizleme['gider'];
                                     <th scope="col" class="text-end">Sayfadaki Toplam</th>
                                     <th scope="col" class="text-end">Kişi Satırları Toplamı</th>
                                     <th scope="col" class="text-end">Fark</th>
-                                    <th scope="col">Devir olarak ekle</th>
+                                    <th scope="col">Açıklama</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($aidat['farklar'] as $fark):
-                                    $anahtar = $fark['yil'] . '-' . $fark['ay'];
-                                ?>
+                                <?php foreach ($aidat['farklar'] as $fark): ?>
                                     <tr>
                                         <td><?= finans_e(FinansDonem::AY_ADLARI[$fark['ay']] . ' ' . $fark['yil']) ?></td>
                                         <td class="text-end"><?= finans_e(FinansTutar::bicimle($fark['sayfa'])) ?></td>
                                         <td class="text-end"><?= finans_e(FinansTutar::bicimle($fark['hesaplanan'])) ?></td>
                                         <td class="text-end fw-semibold"><?= finans_para_html($fark['fark']) ?></td>
-                                        <td>
-                                            <?php if ($fark['fark'] > 0): ?>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="devir_sec[]" id="devir-<?= finans_e($anahtar) ?>" value="<?= finans_e($anahtar) ?>">
-                                                    <label class="form-check-label small" for="devir-<?= finans_e($anahtar) ?>">Ekle</label>
-                                                </div>
-                                            <?php else: ?>
-                                                <span class="small text-muted">Kontrol edin (eklenemez)</span>
-                                            <?php endif; ?>
-                                        </td>
+                                        <td class="small text-muted"><?= $fark['fark'] > 0 ? 'Sayfada fazla' : 'Sayfada eksik (ödeme toplama girmemiş)' ?></td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
+                            <tfoot class="table-light fw-bold">
+                                <tr>
+                                    <th scope="row" colspan="3">Net fark</th>
+                                    <td class="text-end"><?= finans_para_html($netFark) ?></td>
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
+                    <?php if ($netFark > 0): ?>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="devir_sec[]" id="devir-net" value="<?= finans_e(FinansAktarimServisi::NET_DEVIR_ANAHTARI) ?>" checked>
+                            <label class="form-check-label" for="devir-net">
+                                Net farkı (<?= finans_e(FinansTutar::bicimle($netFark)) ?>) tek "devir" kaydı olarak kasaya ekle
+                                — kasa toplamı <?= finans_e(FinansTutar::bicimle((int) $odemeToplam + $netFark)) ?> olur (sayfadaki "Kasa" toplamı)
+                            </label>
+                        </div>
+                    <?php endif; ?>
                 <?php endif; ?>
             </div>
         </div>

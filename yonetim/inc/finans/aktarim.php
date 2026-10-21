@@ -15,6 +15,7 @@ declare(strict_types=1);
 final class FinansAktarimServisi
 {
     public const KAYNAK_EXCEL = 'excel';
+    public const NET_DEVIR_ANAHTARI = 'net';
 
     /** @var Closure(string, string, ?int): void */
     private readonly Closure $gunluk;
@@ -104,32 +105,40 @@ final class FinansAktarimServisi
     }
 
     /**
-     * Sayfa toplamı satır toplamından BÜYÜKSE seçilen farkı "devir" olarak kasaya ekler.
+     * "Sayfa toplamı − kişi satırları toplamı" farklarının NET tutarını (pozitif ise) tek "devir" kaydı olarak yazar.
+     *
+     * Neden net: bir ayda eksik, başka ayda fazla gösterilen tutarlar birbirini götürür; yalnızca
+     * pozitif farkları eklemek kasayı sayfadaki toplamdan saptırır. Ay ayrıntıları açıklamaya yazılır.
      *
      * @param array<string, mixed> $aidat
-     * @param string[]             $secilenler "yil-ay"
+     * @param string[]             $secilenler NET_DEVIR_ANAHTARI içeriyorsa yazılır
      * @param array<string, int>   $sayac
      */
     private function devirleriYaz(array $aidat, array $secilenler, string $kullanici, array &$sayac): void
     {
-        foreach ($aidat['farklar'] as $fark) {
-            if ($fark['fark'] <= 0 || !in_array($fark['yil'] . '-' . $fark['ay'], $secilenler, true)) {
-                continue;
-            }
-            $kaynak = hash('sha256', 'devir|' . $fark['yil'] . '|' . $fark['ay']);
-            if ($this->depo->kaynakAnahtariVarMi($kaynak)) {
-                $sayac['devir_zaten']++;
-                continue;
-            }
-            $this->depo->hareketEkle([
-                'tur' => FinansDeposu::TUR_DEVIR, 'tarih' => sprintf('%04d-%02d-01', $fark['yil'], $fark['ay']),
-                'donem_yil' => $fark['yil'], 'donem_ay' => $fark['ay'], 'tutar_kurus' => $fark['fark'],
-                'taraf' => 'Excel farkı',
-                'aciklama' => 'Excel "Aylık Toplam" ile kişi satırları toplamı arasındaki fark (kaynağı belirsiz, doğrulanmalı).',
-                'kaynak' => self::KAYNAK_EXCEL, 'kaynak_anahtari' => $kaynak, 'olusturan' => $kullanici,
-            ]);
-            $sayac['devir_eklendi']++;
+        $net = array_sum(array_column($aidat['farklar'], 'fark'));
+        if ($net <= 0 || !in_array(self::NET_DEVIR_ANAHTARI, $secilenler, true)) {
+            return;
         }
+        $kaynak = hash('sha256', 'devir|net');
+        if ($this->depo->kaynakAnahtariVarMi($kaynak)) {
+            $sayac['devir_zaten']++;
+
+            return;
+        }
+        $ayrinti = implode(', ', array_map(
+            static fn (array $f): string => FinansDonem::AY_ADLARI[$f['ay']] . ' ' . $f['yil'] . ' ' . ($f['fark'] > 0 ? '+' : '−') . FinansTutar::bicimle(abs($f['fark'])),
+            $aidat['farklar']
+        ));
+        $ilk = $aidat['farklar'][0];
+        $this->depo->hareketEkle([
+            'tur' => FinansDeposu::TUR_DEVIR, 'tarih' => sprintf('%04d-%02d-01', $ilk['yil'], $ilk['ay']),
+            'donem_yil' => $ilk['yil'], 'donem_ay' => $ilk['ay'], 'tutar_kurus' => $net,
+            'taraf' => 'Excel mutabakat farkı',
+            'aciklama' => mb_substr('Excel "Aylık Toplam" ile kişi satırları arasındaki net fark: ' . $ayrinti, 0, FinansServisi::AZAMI_ACIKLAMA),
+            'kaynak' => self::KAYNAK_EXCEL, 'kaynak_anahtari' => $kaynak, 'olusturan' => $kullanici,
+        ]);
+        $sayac['devir_eklendi']++;
     }
 
     /**
