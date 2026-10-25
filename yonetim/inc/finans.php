@@ -31,6 +31,7 @@ $finansServis = $finans['servis'];
 $finansDepo   = $finansServis->depo();
 
 if (!FinansYetki::menuGorunurMu()) {
+    log_kaydet($db_baglanti, 'sayfa_goruntulem', 'Finans kasa özeti açıldı (yalnızca özet).');
     ?>
     <div class="container-fluid py-4 px-md-4">
         <h2 class="fw-bold text-dark mb-3"><i class="fa-solid fa-coins me-2" style="color:#e0a526;"></i>Finans / Kasa Özeti</h2>
@@ -72,6 +73,8 @@ if (!in_array($yil, $yillar, true)) {
 
 $flash = $_SESSION['finans_flash'] ?? null;
 unset($_SESSION['finans_flash']);
+
+log_kaydet($db_baglanti, 'sayfa_goruntulem', 'Finans sayfası açıldı. Sekme: ' . $sekmeler[$aktifSekme][0] . ', yıl: ' . $yil . '.');
 ?>
 
 <style>
