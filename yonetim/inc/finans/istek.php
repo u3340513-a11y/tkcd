@@ -15,6 +15,7 @@ final class FinansIstekYoneticisi
     private const ISLEMLER = [
         'aidat_kaydet'   => [[FinansYetki::KAYIT_GIR, FinansYetki::AIDAT_GORUNTULE], 'aidat'],
         'aidat_uye_ekle' => [[FinansYetki::KAYIT_GIR, FinansYetki::AIDAT_GORUNTULE], 'aidat'],
+        'aidat_uye_cikar' => [[FinansYetki::UYE_CIKAR, FinansYetki::AIDAT_GORUNTULE], 'aidat'],
         'bagis_kaydet'   => [[FinansYetki::KAYIT_GIR, FinansYetki::KASA_GORUNTULE], 'bagis'],
         'gider_kaydet'   => [[FinansYetki::KAYIT_GIR, FinansYetki::KASA_GORUNTULE], 'gider'],
         'iptal_et'       => [[FinansYetki::KAYIT_GIR, FinansYetki::KASA_GORUNTULE], 'kasa'],
@@ -66,6 +67,7 @@ final class FinansIstekYoneticisi
             $sonuc = match ($islem) {
                 'aidat_kaydet'   => $this->servis->aidatKaydet($post, $this->kullanici),
                 'aidat_uye_ekle' => $this->servis->aidatUyesiEkle((string) ($post['ad_soyad'] ?? '')),
+                'aidat_uye_cikar' => $this->servis->aidatUyesiCikar((int) ($post['aidat_uye_id'] ?? 0)),
                 'bagis_kaydet'   => $this->servis->bagisGiderKaydet(FinansDeposu::TUR_BAGIS, $post, $this->kullanici),
                 'gider_kaydet'   => $this->servis->bagisGiderKaydet(FinansDeposu::TUR_GIDER, $post, $this->kullanici),
                 'iptal_et'       => $this->iptalEt($post),

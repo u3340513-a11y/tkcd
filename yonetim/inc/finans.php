@@ -33,6 +33,7 @@ $finansDepo   = $finansServis->depo();
 $kasaGorebilir  = FinansYetki::oturumIcinVarMi(FinansYetki::KASA_GORUNTULE);
 $aidatGorebilir = FinansYetki::oturumIcinVarMi(FinansYetki::AIDAT_GORUNTULE);
 $kayitGirebilir = FinansYetki::oturumIcinVarMi(FinansYetki::KAYIT_GIR);
+$uyeCikarabilir = FinansYetki::oturumIcinVarMi(FinansYetki::UYE_CIKAR) && $aidatGorebilir;
 $aktarabilir    = FinansYetki::oturumIcinVarMi(FinansYetki::AKTARIM) && $aidatGorebilir && $kasaGorebilir;
 $disaAktarabilir = FinansYetki::oturumIcinVarMi(FinansYetki::DISA_AKTARIM);
 $iptalGorebilir  = FinansYetki::oturumIcinVarMi(FinansYetki::IPTAL_GORUNTULE);

@@ -79,6 +79,13 @@ final class FinansServisi
             return FinansSonuc::hata('Ad soyad 1-' . self::AZAMI_AD . ' karakter olmalıdır.');
         }
 
+        $geriAlinanId = $this->depo->aidatUyesiYenidenEtkinlestir($ad);
+        if ($geriAlinanId !== null) {
+            ($this->gunluk)('finans_kayit', 'Çıkarılmış kişi aidat listesine geri alındı (#' . $geriAlinanId . ').', $geriAlinanId);
+
+            return FinansSonuc::basari('Kişi daha önce çıkarılmıştı; aidat listesine geri alındı.');
+        }
+
         try {
             $id = $this->depo->aidatUyesiEkle($ad);
         } catch (PDOException $e) {
@@ -90,6 +97,20 @@ final class FinansServisi
         ($this->gunluk)('finans_kayit', 'Aidat listesine kişi eklendi (#' . $id . ').', $id);
 
         return FinansSonuc::basari('Kişi aidat listesine eklendi.');
+    }
+
+    /**
+     * Kişiyi aidat listesinden çıkarır. Kişi silinmez; geçmiş ödemeleri kasa toplamlarında kalır.
+     */
+    public function aidatUyesiCikar(int $id): FinansSonuc
+    {
+        $uye = $this->depo->aidatUyesiBul($id);
+        if ($uye === null || !$this->depo->aidatUyesiCikar($id)) {
+            return FinansSonuc::hata('Kişi aidat listesinde bulunamadı.');
+        }
+        ($this->gunluk)('finans_kayit', 'Kişi aidat listesinden çıkarıldı (#' . $id . ').', $id);
+
+        return FinansSonuc::basari($uye['ad_soyad'] . ' aidat listesinden çıkarıldı. Geçmiş ödemeleri kasada korunur.');
     }
 
     /**

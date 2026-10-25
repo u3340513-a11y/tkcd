@@ -13,6 +13,7 @@ declare(strict_types=1);
  * Yetki dağılımı:
  *   - KASA_GORUNTULE, AIDAT_GORUNTULE, KAYIT_GIR : geliştirici + admin61 + yonetim_id
  *   - DISA_AKTARIM, IPTAL_GORUNTULE, AKTARIM     : yalnızca geliştirici
+ *   - UYE_CIKAR                                  : geliştirici + admin61
  * Planlanan genişletme: KASA_GORUNTULE için 'kullanici_onekleri' => ['yonetim_'].
  */
 final class FinansYetki
@@ -25,6 +26,9 @@ final class FinansYetki
 
     /** Aidat/bağış/gider girişi yapma ve kaydı iptal etme. */
     public const KAYIT_GIR = 'kayit_gir';
+
+    /** Kişiyi aidat listesinden çıkarma. */
+    public const UYE_CIKAR = 'uye_cikar';
 
     /** Excel (CSV) aktarımı. */
     public const AKTARIM = 'aktarim';
@@ -39,6 +43,7 @@ final class FinansYetki
         self::KASA_GORUNTULE   => ['roller' => ['gelistirici'], 'kullanicilar' => ['admin61', 'yonetim_id'], 'kullanici_onekleri' => []],
         self::AIDAT_GORUNTULE  => ['roller' => ['gelistirici'], 'kullanicilar' => ['admin61', 'yonetim_id'], 'kullanici_onekleri' => []],
         self::KAYIT_GIR        => ['roller' => ['gelistirici'], 'kullanicilar' => ['admin61', 'yonetim_id'], 'kullanici_onekleri' => []],
+        self::UYE_CIKAR        => ['roller' => ['gelistirici'], 'kullanicilar' => ['admin61'], 'kullanici_onekleri' => []],
         self::AKTARIM          => ['roller' => ['gelistirici'], 'kullanicilar' => [], 'kullanici_onekleri' => []],
         self::DISA_AKTARIM     => ['roller' => ['gelistirici'], 'kullanicilar' => [], 'kullanici_onekleri' => []],
         self::IPTAL_GORUNTULE  => ['roller' => ['gelistirici'], 'kullanicilar' => [], 'kullanici_onekleri' => []],

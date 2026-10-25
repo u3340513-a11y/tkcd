@@ -12,6 +12,7 @@ declare(strict_types=1);
  * @var int          $yil
  * @var int[]        $yillar
  * @var bool         $kayitGirebilir
+ * @var bool         $uyeCikarabilir
  * @var DateTimeImmutable $bugun
  */
 
@@ -146,6 +147,9 @@ foreach ($uyeler as $uye) {
                             <th scope="col" class="text-end"><?= finans_e(mb_substr($ayAdi, 0, 3, 'UTF-8')) ?></th>
                         <?php endforeach; ?>
                         <th scope="col" class="text-end">Toplam</th>
+                        <?php if ($uyeCikarabilir): ?>
+                            <th scope="col" class="text-center"><span class="visually-hidden">Kişiyi çıkar</span></th>
+                        <?php endif; ?>
                     </tr>
                 </thead>
                 <tbody>
@@ -176,6 +180,15 @@ foreach ($uyeler as $uye) {
                                 <?php endif; ?>
                             <?php endforeach; ?>
                             <td class="text-end fw-bold"><?= finans_e(FinansTutar::bicimle($uyeToplam, false)) ?></td>
+                            <?php if ($uyeCikarabilir): ?>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-link btn-sm text-danger p-0"
+                                            data-fa-cikar-id="<?= $uyeId ?>" data-fa-cikar-ad="<?= finans_e($uye['ad_soyad']) ?>"
+                                            aria-label="<?= finans_e($uye['ad_soyad'] . ' kişisini listeden çıkar') ?>">
+                                        <i class="fa-solid fa-user-minus"></i>
+                                    </button>
+                                </td>
+                            <?php endif; ?>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -186,6 +199,9 @@ foreach ($uyeler as $uye) {
                             <td class="text-end"><?= finans_e(FinansTutar::bicimle($kurus, false)) ?></td>
                         <?php endforeach; ?>
                         <td class="text-end"><?= finans_e(FinansTutar::bicimle($yilToplami)) ?></td>
+                        <?php if ($uyeCikarabilir): ?>
+                            <td></td>
+                        <?php endif; ?>
                     </tr>
                 </tfoot>
             </table>
@@ -208,6 +224,37 @@ foreach ($uyeler as $uye) {
     });
 })();
 </script>
+
+<?php if ($uyeCikarabilir): ?>
+    <dialog id="fa-cikar-dialog" style="border:0;border-radius:14px;padding:0;max-width:440px;width:92%;box-shadow:0 20px 60px rgba(0,0,0,.3);">
+        <form method="post" action="index.php?sayfa=finans" class="p-4">
+            <?= csrf_hidden_alan() ?>
+            <input type="hidden" name="islem" value="aidat_uye_cikar">
+            <input type="hidden" name="yil" value="<?= $yil ?>">
+            <input type="hidden" name="aidat_uye_id" id="fa-cikar-id" value="">
+            <h5 class="fw-bold mb-1">Kişiyi listeden çıkar</h5>
+            <p class="small text-muted mb-2"><strong id="fa-cikar-ad"></strong> aidat tablosundan çıkarılacak.</p>
+            <p class="small text-muted">Kişi silinmez; geçmiş ödemeleri kasa toplamlarında kalır. Aynı isim tekrar eklenirse listeye geri alınır.</p>
+            <div class="d-flex justify-content-end gap-2 mt-3">
+                <button type="button" class="btn btn-light" id="fa-cikar-vazgec">Vazgeç</button>
+                <button type="submit" class="btn btn-danger">Çıkar</button>
+            </div>
+        </form>
+    </dialog>
+    <script>
+    (function () {
+        var dialog = document.getElementById('fa-cikar-dialog');
+        document.querySelectorAll('[data-fa-cikar-id]').forEach(function (dugme) {
+            dugme.addEventListener('click', function () {
+                document.getElementById('fa-cikar-id').value = dugme.getAttribute('data-fa-cikar-id');
+                document.getElementById('fa-cikar-ad').textContent = dugme.getAttribute('data-fa-cikar-ad');
+                dialog.showModal();
+            });
+        });
+        document.getElementById('fa-cikar-vazgec').addEventListener('click', function () { dialog.close(); });
+    })();
+    </script>
+<?php endif; ?>
 
 <?php
 $tabloTuru = FinansDeposu::TUR_AIDAT;

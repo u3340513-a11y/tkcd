@@ -74,6 +74,24 @@ final class FinansDeposu
         return (int) $this->db->lastInsertId();
     }
 
+    /** Kişiyi listeden çıkarır (silmez, pasife alır). Çıktı: çıkarıldıysa true. */
+    public function aidatUyesiCikar(int $id): bool
+    {
+        $sorgu = $this->db->prepare('UPDATE finans_aidat_uyeleri SET aktif = 0 WHERE id = ? AND aktif = 1');
+        $sorgu->execute([$id]);
+
+        return $sorgu->rowCount() === 1;
+    }
+
+    /** Daha önce çıkarılmış aynı isimli kişiyi listenin sonuna geri alır. Çıktı: kişi id'si veya null. */
+    public function aidatUyesiYenidenEtkinlestir(string $ad): ?int
+    {
+        $sorgu = $this->db->prepare('UPDATE finans_aidat_uyeleri SET aktif = 1, sira = ? WHERE ad_soyad = ? AND aktif = 0');
+        $sorgu->execute([$this->sonrakiAidatSirasi(), $ad]);
+
+        return $sorgu->rowCount() === 1 ? $this->aidatUyesiAdlaBul($ad) : null;
+    }
+
     private function sonrakiAidatSirasi(): int
     {
         return (int) $this->db->query('SELECT COALESCE(MAX(sira), 0) + 1 FROM finans_aidat_uyeleri')->fetchColumn();
