@@ -230,7 +230,7 @@ final class FinansDeposu
     {
         $sorgu = $this->db->query(
             "SELECT tur, SUM(tutar_kurus) AS kurus, COUNT(*) AS adet
-               FROM finans_hareketler WHERE durum = 'aktif' GROUP BY tur"
+               FROM finans_hareketler WHERE durum = 'aktif' AND tur <> 'devir' GROUP BY tur"
         );
         $sonuc = [];
         foreach ($sorgu->fetchAll(PDO::FETCH_ASSOC) as $satir) {
@@ -250,7 +250,7 @@ final class FinansDeposu
         $sorgu = $this->db->prepare(
             "SELECT donem_ay, tur, SUM(tutar_kurus) AS kurus, COUNT(*) AS adet
                FROM finans_hareketler
-              WHERE durum = 'aktif' AND donem_yil = ?
+              WHERE durum = 'aktif' AND tur <> 'devir' AND donem_yil = ?
               GROUP BY donem_ay, tur"
         );
         $sorgu->execute([$yil]);
@@ -270,7 +270,7 @@ final class FinansDeposu
     {
         $sorgu = $this->db->prepare(
             "SELECT COALESCE(SUM(CASE WHEN tur = 'gider' THEN -tutar_kurus ELSE tutar_kurus END), 0)
-               FROM finans_hareketler WHERE durum = 'aktif' AND donem_yil < ?"
+               FROM finans_hareketler WHERE durum = 'aktif' AND tur <> 'devir' AND donem_yil < ?"
         );
         $sorgu->execute([$yil]);
 
