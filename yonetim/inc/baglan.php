@@ -399,3 +399,25 @@ function gizli_alan(string $deger): string
     return '<span class="text-muted" title="Bu bilgiyi görüntüleme yetkiniz yok.">'
          . '<i class="fa-solid fa-lock fa-xs me-1"></i>Gizli</span>';
 }
+
+/**
+ * Telefon numarasını tıklanınca arama başlatan tel: bağlantısı olarak döner.
+ *
+ * Neden var: Künye ekranında numaraya dokununca telefonun arama uygulaması açılsın.
+ * Yetkisiz hesaplar için gizli_alan() ile aynı maskeli çıktı verilir; numara sayfa
+ * kaynağına bile yazılmaz. Numara tel: için yalnızca rakam ve baştaki + işaretine indirgenir.
+ *
+ * @param string $telefon Ham telefon değeri (örn. "0532 123 45 67")
+ * @return string Güvenli HTML (bağlantı, boş değerde boş metin veya maske)
+ */
+function telefon_baglantisi(string $telefon): string
+{
+    if (!kisi_bilgisi_gorebilir() || trim($telefon) === '') {
+        return gizli_alan('');
+    }
+    $arama_numarasi = (str_starts_with(trim($telefon), '+') ? '+' : '') . preg_replace('/\D+/', '', $telefon);
+
+    return '<a href="tel:' . htmlspecialchars($arama_numarasi, ENT_QUOTES, 'UTF-8') . '" class="text-decoration-none">'
+         . '<i class="fa-solid fa-phone-volume me-1 text-success"></i>'
+         . htmlspecialchars($telefon, ENT_QUOTES, 'UTF-8') . '</a>';
+}

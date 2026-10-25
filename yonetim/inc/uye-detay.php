@@ -352,7 +352,7 @@ if (!empty($uye['uyelik_tarihi']) && $uye['uyelik_tarihi'] !== '0000-00-00') {
                     <table class="table table-striped align-middle fs-6">
                         <tr>
                             <td class="fw-bold text-secondary" style="width: 40%;"><i class="fa-solid fa-phone me-2 text-muted"></i>Telefon:</td>
-                            <td class="text-dark fw-semibold"><?= gizli_alan(htmlspecialchars($uye['telefon'] ?: '')); ?></td>
+                            <td class="text-dark fw-semibold"><?= telefon_baglantisi((string) ($uye['telefon'] ?? '')); ?></td>
                         </tr>
                         <tr>
                             <td class="fw-bold text-secondary"><i class="fa-solid fa-envelope me-2 text-muted"></i>E-Posta:</td>
