@@ -20,9 +20,6 @@ $kartlar = [
     ['Toplam Bağış', $ozet['bagis'], 'fa-hand-holding-heart', '#2980b9'],
     ['Toplam Gider', $ozet['gider'], 'fa-receipt', '#c0392b'],
 ];
-if ($ozet['devir'] > 0) {
-    $kartlar[] = ['Devir / Açılış', $ozet['devir'], 'fa-right-left', '#8e44ad'];
-}
 ?>
 
 <div class="row g-3 mb-4">
