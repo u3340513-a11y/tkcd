@@ -176,7 +176,7 @@ if (!$is_kisitli_rol) {
 
             <?php $sb_finans_yetkili = FinansYetki::menuGorunurMu();
             $sb_finans_rapor = $sayfa === 'finans' && ($_GET['sekme'] ?? '') === 'raporlar'; ?>
-            <?php if ($sb_finans_yetkili): ?>
+            <?php if (FinansYetki::sayfaGorunurMu()): ?>
             <a class="sb-link <?= ($sayfa === 'finans' && !$sb_finans_rapor) ? 'sb-link--active' : '' ?>" href="index.php?sayfa=finans">
                 <i class="sb-link__icon fa-solid fa-coins"></i>
                 <span>Finans / Aidat</span>

@@ -14,12 +14,16 @@ declare(strict_types=1);
  *   - KASA_GORUNTULE, AIDAT_GORUNTULE, KAYIT_GIR : geliştirici + admin61 + yonetim_id
  *   - DISA_AKTARIM, IPTAL_GORUNTULE, AKTARIM     : yalnızca geliştirici
  *   - UYE_CIKAR                                  : geliştirici + admin61
+ *   - KASA_OZET_GORUNTULE                        : geliştirici + admin61 + yonetim_* (yalnızca özet kartları)
  * Planlanan genişletme: KASA_GORUNTULE için 'kullanici_onekleri' => ['yonetim_'].
  */
 final class FinansYetki
 {
     /** Kasa bakiyesi, aylık özetler ve bağış/gider kayıtlarını görme. */
     public const KASA_GORUNTULE = 'kasa_goruntule';
+
+    /** Yalnızca kasa özet kartlarını (bakiye, toplam aidat/bağış/gider) görme; kişi ve kayıt verisi yok. */
+    public const KASA_OZET_GORUNTULE = 'kasa_ozet_goruntule';
 
     /** Aidatı kimin verip vermediğini (isimli aidat listesini) görme. */
     public const AIDAT_GORUNTULE = 'aidat_goruntule';
@@ -40,6 +44,7 @@ final class FinansYetki
     public const IPTAL_GORUNTULE = 'iptal_goruntule';
 
     private const KURALLAR = [
+        self::KASA_OZET_GORUNTULE => ['roller' => ['gelistirici'], 'kullanicilar' => ['admin61'], 'kullanici_onekleri' => ['yonetim_']],
         self::KASA_GORUNTULE   => ['roller' => ['gelistirici'], 'kullanicilar' => ['admin61', 'yonetim_id'], 'kullanici_onekleri' => []],
         self::AIDAT_GORUNTULE  => ['roller' => ['gelistirici'], 'kullanicilar' => ['admin61', 'yonetim_id'], 'kullanici_onekleri' => []],
         self::KAYIT_GIR        => ['roller' => ['gelistirici'], 'kullanicilar' => ['admin61', 'yonetim_id'], 'kullanici_onekleri' => []],
@@ -87,5 +92,11 @@ final class FinansYetki
     public static function menuGorunurMu(): bool
     {
         return self::oturumIcinVarMi(self::KASA_GORUNTULE) || self::oturumIcinVarMi(self::AIDAT_GORUNTULE);
+    }
+
+    /** Finans sayfasına girebilen (tam yetkili ya da yalnızca özet görebilen) hesap mı? */
+    public static function sayfaGorunurMu(): bool
+    {
+        return self::menuGorunurMu() || self::oturumIcinVarMi(self::KASA_OZET_GORUNTULE);
     }
 }

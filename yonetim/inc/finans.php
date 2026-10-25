@@ -18,7 +18,7 @@ if (($_SESSION['oturum'] ?? false) !== true) {
 require_once __DIR__ . '/finans/baslat.php';
 require_once __DIR__ . '/finans/gorunum.php';
 
-if (!FinansYetki::menuGorunurMu()) {
+if (!FinansYetki::sayfaGorunurMu()) {
     echo '<div class="container py-5"><div class="alert alert-danger text-center fw-bold"><i class="fa-solid fa-lock me-2"></i>Erişim Engellendi: Finans sayfası yetkili hesaplara açıktır.</div></div>';
 
     return;
@@ -29,6 +29,17 @@ const FINANS_SAYFA_BOYUTU = 50;
 $finans       = finans_baslat($db_baglanti);
 $finansServis = $finans['servis'];
 $finansDepo   = $finansServis->depo();
+
+if (!FinansYetki::menuGorunurMu()) {
+    ?>
+    <div class="container-fluid py-4 px-md-4">
+        <h2 class="fw-bold text-dark mb-3"><i class="fa-solid fa-coins me-2" style="color:#e0a526;"></i>Finans / Kasa Özeti</h2>
+        <?php include __DIR__ . '/finans/sekmeler/_kasa-ozet.php'; ?>
+    </div>
+    <?php
+
+    return;
+}
 
 $kasaGorebilir  = FinansYetki::oturumIcinVarMi(FinansYetki::KASA_GORUNTULE);
 $aidatGorebilir = FinansYetki::oturumIcinVarMi(FinansYetki::AIDAT_GORUNTULE);
