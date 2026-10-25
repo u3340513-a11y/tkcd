@@ -1,0 +1,467 @@
+/* ==========================================================================
+   Toplantı sunumu — İlçe Başkanları  (sunum-, slayt-, t1-, t2-, t3-)
+
+   Bölümler:
+     1. Tokenlar ve temel
+     2. Slayt kabuğu + kontroller
+     3. Tasarım 1 — Klasik Bordo   (t1)
+     4. Tasarım 2 — Modern Gece    (t2)
+     5. Tasarım 3 — Aydınlık       (t3)
+   Tüm ölçüler vh/vw tabanlıdır; 16:9 projeksiyon ekranlarında ölçeklenir.
+   ========================================================================== */
+
+/* ============================================================
+   1. TOKENLAR VE TEMEL
+   ============================================================ */
+
+:root {
+  --bordo-900: #35111b;
+  --bordo-800: #4a1927;
+  --bordo-700: #5f2132;
+  --bordo-100: #f5e3e8;
+  --mavi-300: #8ec7e5;
+  --mavi-400: #4b9cce;
+  --mavi-800: #163d58;
+  --mavi-900: #0f2a3c;
+  --notr-50: #f8f9fb;
+  --notr-900: #151a26;
+  --yazi: "Inter", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--notr-900);
+  font-family: var(--yazi);
+  -webkit-font-smoothing: antialiased;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+/* ============================================================
+   2. SLAYT KABUĞU + KONTROLLER
+   ============================================================ */
+
+.slayt {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  min-height: 34rem;
+  overflow: hidden;
+}
+
+/* JavaScript açıkken yalnızca aktif slayt görünür */
+.js-sunum .sunum__alan {
+  position: fixed;
+  inset: 0;
+}
+
+.js-sunum .slayt {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.6s ease, visibility 0.6s;
+}
+
+.js-sunum .slayt--aktif {
+  opacity: 1;
+  visibility: visible;
+}
+
+.sunum__kontrol {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  z-index: 10;
+  display: none;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(21, 26, 38, 0.72);
+  color: #fff;
+  font-size: 0.875rem;
+  backdrop-filter: blur(6px);
+  transition: opacity 0.4s ease;
+}
+
+.js-sunum .sunum__kontrol {
+  display: flex;
+}
+
+.js-sunum .sunum__kontrol.sunum__kontrol--gizli {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sunum__dugme {
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  color: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.sunum__dugme:hover,
+.sunum__dugme:focus-visible {
+  background: rgba(255, 255, 255, 0.3);
+  outline: 2px solid var(--mavi-300);
+  outline-offset: 2px;
+}
+
+/* Tek slaytta gezinme kontrolleri gereksizdir */
+.sunum[data-sunum-toplam="1"] [data-onceki],
+.sunum[data-sunum-toplam="1"] [data-sonraki],
+.sunum[data-sunum-toplam="1"] .sunum__sayac {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js-sunum .slayt,
+  .sunum__kontrol {
+    transition: none;
+  }
+}
+
+/* ============================================================
+   3. TASARIM 1 — KLASİK BORDO
+   ============================================================ */
+
+.t1 {
+  display: grid;
+  grid-template-columns: 46% 54%;
+  height: 100%;
+  color: #fff;
+}
+
+.t1__panel {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 7vh 4vw 6vh 5vw;
+  background:
+    radial-gradient(40vw 40vh at 0% 0%, rgba(75, 156, 206, 0.22), transparent 70%),
+    linear-gradient(160deg, var(--bordo-800) 0%, var(--bordo-700) 60%, var(--bordo-900) 100%);
+}
+
+.t1__logo {
+  width: clamp(5rem, 15vh, 9rem);
+  height: auto;
+  padding: 0.6vh;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.t1__etiket {
+  margin: 0 0 2vh;
+  color: var(--mavi-300);
+  font-size: clamp(0.95rem, 2.3vh, 1.5rem);
+  font-weight: 700;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+}
+
+.t1__isim {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5vh;
+  margin: 0;
+  line-height: 1.02;
+}
+
+.t1__ad {
+  font-size: clamp(1.8rem, 6.4vh, 4.6rem);
+  font-weight: 400;
+}
+
+.t1__soyad {
+  font-size: clamp(2.6rem, 10vh, 7.2rem);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+
+.t1__ilce {
+  display: inline-block;
+  margin: 4vh 0 0;
+  padding: 1.2vh 2.2vw;
+  border-radius: 999px;
+  background: var(--mavi-400);
+  color: #fff;
+  font-size: clamp(1.1rem, 3.2vh, 2.2rem);
+  font-weight: 700;
+}
+
+.t1__dernek {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: clamp(0.75rem, 1.8vh, 1.1rem);
+  letter-spacing: 0.06em;
+}
+
+.t1__foto {
+  position: relative;
+  margin-left: -6vw;
+  clip-path: polygon(6vw 0, 100% 0, 100% 100%, 0 100%);
+  background: #d9dbe2;
+}
+
+.t1__foto img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 18%;
+}
+
+/* ============================================================
+   4. TASARIM 2 — MODERN GECE
+   ============================================================ */
+
+.t2 {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  justify-items: center;
+  height: 100%;
+  padding: 4vh 4vw 5vh;
+  color: #fff;
+  text-align: center;
+  background:
+    radial-gradient(50vw 50vh at 50% 42%, rgba(75, 156, 206, 0.32), transparent 70%),
+    linear-gradient(150deg, var(--bordo-900) 0%, var(--bordo-700) 42%, var(--mavi-900) 100%);
+}
+
+.t2__ust {
+  display: flex;
+  align-items: center;
+  gap: 1.2vw;
+}
+
+.t2__logo {
+  width: clamp(3.5rem, 9vh, 5.5rem);
+  height: auto;
+  padding: 0.5vh;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.t2__dernek {
+  margin: 0;
+  font-size: clamp(0.8rem, 2vh, 1.25rem);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.t2__portre {
+  align-self: center;
+  height: min(52vh, 40vw);
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: 2.2vh;
+  border: 0.6vh solid rgba(255, 255, 255, 0.92);
+  box-shadow:
+    0 0 0 1.2vh rgba(75, 156, 206, 0.45),
+    0 3vh 8vh rgba(0, 0, 0, 0.5);
+}
+
+.t2__portre img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 15%;
+}
+
+.t2__isim {
+  margin: 0;
+  font-size: clamp(2rem, 7.5vh, 5.2rem);
+  font-weight: 300;
+  line-height: 1.05;
+}
+
+.t2__isim strong {
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.t2__unvan {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  margin: 1.6vh 0 0;
+  font-size: clamp(1.1rem, 3.2vh, 2.1rem);
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.t2__unvan span {
+  padding: 0.3em 0.9em;
+  border-radius: 999px;
+  background: var(--mavi-400);
+  color: #fff;
+  font-weight: 700;
+}
+
+/* ============================================================
+   5. TASARIM 3 — AYDINLIK EDİTORYAL
+   ============================================================ */
+
+.t3 {
+  position: relative;
+  display: grid;
+  grid-template-columns: 42% 58%;
+  align-items: center;
+  height: 100%;
+  padding: 6vh 5vw;
+  overflow: hidden;
+  color: var(--notr-900);
+  background:
+    radial-gradient(40vw 60vh at 100% 0%, rgba(75, 156, 206, 0.16), transparent 70%),
+    var(--notr-50);
+}
+
+.t3__filigran {
+  position: absolute;
+  left: -1vw;
+  bottom: -6vh;
+  margin: 0;
+  color: var(--bordo-700);
+  font-size: clamp(6rem, 30vh, 24rem);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  opacity: 0.06;
+  pointer-events: none;
+  user-select: none;
+}
+
+.t3__portre {
+  position: relative;
+  justify-self: center;
+  height: min(78vh, 56vw);
+  aspect-ratio: 5 / 6;
+}
+
+.t3__portre::before {
+  content: "";
+  position: absolute;
+  inset: 3vh -2.4vw -3vh 2.4vw;
+  border-radius: 1.2vh;
+  background: linear-gradient(160deg, var(--bordo-700), var(--bordo-900));
+}
+
+.t3__portre img {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 1.2vh;
+  object-fit: cover;
+  object-position: center 15%;
+  box-shadow: 0 2vh 6vh rgba(21, 26, 38, 0.25);
+}
+
+.t3__icerik {
+  position: relative;
+  padding-left: 3vw;
+}
+
+.t3__logo {
+  width: clamp(4.5rem, 14vh, 8rem);
+  height: auto;
+  margin-bottom: 5vh;
+}
+
+.t3__etiket {
+  display: inline-block;
+  margin: 0 0 2.4vh;
+  padding-bottom: 1.2vh;
+  border-bottom: 0.6vh solid var(--mavi-400);
+  color: var(--bordo-700);
+  font-size: clamp(1.1rem, 3.2vh, 2.2rem);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.t3__isim {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  line-height: 1.02;
+}
+
+.t3__isim span {
+  font-size: clamp(2rem, 7vh, 5rem);
+  font-weight: 400;
+}
+
+.t3__isim strong {
+  color: var(--bordo-700);
+  font-size: clamp(2.8rem, 11vh, 8rem);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+
+.t3__dernek {
+  margin: 5vh 0 0;
+  color: rgba(21, 26, 38, 0.6);
+  font-size: clamp(0.8rem, 1.9vh, 1.2rem);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ============================================================
+   6. DAR EKRAN (telefon/tablet önizlemesi)
+   ============================================================ */
+
+@media (max-width: 52rem) {
+  .t1,
+  .t3 {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+
+  .t1__foto {
+    order: -1;
+    margin-left: 0;
+    clip-path: none;
+    max-height: 45vh;
+  }
+
+  .t3 {
+    gap: 4vh;
+    padding: 4vh 6vw;
+  }
+
+  .t3__portre {
+    height: 36vh;
+  }
+
+  .t3__icerik {
+    padding-left: 0;
+  }
+
+  .t3__logo {
+    margin-bottom: 2vh;
+  }
+}

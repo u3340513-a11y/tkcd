@@ -10,6 +10,7 @@ use App\Http\Controller\EventController;
 use App\Http\Controller\HomeController;
 use App\Http\Controller\MembershipController;
 use App\Http\Controller\MemberUpdateController;
+use App\Http\Controller\MeetingController;
 use App\Http\Controller\SitemapController;
 
 /**
@@ -41,6 +42,9 @@ return [
     ['GET',  '/bilgi-guncelleme',         MemberUpdateController::class, 'index',  'member-update.index'],
     ['POST', '/bilgi-guncelleme/dogrula', MemberUpdateController::class, 'verify', 'member-update.verify'],
     ['POST', '/bilgi-guncelleme',         MemberUpdateController::class, 'store',  'member-update.store'],
+
+    ['GET', '/toplanti/ilce-baskanlari',            MeetingController::class, 'districtChairs',       'meeting.district-chairs'],
+    ['GET', '/toplanti/ilce-baskanlari/{tasarim}',  MeetingController::class, 'districtChairsDesign', 'meeting.district-chairs.design'],
 
     ['GET', '/sitemap.xml', SitemapController::class, 'index', 'sitemap'],
 ];
