@@ -5,16 +5,18 @@ declare(strict_types=1);
 /**
  * Toplantı sunumundaki ilçe başkanı slaytları (sunum sırası = dizi sırası).
  *
- * Her slayt hazır bir 16:9 posterdir; fotoğraf, isim ve logo görselin içindedir.
+ * Her slayt hazır bir 16:9 poster görseli ya da bir videodur; fotoğraf, isim ve logo görselin içindedir.
  * Alanlar:
- *   - ad    : Ad Soyad (erişilebilirlik metni için)
- *   - ilce  : Başkanı olduğu ilçe (erişilebilirlik metni için)
- *   - gorsel: public/ klasörüne göre poster yolu
+ *   - ad    : Ad Soyad / slayt adı (erişilebilirlik metni için)
+ *   - ilce  : Başkanı olduğu ilçe; başkan olmayan slaytlarda boş (erişilebilirlik metni için)
+ *   - gorsel: public/ klasörüne göre poster yolu (görsel slaytları)
+ *   - video : public/ klasörüne göre video yolu (video slaytları; 'gorsel' yerine verilir)
  *
- * @return list<array{ad: string, ilce: string, gorsel: string}>
+ * @return list<array{ad: string, ilce: string, gorsel?: string, video?: string}>
  */
 return [
     ['ad' => 'Lansman Kapağı',     'ilce' => '',          'gorsel' => 'assets/img/lansman-kapak.png'],
+    ['ad' => 'Lansman Videosu',    'ilce' => '',          'video'  => 'assets/video/TRABZONN.mp4'],
     ['ad' => 'İlhan Balcı',        'ilce' => 'Adapazarı', 'gorsel' => 'assets/img/slider-sakarya/ilhan-balci-b.png'],
     ['ad' => 'Enes Akgün',         'ilce' => 'Akyazı',    'gorsel' => 'assets/img/slider-sakarya/enes-akgun-b.png'],
     ['ad' => 'İsmail Kolaşalı',    'ilce' => 'Arifiye',   'gorsel' => 'assets/img/slider-sakarya/ismail-kolasali-arifiye.png'],

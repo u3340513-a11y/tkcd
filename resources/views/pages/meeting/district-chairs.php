@@ -9,10 +9,10 @@ use App\Core\View\PhpViewRenderer;
  *
  * Neden ayrı şablon: Sunum ekranında site menüsü/alt bilgisi olmamalı; sayfa
  * arama motorlarına kapalıdır ve yalnızca dış CSS/JS dosyaları kullanır (CSP uyumlu).
- * Her slayt hazır bir poster görselidir; sayfa yalnızca sırayla gösterir.
+ * Her slayt hazır bir poster görseli ya da videodur; sayfa yalnızca sırayla gösterir.
  *
  * @var PhpViewRenderer $view
- * @var list<array{ad: string, ilce: string, gorsel: string}> $baskanlar
+ * @var list<array{ad: string, ilce: string, gorsel?: string, video?: string}> $baskanlar
  */
 
 $dernekAdi = 'Trabzonlu Kamu Çalışanları Derneği';
@@ -34,9 +34,14 @@ $toplam = count($baskanlar);
     $etiket = $baskan['ilce'] === '' ? $baskan['ad'] : $baskan['ad'] . ', ' . $baskan['ilce'] . ' İlçe Başkanı';
     ?>
         <section class="slayt<?= $sira === 0 ? ' slayt--aktif' : '' ?>" data-slayt aria-label="<?= $view->e($etiket) ?>">
+<?php if (isset($baskan['video'])): ?>
+            <video class="slayt__gorsel" src="<?= $view->e($view->asset($baskan['video'])) ?>"
+                   preload="auto" playsinline data-slayt-video aria-label="<?= $view->e($etiket) ?>"></video>
+<?php else: ?>
             <img class="slayt__gorsel" src="<?= $view->e($view->asset($baskan['gorsel'])) ?>"
                  alt="<?= $view->e($etiket) ?>"
                  decoding="async">
+<?php endif; ?>
         </section>
 <?php endforeach; ?>
     </main>
