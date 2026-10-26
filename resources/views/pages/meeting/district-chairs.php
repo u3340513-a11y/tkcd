@@ -9,10 +9,10 @@ use App\Core\View\PhpViewRenderer;
  *
  * Neden ayrı şablon: Sunum ekranında site menüsü/alt bilgisi olmamalı; sayfa
  * arama motorlarına kapalıdır ve yalnızca dış CSS/JS dosyaları kullanır (CSP uyumlu).
+ * Her slayt hazır bir poster görselidir; sayfa yalnızca sırayla gösterir.
  *
  * @var PhpViewRenderer $view
- * @var int $tasarim 1-3 arası tasarım numarası
- * @var list<array{ad: string, ilce: string, fotograf: string}> $baskanlar
+ * @var list<array{ad: string, ilce: string, gorsel: string}> $baskanlar
  */
 
 $dernekAdi = 'Trabzonlu Kamu Çalışanları Derneği';
@@ -28,19 +28,13 @@ $toplam = count($baskanlar);
     <link rel="icon" href="<?= $view->e($view->asset('assets/img/logo.webp')) ?>" type="image/webp">
     <link rel="stylesheet" href="<?= $view->e($view->asset('assets/css/meeting.css')) ?>">
 </head>
-<body class="sunum sunum--t<?= $tasarim ?>" data-sunum-toplam="<?= $toplam ?>">
+<body class="sunum" data-sunum-toplam="<?= $toplam ?>">
     <main class="sunum__alan" aria-label="İlçe başkanları sunumu">
-<?php foreach ($baskanlar as $sira => $baskan):
-    $parcalar = preg_split('/\s+/u', trim($baskan['ad'])) ?: [$baskan['ad']];
-    $soyad = (string) array_pop($parcalar);
-    ?>
-        <section class="slayt<?= $sira === 0 ? ' slayt--aktif' : '' ?>" data-slayt aria-label="<?= $view->e($baskan['ad']) ?>">
-<?= $view->partial('pages/meeting/slide-' . $tasarim, [
-    'baskan'    => $baskan,
-    'adlar'     => implode(' ', $parcalar),
-    'soyad'     => $soyad,
-    'dernekAdi' => $dernekAdi,
-]) ?>
+<?php foreach ($baskanlar as $sira => $baskan): ?>
+        <section class="slayt<?= $sira === 0 ? ' slayt--aktif' : '' ?>" data-slayt aria-label="<?= $view->e($baskan['ad'] . ', ' . $baskan['ilce'] . ' İlçe Başkanı') ?>">
+            <img class="slayt__gorsel" src="<?= $view->e($view->asset($baskan['gorsel'])) ?>"
+                 alt="<?= $view->e($baskan['ad'] . ', ' . $baskan['ilce'] . ' İlçe Başkanı') ?>"
+                 decoding="async">
         </section>
 <?php endforeach; ?>
     </main>

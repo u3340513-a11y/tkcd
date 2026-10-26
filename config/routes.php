@@ -43,8 +43,7 @@ return [
     ['POST', '/bilgi-guncelleme/dogrula', MemberUpdateController::class, 'verify', 'member-update.verify'],
     ['POST', '/bilgi-guncelleme',         MemberUpdateController::class, 'store',  'member-update.store'],
 
-    ['GET', '/toplanti/ilce-baskanlari',            MeetingController::class, 'districtChairs',       'meeting.district-chairs'],
-    ['GET', '/toplanti/ilce-baskanlari/{tasarim}',  MeetingController::class, 'districtChairsDesign', 'meeting.district-chairs.design'],
+    ['GET', '/toplanti/ilce-baskanlari', MeetingController::class, 'districtChairs', 'meeting.district-chairs'],
 
     ['GET', '/sitemap.xml', SitemapController::class, 'index', 'sitemap'],
 ];
