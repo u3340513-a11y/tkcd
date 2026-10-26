@@ -30,10 +30,12 @@ $toplam = count($baskanlar);
 </head>
 <body class="sunum" data-sunum-toplam="<?= $toplam ?>">
     <main class="sunum__alan" aria-label="İlçe başkanları sunumu">
-<?php foreach ($baskanlar as $sira => $baskan): ?>
-        <section class="slayt<?= $sira === 0 ? ' slayt--aktif' : '' ?>" data-slayt aria-label="<?= $view->e($baskan['ad'] . ', ' . $baskan['ilce'] . ' İlçe Başkanı') ?>">
+<?php foreach ($baskanlar as $sira => $baskan):
+    $etiket = $baskan['ilce'] === '' ? $baskan['ad'] : $baskan['ad'] . ', ' . $baskan['ilce'] . ' İlçe Başkanı';
+    ?>
+        <section class="slayt<?= $sira === 0 ? ' slayt--aktif' : '' ?>" data-slayt aria-label="<?= $view->e($etiket) ?>">
             <img class="slayt__gorsel" src="<?= $view->e($view->asset($baskan['gorsel'])) ?>"
-                 alt="<?= $view->e($baskan['ad'] . ', ' . $baskan['ilce'] . ' İlçe Başkanı') ?>"
+                 alt="<?= $view->e($etiket) ?>"
                  decoding="async">
         </section>
 <?php endforeach; ?>

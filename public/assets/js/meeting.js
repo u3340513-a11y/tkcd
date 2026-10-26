@@ -4,7 +4,8 @@
  * Neden var: Slaytlar arasında klavye (sunum kumandası dahil), ekran düğmeleri ve
  * tam ekran ile gezinmeyi sağlar. JavaScript kapalıysa tüm slaytlar alt alta görünür.
  *
- * Kısayollar: → ↓ Boşluk PageDown (sonraki) · ← ↑ PageUp (önceki) · Home/End · F (tam ekran)
+ * Kısayollar: → ↓ Boşluk PageDown (sonraki) · ← ↑ PageUp (önceki) · Home/End ·
+ * 1 (kapak slaytına git) · F (tam ekran)
  */
 (function () {
   'use strict';
@@ -12,6 +13,8 @@
   var GIZLEME_SURESI_MS = 3000;
   var SONRAKI_TUSLAR = ['ArrowRight', 'ArrowDown', 'PageDown', ' '];
   var ONCEKI_TUSLAR = ['ArrowLeft', 'ArrowUp', 'PageUp'];
+  var KAPAK_TUSU = '1';
+  var KAPAK_INDEKSI = 0;
 
   var govde = document.body;
   var slaytlar = Array.prototype.slice.call(document.querySelectorAll('[data-slayt]'));
@@ -68,8 +71,8 @@
     } else if (ONCEKI_TUSLAR.indexOf(olay.key) !== -1) {
       olay.preventDefault();
       goster(aktif - 1);
-    } else if (olay.key === 'Home') {
-      goster(0);
+    } else if (olay.key === 'Home' || olay.key === KAPAK_TUSU) {
+      goster(KAPAK_INDEKSI);
     } else if (olay.key === 'End') {
       goster(slaytlar.length - 1);
     } else if (olay.key === 'f' || olay.key === 'F') {

@@ -14,6 +14,7 @@ declare(strict_types=1);
  * @return list<array{ad: string, ilce: string, gorsel: string}>
  */
 return [
+    ['ad' => 'Lansman Kapağı',     'ilce' => '',          'gorsel' => 'assets/img/lansman-kapak.png'],
     ['ad' => 'İlhan Balcı',        'ilce' => 'Adapazarı', 'gorsel' => 'assets/img/slider-sakarya/ilhan-balci-b.png'],
     ['ad' => 'Enes Akgün',         'ilce' => 'Akyazı',    'gorsel' => 'assets/img/slider-sakarya/enes-akgun-b.png'],
     ['ad' => 'İsmail Kolaşalı',    'ilce' => 'Arifiye',   'gorsel' => 'assets/img/slider-sakarya/ismail-kolasali-arifiye.png'],
