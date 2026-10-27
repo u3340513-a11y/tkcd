@@ -472,34 +472,6 @@ $calismaSekilleri = ['Kadrolu', 'Yarı Zamanlı', 'Sözleşmeli', 'Emekli Kamu �
                             Kişisel verilerimin tarafıma sunulan Açık Rıza Metni'nde belirtilen amaçlarla işlenmesine açık rıza veriyorum.
                         </label>
                     </div>
-
-                    <!-- 3. E-posta bilgilendirme (isteğe bağlı) -->
-                    <div class="ub-kvkk">
-                        <input
-                            class="ub-kvkk__kutu"
-                            type="checkbox"
-                            id="ub-eposta-riza"
-                            name="eposta_riza"
-                            value="1"
-                        >
-                        <label class="ub-kvkk__etiket" for="ub-eposta-riza">
-                            Dernek tarafından gerçekleştirilecek etkinlik, eğitim ve faaliyetler hakkında <strong>e-posta yoluyla bilgilendirme</strong> yapılmasına açık rıza veriyorum.
-                        </label>
-                    </div>
-
-                    <!-- 4. SMS bilgilendirme (isteğe bağlı) -->
-                    <div class="ub-kvkk">
-                        <input
-                            class="ub-kvkk__kutu"
-                            type="checkbox"
-                            id="ub-sms-riza"
-                            name="sms_riza"
-                            value="1"
-                        >
-                        <label class="ub-kvkk__etiket" for="ub-sms-riza">
-                            Dernek tarafından gerçekleştirilecek etkinlik, eğitim ve faaliyetler hakkında <strong>SMS yoluyla bilgilendirme</strong> yapılmasına açık rıza veriyorum.
-                        </label>
-                    </div>
                 </div>
 
                 <!-- KVKK Modal -->
