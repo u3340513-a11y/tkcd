@@ -740,6 +740,13 @@ switch ($sayfa) {
                 $kurum_verileri = [];
             }
 
+            // İlçe başkanı: son üyeler, kan, ilçe ve yaş kartları TÜM üyelere göre hesaplanır
+            if ($is_ilce_baskani) {
+                require_once __DIR__ . '/inc/dashboard-yardimcilari.php';
+                $genel_veri = genel_dashboard_verileri($db_baglanti);
+                $avatar_renkleri = ['#3b82f6','#ef4444','#f59e0b','#10b981','#8b5cf6','#ec4899','#06b6d4','#f97316','#14b8a6','#6366f1'];
+            }
+
             // Bugünün tarihini Türkçe formatla
             $bugun_goruntu = date('d F Y');
             $ay_isimleri_kisitli = [
@@ -839,6 +846,9 @@ switch ($sayfa) {
                 <!-- ── ALT BÖLÜM: 3 sütun ── -->
                 <div class="row g-4">
 
+                    <?php if ($is_ilce_baskani): ?>
+                        <?php require __DIR__ . '/inc/dashboard-genel-uyeler-kan.php'; ?>
+                    <?php else: ?>
                     <!-- SOL: Son Eklenen Üyeler -->
                     <div class="col-lg-4">
                         <div class="rounded-4 shadow-sm overflow-hidden h-100" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); border: 1px solid rgba(255,255,255,0.08);">
@@ -954,6 +964,7 @@ switch ($sayfa) {
                             </div>
                         </div>
                     </div>
+                    <?php endif; ?>
 
                     <!-- SAĞ: Doğum Günü + En Çok Üyeye Sahip Kurumlar -->
                     <div class="col-lg-4">
@@ -1054,9 +1065,14 @@ switch ($sayfa) {
                     </div>
 
                 </div>
+
+                <?php if ($is_ilce_baskani): ?>
+                    <div class="mt-4"></div>
+                    <?php require __DIR__ . '/inc/dashboard-genel-ilce-yas.php'; ?>
+                <?php endif; ?>
             </div>
 
-            <?php if (count($kan_verileri) > 0): ?>
+            <?php if (!$is_ilce_baskani && count($kan_verileri) > 0): ?>
             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
             <script>
             window.addEventListener("load", function() {

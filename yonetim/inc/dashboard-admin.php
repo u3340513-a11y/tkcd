@@ -80,21 +80,7 @@ try {
 
 // Avatar renk paleti (hash'e göre)
 $avatar_renkleri = ['#3b82f6','#ef4444','#f59e0b','#10b981','#8b5cf6','#ec4899','#06b6d4','#f97316','#14b8a6','#6366f1'];
-if (!function_exists('avatarRengi')) {
-    function avatarRengi(string $isim, array $renkler): string {
-        return $renkler[abs(crc32($isim)) % count($renkler)];
-    }
-}
-if (!function_exists('basHarfleri')) {
-    function basHarfleri(string $isim): string {
-        $parcalar = explode(' ', trim($isim));
-        $harfler = '';
-        foreach (array_slice($parcalar, 0, 2) as $p) {
-            $harfler .= mb_strtoupper(mb_substr(trim($p), 0, 1));
-        }
-        return $harfler;
-    }
-}
+require_once __DIR__ . '/dashboard-yardimcilari.php';
 
 // Üye artış trendi — Son 12 ay
 $aylik_artis = [];
