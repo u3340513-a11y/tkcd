@@ -341,7 +341,9 @@ $genel_doluluk = empty($profil_doluluk) ? 0
 <div class="dash-banner mb-4">
     <div class="dash-banner__text">
         <h3>Trabzon'un gücü, gönül veren insanlarında…</h3>
-        <p>Bugün derneğimizde <strong><?= number_format($toplam_uye) ?></strong> kayıtlı üye,
+        <p>Bugün derneğimizde <strong id="bannerUyeDeger"
+                                       data-gizle-acik="<?= number_format($toplam_uye) ?>"
+                                       data-gizle-kapali="***">***</strong> kayıtlı üye,
            <strong><?= $toplam_il ?></strong> aktif ilde teşkilatlanma ile güçlenmeye devam ediyoruz.</p>
     </div>
     <div class="dash-banner__quote">
@@ -367,7 +369,7 @@ $genel_doluluk = empty($profil_doluluk) ? 0
                                 class="btn btn-sm btn-link p-0 position-relative text-secondary"
                                 style="z-index: 2; font-size: 1rem;"
                                 aria-pressed="false"
-                                aria-controls="toplamUyeDeger toplamUyeSon30"
+                                aria-controls="toplamUyeDeger toplamUyeSon30 bannerUyeDeger"
                                 aria-label="Toplam üye sayısını göster">
                             <i class="fa-solid fa-eye-slash" aria-hidden="true"></i>
                         </button>
@@ -391,8 +393,11 @@ $genel_doluluk = empty($profil_doluluk) ? 0
         var buton = document.getElementById('toplamUyeToggle');
         if (!buton) { return; }
 
-        var hedefler = [document.getElementById('toplamUyeDeger'), document.getElementById('toplamUyeSon30')]
-            .filter(Boolean);
+        var hedefler = [
+            document.getElementById('toplamUyeDeger'),
+            document.getElementById('toplamUyeSon30'),
+            document.getElementById('bannerUyeDeger')
+        ].filter(Boolean);
         var acik = false; // her sayfa yüklemesinde kapalı başlar
 
         function goster() {
