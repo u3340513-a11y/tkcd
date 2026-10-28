@@ -60,6 +60,16 @@ $kan_toplam = array_sum($genel_veri['kan_sayilar']);
             <?php else: ?>
                 <p class="text-muted small py-4">Kan grubu verisi bulunamadı.</p>
             <?php endif; ?>
+
+            <?php if (!empty($genel_veri['calisma_etiketler'])): ?>
+                <hr class="my-4">
+                <h6 class="fw-bold text-start mb-3" style="font-size:.85rem;color:#475569;">
+                    <i class="fa-solid fa-briefcase me-1" style="color:#6366f1;"></i> Çalışma Şekli Dağılımı
+                </h6>
+                <div style="position:relative; height:<?= max(120, count($genel_veri['calisma_etiketler']) * 44) ?>px;">
+                    <canvas id="genelCalismaSekliGrafik"></canvas>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>

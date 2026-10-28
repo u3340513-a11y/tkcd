@@ -83,7 +83,7 @@ $yas_ozet    = [
     </div>
 </div>
 
-<?php if (!empty($genel_veri['kan_etiketler']) || !empty($genel_veri['ilce_etiketler'])): ?>
+<?php if (!empty($genel_veri['kan_etiketler']) || !empty($genel_veri['ilce_etiketler']) || !empty($genel_veri['calisma_etiketler'])): ?>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
 (function () {
@@ -120,7 +120,39 @@ $yas_ozet    = [
         });
     }
 
+    function yatayCubukOlustur(canvasId, etiketler, sayilar) {
+        var tuval = document.getElementById(canvasId);
+        if (!tuval) { return; }
+        new Chart(tuval, {
+            type: 'bar',
+            data: {
+                labels: etiketler,
+                datasets: [{
+                    data: sayilar,
+                    backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#06b6d4', '#ec4899', '#8b5cf6'],
+                    borderRadius: 6,
+                    maxBarThickness: 22
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: '#f1f5f9' } },
+                    y: { grid: { display: false } }
+                }
+            }
+        });
+    }
+
     window.addEventListener('load', function () {
+        yatayCubukOlustur(
+            'genelCalismaSekliGrafik',
+            <?= json_encode($genel_veri['calisma_etiketler'], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) ?>,
+            <?= json_encode($genel_veri['calisma_sayilar']) ?>
+        );
         donutOlustur(
             'genelKanGrubuGrafik',
             <?= json_encode($genel_veri['kan_etiketler'], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) ?>,

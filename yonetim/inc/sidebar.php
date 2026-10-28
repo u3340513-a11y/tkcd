@@ -79,7 +79,7 @@ if (!$is_kisitli_rol) {
             </a>
             <?php endif; ?>
 
-            <?php if (!$is_kisitli_rol): ?>
+            <?php if ($teskilatlanma_erisimi): ?>
             <a class="sb-link <?= $sayfa === 'teskilatlanma' ? 'sb-link--active' : '' ?>" href="index.php?sayfa=teskilatlanma">
                 <i class="sb-link__icon fa-solid fa-sitemap"></i>
                 <span>Teşkilatlanma</span>

@@ -55,6 +55,8 @@ if (!function_exists('genel_dashboard_verileri')) {
             'kan_sayilar'    => [],
             'ilce_etiketler' => [],
             'ilce_sayilar'   => [],
+            'calisma_etiketler' => [],
+            'calisma_sayilar'   => [],
             'yas_dagilimi'   => array_fill_keys(array_keys(DASHBOARD_YAS_GRUPLARI), 0),
             'yas_ortalama'   => null,
             'yas_en_genc'    => null,
@@ -93,6 +95,18 @@ if (!function_exists('genel_dashboard_verileri')) {
             foreach ($sorgu->fetchAll(PDO::FETCH_ASSOC) as $satir) {
                 $veri['ilce_etiketler'][] = $satir['trabzon_ilcesi'];
                 $veri['ilce_sayilar'][]   = (int) $satir['adet'];
+            }
+
+            $sorgu = $db->prepare(
+                "SELECT COALESCE(NULLIF(calisma_sekli, ''), 'Belirtilmemiş') AS calisma_sekli, COUNT(*) AS adet
+                   FROM dernek_uyeler
+                  WHERE onay_durumu = 'onayli'
+                  GROUP BY calisma_sekli ORDER BY adet DESC"
+            );
+            $sorgu->execute();
+            foreach ($sorgu->fetchAll(PDO::FETCH_ASSOC) as $satir) {
+                $veri['calisma_etiketler'][] = $satir['calisma_sekli'];
+                $veri['calisma_sayilar'][]   = (int) $satir['adet'];
             }
 
             $sorgu = $db->prepare(

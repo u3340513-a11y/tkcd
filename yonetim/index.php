@@ -366,6 +366,8 @@ $is_kurum_temsilcisi = ($kullanici_rolu === 'kurum_temsilcisi');
 $is_kadin_kollari    = ($kullanici_rolu === 'kadin_kollari_baskani');
 $is_kisitli_rol      = ($is_il_baskani || $is_ilce_baskani || $is_kurum_temsilcisi || $is_kadin_kollari);
 $is_yetki_var        = ($is_admin || $is_yonetim || $is_gelistirici);
+// Teşkilatlanma sayfası: kısıtlı rollerden yalnızca il ve ilçe başkanlarına açıktır.
+$teskilatlanma_erisimi = (!$is_kisitli_rol || $is_il_baskani || $is_ilce_baskani);
 // Yönetim düzeyi dashboard yetkisi: yonetim, geliştirici ve admin61 (geliştiriciden sonraki en yetkili hesap).
 $is_ust_yonetici    = ($is_yonetim || $is_gelistirici || (($_SESSION['kullanici_adi'] ?? '') === 'admin61'));
 
@@ -581,7 +583,7 @@ switch ($sayfa) {
         exit; // JSON döndüğü için footer include etme
 
     case 'teskilatlanma':
-        if ($is_kisitli_rol) {
+        if (!$teskilatlanma_erisimi) {
             echo '<div class="container py-5"><div class="alert alert-danger text-center fw-bold"><i class="fa-solid fa-lock me-2"></i>Erişim Engellendi: Bu hesap türü ile teşkilatlanma sayfasına erişilemez.</div></div>';
         } else {
             log_kaydet($db_baglanti, 'sayfa_goruntulem', 'Teşkilatlanma sayfası açıldı.');
@@ -1155,6 +1157,7 @@ switch ($sayfa) {
             ?>
 
             <!-- HAFTALIK QUIZ ŞAMPİYONLARI (Kısıtlı Dashboard) -->
+            <div class="container-fluid px-md-4">
             <div class="row g-4 mb-4">
                 <div class="col-12">
                     <div class="card border-0 shadow-sm">
@@ -1216,6 +1219,7 @@ switch ($sayfa) {
                         </div>
                     </div>
                 </div>
+            </div>
             </div>
 
             <?php
