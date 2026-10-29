@@ -34,9 +34,9 @@ Options -Indexes -MultiViews
     Header unset Server
 
     # CSP her istekte değişen bir nonce içerdiğinden PHP tarafından
-    # (App\Core\Http\SecurityHeaders) gönderilir. Kök .htaccess'in yönetim paneli
-    # için tanımladığı statik CSP'nin public yanıtlarına sızmaması için temizlenir.
-    Header always unset Content-Security-Policy
+    # (App\Core\Http\SecurityHeaders) gönderilir. Burada CSP'ye dokunulmaz:
+    # "Header unset" PHP'nin gönderdiği başlığı da sildiği için kullanılmaz.
+    # Kök .htaccess'teki statik CSP yalnızca /yonetim isteklerine uygulanır.
 </IfModule>
 
 # ------------------------------ Önbellekleme -------------------------------
