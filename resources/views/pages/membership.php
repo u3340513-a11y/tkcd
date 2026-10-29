@@ -564,7 +564,7 @@ $calismaSekilleri = ['Kadrolu', 'Yarı Zamanlı', 'Sözleşmeli', 'Emekli Kamu �
 </section>
 
 <?php if ($durum !== null): ?>
-<script>
+<script nonce="<?= $view->nonce() ?>">
 /**
  * Durum bildiri mesajına otomatik scroll.
  * PRG sonrası sayfa yüklenince bildiri kutusunu görünür alana taşır.

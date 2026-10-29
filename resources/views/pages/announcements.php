@@ -173,7 +173,7 @@ $aylarTam = [
     </div>
 </section>
 
-<script>
+<script nonce="<?= $view->nonce() ?>">
 (function () {
     'use strict';
 

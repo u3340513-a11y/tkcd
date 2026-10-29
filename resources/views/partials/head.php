@@ -52,7 +52,7 @@ $siteName = (string) ($site['name'] ?? '');
     <link rel="preconnect" href="https://www.googletagmanager.com">
     <link rel="dns-prefetch" href="https://www.googletagmanager.com">
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYE9P28XZ6"></script>
-    <script>
+    <script nonce="<?= $view->nonce() ?>">
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
@@ -68,10 +68,17 @@ $siteName = (string) ($site['name'] ?? '');
     <link rel="preload" as="image" href="<?= $view->e($view->asset('assets/img/logo.webp')) ?>" type="image/webp">
     <link rel="stylesheet" href="<?= $view->e($view->asset('assets/css/app.css')) ?>">
 <?php foreach ($styles as $style): ?>
-    <link rel="preload" href="<?= $view->e($view->asset('assets/css/' . $style)) ?>" as="style"
-          onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="<?= $view->e($view->asset('assets/css/' . $style)) ?>" as="style" data-async-style>
     <noscript><link rel="stylesheet" href="<?= $view->e($view->asset('assets/css/' . $style)) ?>"></noscript>
 <?php endforeach; ?>
+<?php if ($styles !== []): ?>
+    <!-- Ek stiller engellemeden yüklenir; inline onload yerine nonce'lı dinleyici (CSP). -->
+    <script nonce="<?= $view->nonce() ?>">
+        document.querySelectorAll('link[data-async-style]').forEach(function (link) {
+            link.addEventListener('load', function () { link.rel = 'stylesheet'; }, { once: true });
+        });
+    </script>
+<?php endif; ?>
 
     <!-- JavaScript kapalıysa görünürlük animasyonları devre dışı bırakılır,
          böylece tüm içerik her koşulda okunabilir kalır. -->

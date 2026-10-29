@@ -61,7 +61,9 @@ final class Application
         // Request'i container'a bağla; denetleyiciler kurucu enjeksiyonuyla alabilir.
         $this->container->instance(Request::class, $request);
 
-        (new SecurityHeaders())->apply();
+        /** @var SecurityHeaders $securityHeaders */
+        $securityHeaders = $this->container->get(SecurityHeaders::class);
+        $securityHeaders->apply();
 
         // Ziyaretçiyi kaydet (bot değilse, yönetim dışı sayfalarda)
         $this->logVisitor($request);

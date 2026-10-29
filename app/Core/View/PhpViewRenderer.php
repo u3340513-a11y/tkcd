@@ -6,6 +6,7 @@ namespace App\Core\View;
 
 use App\Core\Config;
 use App\Core\Exception\ViewNotFoundException;
+use App\Core\Http\CspNonce;
 use App\Core\Support\Html;
 use App\Core\Support\Text;
 use Throwable;
@@ -33,6 +34,7 @@ final class PhpViewRenderer implements ViewRendererInterface
         private readonly Config $config,
         private readonly AssetManager $assets,
         private readonly IconSet $icons,
+        private readonly CspNonce $nonce,
     ) {
         $this->viewPath = rtrim($this->config->string('app.paths.views'), '/');
     }
@@ -106,6 +108,15 @@ final class PhpViewRenderer implements ViewRendererInterface
     public function assetExists(string $path): bool
     {
         return $this->assets->exists($path);
+    }
+
+    /**
+     * Inline <script> etiketlerine eklenecek CSP nonce değeri.
+     * Kullanım: <script nonce="<?= $view->nonce() ?>">
+     */
+    public function nonce(): string
+    {
+        return Html::escape($this->nonce->value());
     }
 
     public function icon(string $name, string $class = 'icon'): string
