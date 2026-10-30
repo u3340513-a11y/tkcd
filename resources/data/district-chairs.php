@@ -27,8 +27,8 @@ return [
     ['ad' => 'Selim Koç',          'ilce' => 'Serdivan',  'gorsel' => 'assets/img/slider-sakarya/selim-koc-serdivan.png'],
     ['ad' => 'Erkan Kurt',         'ilce' => 'Kaynarca',  'gorsel' => 'assets/img/slider-sakarya/erkan-kurt-kaynarca.png'],
     ['ad' => 'Volkan Çalık',       'ilce' => 'Pamukova',  'gorsel' => 'assets/img/slider-sakarya/volkan-calik-pamukova.png'],
-    ['ad' => 'Ali Osman Bayraktar', 'ilce' => 'Taraklı',  'gorsel' => 'assets/img/slider-sakarya/ali-osman-bayraktar-tarakli.png'],
     ['ad' => 'Hasan Kolaşalı',     'ilce' => 'Sapanca',   'gorsel' => 'assets/img/slider-sakarya/hasan-kolasali-sapanca.png'],
     ['ad' => 'Yusuf Aksoy',        'ilce' => 'Söğütlü',   'gorsel' => 'assets/img/slider-sakarya/yusuf-aksoy-sogutlu.png'],
+    ['ad' => 'Ali Osman Bayraktar', 'ilce' => 'Taraklı',  'gorsel' => 'assets/img/slider-sakarya/ali-osman-bayraktar-tarakli.png'],
     ['ad' => 'Ali Kamus',          'ilce' => 'Ferizli',   'gorsel' => 'assets/img/slider-sakarya/ali-kamus-ferizli.png'],
 ];
